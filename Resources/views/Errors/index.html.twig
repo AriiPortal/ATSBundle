@@ -1,0 +1,151 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<body>
+<script type="text/javascript">
+var max_history = 0; // pas d'historique
+var chained = 0; // que des standalone
+var only_warning = 0; // que les problemes
+var update=30;
+var autorefresh;
+var status;
+
+dhtmlxEvent(window,"load",function(){     
+    globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
+    globalLayout.cells("a").setWidth(355); 
+    globalLayout.cells("a").hideHeader(); 
+    globalLayout.cells("b").hideHeader(); 
+    globalLayout.cells("c").hideHeader(); 
+    globalLayout.cells("c").setHeight(260); 
+
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('/bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    myTree = globalLayout.cells("a").attachTree();
+    myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
+    myTree.load( "{{ url('xml_ATS_errors_tree') }}" );
+    
+    myGrid = globalLayout.cells("b").attachGrid();
+    myGrid.selMultiRows = true;
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    /*
+           $list .= '<cell>'.$date->Time2Local($line['ALARM_TIME'],'',true).'</cell>';
+            $list .= '<cell>'.$autosys->Alarm($line['ALARM']).'</cell>';
+            $list .= '<cell>'.$autosys->AlarmState($line['STATE']).'</cell>';
+            $list .= '<cell>'.$line['JOB_NAME'].'</cell>';
+            $list .= '<cell>'.$line['THE_USER'].'</cell>';
+            $list .= '<cell>'.$line['EVENT_COMMENT'].'</cell>';
+            $list .= '<cell>'.$line['RESPONSE'].'</cell>';
+            $list .= '<cell>'.$line['EVT_NUM'].'</cell>';
+*/
+    myGrid.setHeader("{{ "Job" | trans }},{{ "Start" | trans }},{{ "Duration" | trans }},{{ "Machine" | trans }},{{ "PID" | trans }}");
+    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#select_filter,#numeric_filter");
+    myGrid.setInitWidths("*,140,140,200,80");
+    myGrid.setColAlign("left,left,right,left,right");
+    myGrid.setColTypes("ro,ro,ro,ro,ro");
+    myGrid.setColSorting("str,date,str,str,int");
+    myGrid.enableAlterCss("","");
+    myGrid.init();
+
+    
+    myGrid.load( "{{ url('xml_ATS_errors_runtimes') }}");
+    myGrid.attachEvent("onRowDblClicked", Detail );
+
+    myGridToolbar = globalLayout.cells("b").attachToolbar();
+    myGridToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myGridToolbar.loadStruct( "{{ url('xml_ATS_alarms_grid_toolbar') }}");
+    myGridToolbar.attachEvent("onClick",function(itemid){
+         switch (itemid) {
+            case 'refresh':
+                globalLayout.cells("b").progressOn();
+                GlobalRefresh();
+                break;
+            case "print":
+                myGrid.printView();
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+    myGridToolbar.attachEvent("onStateChange",function(itemid, state){
+         switch (itemid) {
+            case 'location':
+                myGrid.setColumnHidden(0,!state);      
+                myGrid.setColumnHidden(1,!state);      
+                break;
+            case 'execution':
+                myGrid.setColumnHidden(8,!state);  
+                myGrid.setColumnHidden(9,!state);  
+                myGrid.setColumnHidden(10,!state);  
+                myGrid.setColumnHidden(11,!state);  
+                break;
+            case 'variable':
+                myGrid.setColumnHidden(12,!state);  
+                myGrid.setColumnHidden(13,!state);  
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+    
+    myDetail = globalLayout.cells("c").attachGrid();
+    myDetail.selMultiRows = true;
+    myDetail.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myDetail.setHeader("{{ "Alarm" | trans }},{{ "Status" | trans }},{{ "Event" | trans }}");
+    myDetail.attachHeader("#select_filter,#text_filter,#text_filter");
+    myDetail.setInitWidths("80,200,*");
+    myDetail.setColAlign("right,left,left");
+    myDetail.setColTypes("ro,ro,ro");
+    myDetail.setColSorting("int,str,str");
+    myDetail.enableAlterCss("","");
+    myDetail.init();
+    
+    // Premier chargement avant le smart rendering
+    autorefresh = setInterval( "GridRefresh()",update*1000);
+});
+
+function GlobalRefresh() {
+    clearInterval( autorefresh );
+    GridRefresh();
+    autorefresh = setInterval( "GridRefresh()", update*1000 );
+}
+
+function GridRefresh() {
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
+    var seconds = currentTime.getSeconds();
+    if (minutes < 10){
+    minutes = "0" + minutes;
+    }
+    if (seconds < 10){
+    seconds = "0" + seconds;
+    }
+    myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
+    myGrid.load("{{ url('xml_ATS_errors_runtimes') }}?time="+seconds+"&history="+max_history+"&chained="+chained+"&only_warning="+only_warning, function(){    
+        globalLayout.cells("b").progressOff();
+        myGrid.refreshFilters();
+        myGrid.filterByAll();
+    });    
+}
+
+function Detail(id) {
+    globalLayout.cells("c").progressOn();
+    myDetail.clearAndLoad("{{ url('xml_ATS_alarms_detail') }}?id="+id, function(){    
+        globalLayout.cells("c").progressOff();
+    });    
+}
+
+
+</script>
+</body>
+{% endblock %}

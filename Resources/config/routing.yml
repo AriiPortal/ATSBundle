@@ -171,6 +171,29 @@ xml_ATS_alarms_grid_toolbar:
     defaults: { _controller: AriiATSBundle:Alarms:toolbar }
 
 # --------------------------------------------------------------------------
+# ERRORS
+# --------------------------------------------------------------------------
+arii_ATS_errors:
+    pattern:  /errors
+    defaults: { _controller: AriiATSBundle:Errors:index }
+
+xml_ATS_errors_runtimes:
+    pattern:  /errors/runtimes.xml
+    defaults: { _controller: AriiATSBundle:Errors:runtimes }
+
+xml_ATS_errors_tree:
+    pattern:  /errors/tree.xml
+    defaults: { _controller: AriiATSBundle:Errors:tree }
+
+xml_ATS_errors_detail:
+    pattern:  /errors/detail.xml
+    defaults: { _controller: AriiATSBundle:Errors:detail }
+
+xml_ATS_errors_grid_toolbar:
+    pattern:  /errors/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Errors:toolbar }
+
+# --------------------------------------------------------------------------
 # INSTRUCTIONS
 # --------------------------------------------------------------------------
 arii_ATS_instructions:
