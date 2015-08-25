@@ -1,0 +1,194 @@
+# --------------------------------------------------------------------------
+# PAGES PRINCIPALES
+# --------------------------------------------------------------------------
+arii_ATS_index:
+    pattern:  /
+    defaults: { _controller: AriiATSBundle:Default:index }
+
+xml_ATS_toolbar:
+    pattern:  /toolbar.xml
+    defaults: { _controller: AriiATSBundle:Default:toolbar }
+
+json_ATS_ribbon:
+    pattern:  /ribbon.json
+    defaults: { _controller: AriiATSBundle:Default:ribbon }
+
+xml_ATS_menu:
+    pattern:  /menu.xml
+    defaults: { _controller: AriiATSBundle:Default:menu }
+
+arii_ATS_doc:
+    pattern:  /doc
+    defaults: { _controller: AriiATSBundle:Default:doc }
+
+# --------------------------------------------------------------------------
+# JOBS
+# --------------------------------------------------------------------------
+arii_ATS_jobs:
+    pattern:  /jobs
+    defaults: { _controller: AriiATSBundle:Jobs:index }
+
+xml_ATS_jobs_pie:
+    pattern:  /jobs/pie.xml
+    defaults: { _controller: AriiATSBundle:Jobs:pie }
+
+xml_ATS_jobs_tree:
+    pattern:  /jobs/tree.xml
+    defaults: { _controller: AriiATSBundle:Jobs:tree }
+
+xml_ATS_jobs_grid:
+    pattern:  /jobs/grid.xml
+    defaults: { _controller: AriiATSBundle:Jobs:status }
+
+xml_ATS_jobs_grid_toolbar:
+    pattern:  /jobs/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Jobs:grid_toolbar }
+
+xml_ATS_jobs_barchart:
+    pattern:  /jobs/barchart.xml
+    defaults: { _controller: AriiATSBundle:Jobs:barchart }
+
+# --------------------------------------------------------------------------
+# JOB
+# --------------------------------------------------------------------------
+json_ATS_job_form:
+    pattern:  /job/form.json
+    defaults: { _controller: AriiATSBundle:Job:form }
+
+xml_ATS_job_form:
+    pattern:  /job/form.xml
+    defaults: { _controller: AriiATSBundle:Job:xml }
+
+# --------------------------------------------------------------------------
+# EVENTS
+# --------------------------------------------------------------------------
+arii_ATS_events:
+    pattern:  /events
+    defaults: { _controller: AriiATSBundle:Events:index }
+
+xml_ATS_events_pie:
+    pattern:  /events/pie.xml
+    defaults: { _controller: AriiATSBundle:Events:pie }
+
+xml_ATS_events_grid:
+    pattern:  /events/grid.xml
+    defaults: { _controller: AriiATSBundle:Events:grid }
+
+xml_ATS_events_grid_toolbar:
+    pattern:  /events/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Events:toolbar }
+
+# --------------------------------------------------------------------------
+# EVENTS
+# --------------------------------------------------------------------------
+arii_ATS_servers:
+    pattern:  /servers
+    defaults: { _controller: AriiATSBundle:Servers:index }
+
+xml_ATS_servers_pie:
+    pattern:  /servers/pie.xml
+    defaults: { _controller: AriiATSBundle:Servers:pie }
+
+xml_ATS_servers_grid:
+    pattern:  /servers/grid.xml
+    defaults: { _controller: AriiATSBundle:Servers:grid }
+
+xml_ATS_servers2_grid:
+    pattern:  /servers/grid2.xml
+    defaults: { _controller: AriiATSBundle:Servers:grid2 }
+
+xml_ATS_servers3_grid:
+    pattern:  /servers/grid3.xml
+    defaults: { _controller: AriiATSBundle:Servers:grid3 }
+
+xml_ATS_servers_grid_toolbar:
+    pattern:  /servers/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Servers:toolbar }
+    
+# --------------------------------------------------------------------------
+# PROCESSED
+# --------------------------------------------------------------------------
+arii_ATS_processed:
+    pattern:  /processed
+    defaults: { _controller: AriiATSBundle:Processed:index }
+
+xml_ATS_processed_pie:
+    pattern:  /processed/pie.xml
+    defaults: { _controller: AriiATSBundle:Processed:pie }
+
+xml_ATS_processed_grid:
+    pattern:  /processed/grid.xml
+    defaults: { _controller: AriiATSBundle:Processed:grid }
+
+xml_ATS_processed_grid_toolbar:
+    pattern:  /processed/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Processed:toolbar }
+
+# --------------------------------------------------------------------------
+# AUDIT
+# --------------------------------------------------------------------------
+arii_ATS_audit:
+    pattern:  /audit
+    defaults: { _controller: AriiATSBundle:Audit:index }
+
+xml_ATS_audit_grid:
+    pattern:  /audit/grid.xml
+    defaults: { _controller: AriiATSBundle:Audit:grid }
+
+xml_ATS_audit_pie:
+    pattern:  /audit/pie.xml
+    defaults: { _controller: AriiATSBundle:Audit:pie }
+
+xml_ATS_audit_detail:
+    pattern:  /audit/detail.xml
+    defaults: { _controller: AriiATSBundle:Audit:detail }
+
+xml_ATS_audit_grid_toolbar:
+    pattern:  /audit/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Audit:toolbar }
+
+# --------------------------------------------------------------------------
+# ALARMS
+# --------------------------------------------------------------------------
+arii_ATS_alarms:
+    pattern:  /alarms
+    defaults: { _controller: AriiATSBundle:Alarms:index }
+
+xml_ATS_alarms_grid:
+    pattern:  /alarms/grid.xml
+    defaults: { _controller: AriiATSBundle:Alarms:grid }
+
+xml_ATS_alarms_pie:
+    pattern:  /alarms/pie.xml
+    defaults: { _controller: AriiATSBundle:Alarms:pie }
+
+xml_ATS_alarms_detail:
+    pattern:  /alarms/detail.xml
+    defaults: { _controller: AriiATSBundle:Alarms:detail }
+
+xml_ATS_alarms_grid_toolbar:
+    pattern:  /alarms/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Alarms:toolbar }
+
+# --------------------------------------------------------------------------
+# INSTRUCTIONS
+# --------------------------------------------------------------------------
+arii_ATS_instructions:
+    pattern:  /instructions
+    defaults: { _controller: AriiATSBundle:Instructions:index }
+
+xml_ATS_instructions_grid:
+    pattern:  /instructions/grid.xml
+    defaults: { _controller: AriiATSBundle:Instructions:grid }
+
+xml_ATS_instructions_pie:
+    pattern:  /instructions/pie.xml
+    defaults: { _controller: AriiATSBundle:Instructions:pie }
+
+xml_ATS_instructions_detail:
+    pattern:  /instructions/detail.xml
+    defaults: { _controller: AriiATSBundle:Instructions:detail }
+
+xml_ATS_instructions_grid_toolbar:
+    pattern:  /instructions/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Instructions:toolbar }

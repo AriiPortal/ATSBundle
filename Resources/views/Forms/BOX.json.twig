@@ -1,0 +1,48 @@
+[
+    {type:"settings",
+        position: "label-left", 
+        labelAlign:"right", 
+        labelWidth:"80",
+        inputWidth:"200" },
+    {   type:"input",    
+            name: "FOLDER", 
+            label:"{{ "Folder" | trans}}"
+    },
+    {   type:"input",    
+            name: "AS_APPLICATION", 
+            label:"{{ "Application" | trans}}"
+    },
+    {   type:"input",    
+            name: "OWNER", 
+            label:"{{ "Owner" | trans}}", 
+            rows: 3
+    },
+    {type:"newcolumn"},
+    {   type:"input",    
+            name: "NAME", 
+            label:"{{ "Job" | trans}}"
+    },
+    {   type:"input",    
+            name: "PERMISSION", 
+            label:"{{ "Permission" | trans}}"
+    },
+    {type:"newcolumn"},
+    {   type:"input",    
+            name: "NAME", 
+            label:"{{ "Job" | trans}}"
+    },
+    {   type:"input",    
+            name: "AS_GROUP", 
+            label:"{{ "Group" | trans}}"
+    },
+    {   type:"input",    
+            name: "PERMISSION", 
+            label:"{{ "Permission" | trans}}"
+    },
+    {type:"newcolumn"},
+    {   type:"checkbox",    
+            name: "HAS_OVERRIDE", 
+            label:"{{ "Override" | trans}}"
+    },
+    {type:"hidden",    name: "ID" }
+]

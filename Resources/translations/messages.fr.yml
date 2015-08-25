@@ -1,0 +1,3 @@
+module.ATS: Autosys
+summary.ATS: Module de suivi des traitements Autosys.
+text.ATS: Interface pour l'ordonnanceur "Workload Automation Autosys Edition" de CA.

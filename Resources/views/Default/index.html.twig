@@ -1,0 +1,306 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<body>
+<script type="text/javascript">
+var max_history = 0; // pas d'historique
+var chained = 0; // que des standalone
+var only_warning = 0; // que les problemes
+var update=30;
+var autorefresh;
+var jobtype = "CMD"; // Type de job en cours
+var myGridToolbar;
+var status;
+
+dhtmlxEvent(window,"load",function(){     
+    globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
+    globalLayout.cells("a").setWidth(345); 
+    globalLayout.cells("a").hideHeader(); 
+    globalLayout.cells("b").hideHeader(); 
+    globalLayout.cells("c").hideHeader(); 
+
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('/bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    myGlobalTab = globalLayout.cells("b").attachTabbar();
+    myGlobalTab.addTab("applications","{{ "Applications" | trans }}","150px", null, true);
+    myGlobalTab.addTab("groups","{{ "Groups" | trans }}","150px");
+
+    myBarChart =  myGlobalTab.cells("applications").attachChart({
+            view:"stackedBarH",
+            value:"#SUCCESS#",
+            label: function(obj) {
+                if (obj.SUCCESS=='0') return '';
+                return obj.SUCCESS;
+            },
+            tooltip: "SUCCESS",
+            color: "{{ color.SUCCESS }}",
+            padding: { left: 250 },
+            xAxis:{
+                title:"{{ "Jobs" | trans }}",
+                template: ""
+            },
+            yAxis:{
+                title: "{{ "Applications" | trans }}",
+                template: "#domain#"      
+            },
+            legend:{
+                values:[ 
+                    { text: "SUCCESS",      color: "{{ color.SUCCESS }}"},
+                    { text: "FAILURE",      color: "{{ color.FAILURE }}"},
+                    { text: "TERMINATED",   color: "{{ color.TERMINATED }}"},
+                    { text: "RUNNING",      color: "{{ color.RUNNING }}"},
+                    { text: "ACTIVATED",    color: "{{ color.ACTIVATED }}"},
+                    { text: "INACTIVE",     color: "{{ color.INACTIVE }}"},
+                    { text: "JOB_ON_ICE",   color: "{{ color.JOB_ON_ICE }}"},
+                    { text: "JOB_ON_HOLD",  color: "{{ color.JOB_ON_HOLD }}"}
+                    ],
+                valign:"middle",
+                align:"right",
+                width:200,
+                layout:"x"           
+            }                     
+    });
+    myBarChart.addSeries({
+            value: "#FAILURE#",
+            color: "{{ color.FAILURE }}",
+            label: function(obj) {
+                if (obj.FAILURE=='0') return '';
+                return "<div class='label' style='background-color: red'>"+obj.FAILURE+"</div>";
+            }
+    });
+    myBarChart.addSeries({
+            value: "#TERMINATED#",
+            color: "{{ color.TERMINATED }}",
+            label: function(obj) {
+                if (obj.TERMINATED=='0') return '';
+                return "<div class='label' style='background-color: red'>"+obj.FAILURE+"</div>";
+            }
+    });
+    myBarChart.addSeries({
+            value: "#RUNNING#",
+            color: "{{ color.RUNNING }}",
+            label: function(obj) {
+                if (obj.RUNNING=='0') return '';
+                return "<div class='label' style='color: orange'>"+obj.RUNNING+"</div>";
+            }
+    });    
+    myBarChart.addSeries({
+            value: "#ACTIVATED#",
+            color: "{{ color.ACTIVATED }}",
+            label: function(obj) {
+                if (obj.ACTIVATED=='0') return '';
+                return obj.ACTIVATED;
+            }
+    });
+    myBarChart.addSeries({
+            value: "#INACTIVE#",
+            color: "{{ color.INACTIVE }}",
+            label: function(obj) {
+                if (obj.INACTIVE=='0') return '';
+                return obj.INACTIVE;
+            }
+    });
+    myBarChart.addSeries({
+            value: "#JOB_ON_ICE#",
+            color: "{{ color.JOB_ON_ICE }}",
+            label: function(obj) {
+                if (obj.JOB_ON_ICE=='0') return '';
+                return obj.JOB_ON_ICE;
+            }
+    });
+    myBarChart.addSeries({
+            value: "#JOB_ON_HOLD#",
+            color: "{{ color.JOB_ON_HOLD }}",
+            label: function(obj) {
+                if (obj.JOB_ON_HOLD=='0') return '';
+                return obj.JOB_ON_HOLD;
+            }
+    });
+    myBarChart.load( "{{ url('xml_ATS_jobs_barchart') }}?only_warning="+only_warning );
+    myBarChart.attachEvent("onItemClick",function(id, event) {
+        var target = event.target||event.srcElement;
+        col = target.getAttribute("userdata");
+        var Status = ['SUCCESS','FAILURE','TERMINATED','RUNNING','ACTIVATED','INACTIVE','JOB_ON_ICE','JOB_ON_HOLD'];
+        status = Status[col];
+        myGrid.filterBy(2, status); 
+    });
+    
+    myBarChartGroup =  myGlobalTab.cells("groups").attachChart({
+            view:"stackedBarH",
+            value:"#SUCCESS#",
+            label:"#SUCCESS#",
+            tooltip: "SUCCESS",
+            color: "{{ color.SUCCESS }}",
+            padding: { left: 200 },
+            xAxis:{
+                title:"{{ "Jobs" | trans }}",
+                template: ""
+            },
+            yAxis:{
+                title: "{{ "Groups" | trans }}",
+                template: "#domain#"      
+            },
+            legend:{
+                values:[ 
+                    { text: "SUCCESS", color: "{{ color.SUCCESS }}"},
+                    { text: "FAILURE", color: "{{ color.FAILURE }}"},
+                    { text: "RUNNING", color: "{{ color.RUNNING }}"}
+                    ],
+                valign:"middle",
+                align:"right",
+                width:200,
+                layout:"x"           
+            }                     
+    });
+    myBarChartGroup.addSeries({
+            value: "#FAILURE#",
+            color: "{{ color.FAILURE }}",
+            label: function(obj) {
+                if (obj.FAILURE=='') return '';
+                return "<div class='label' style='background-color: red'>"+obj.FAILURE+"</div>";
+            }
+    });
+    myBarChartGroup.addSeries({
+            value: "#TERMINATED#",
+            color: "{{ color.TERMINATED }}",
+            label: function(obj) {
+                if (obj.TERMINATED=='') return '';
+                return "<div class='label' style='background-color: red'>"+obj.FAILURE+"</div>";
+            }
+    });
+    myBarChartGroup.addSeries({
+            value: "#RUNNING#",
+            color: "{{ color.RUNNING }}",
+            label: function(obj) {
+                if (obj.RUNNING=='') return '';
+                return "<div class='label' style='color: orange'>"+obj.RUNNING+"</div>";
+            }
+    });    
+    myBarChartGroup.addSeries({
+            value: "#ACTIVATED#",
+            color: "{{ color.ACTIVATED }}",
+            label: function(obj) {
+                if (obj.ACTIVATED=='') return '';
+                return "<div class='label' style='color: blue'>"+obj.ACTIVATED+"</div>";
+            }
+    });
+    myBarChartGroup.addSeries({
+            value: "#INACTIVE#",
+            color: "{{ color.INACTIVE }}",
+            label: function(obj) {
+                if (obj.INACTIVE=='') return '';
+                return "<div class='label' style='color: blue'>"+obj.INACTIVE+"</div>";
+            }
+    });
+    myBarChartGroup.addSeries({
+            value: "#JOB_ON_ICE#",
+            color: "{{ color.JOB_ON_ICE }}",
+            label: function(obj) {
+                if (obj.JOB_ON_ICE=='') return '';
+                return "<div class='label' style='color: blue'>"+obj.JOB_ON_ICE+"</div>";
+            }
+    });
+    myBarChartGroup.addSeries({
+            value: "#JOB_ON_HOLD#",
+            color: "{{ color.JOB_ON_HOLD }}",
+            label: function(obj) {
+                if (obj.JOB_ON_HOLD=='') return '';
+                return "<div class='label' style='color: blue'>"+obj.JOB_ON_HOLD+"</div>";
+            }
+    });
+    
+    myBarChartGroup.load( "{{ url('xml_ATS_jobs_barchart') }}?tag=GROUP&only_warning="+only_warning );
+
+    myTab = globalLayout.cells("a").attachTabbar();
+    myTab.addTab("b1","{{ "Status" | trans }}","100px", null, true);
+    myTab.addTab("b2","{{ "Folders" | trans }}","100px");
+
+    myDonut =  myTab.cells("b1").attachChart({
+            view:"donut",
+            container:"pie_chart_container",
+            value:"#JOBS#",
+            label:"",
+            tooltip: "#STATUS#",
+            color: "#COLOR#",
+            border:false,
+            pieInnerText: "#JOBS#",
+            shadow: 0,
+            legend:{
+                width: 0,
+                template: "#STATUS#",
+                valign:"top",
+                align:"left"
+            } 
+    });
+    myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?only_warning="+only_warning );
+    
+    myTree = myTab.cells("b2").attachTree();
+    myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
+    myTree.load( "{{ url('xml_ATS_jobs_tree') }}" );
+    
+    myGrid = globalLayout.cells("c").attachGrid();
+    myGrid.selMultiRows = true;
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid.setHeader("{{ "Folder" | trans }},{{ "Job" | trans }},{{ "Status" | trans }},{{ "Type" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
+    myGrid.attachHeader("#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
+    myGrid.setInitWidths("*,300,90,90,150,150,100,80");
+    myGrid.setColAlign("left,left,center,center,right,right,right,right");
+    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
+    myGrid.setColSorting("str,str,str,str,date,date,str,int");
+    myGrid.enableAlterCss("","");
+    myGrid.init();
+    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}");
+
+    myDonut.attachEvent("onItemClick",function(id, value){
+        status = id;
+        myGrid.filterBy(2, status);  
+    });
+
+    // Premier chargement avant le smart rendering
+    autorefresh = setInterval( "GridRefresh()",update*1000);
+});
+
+function GlobalRefresh() {
+    clearInterval( autorefresh );
+    GridRefresh();
+    autorefresh = setInterval( "GridRefresh()", update*1000 );
+}
+
+function GridRefresh() {
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
+    var seconds = currentTime.getSeconds();
+    if (minutes < 10){
+    minutes = "0" + minutes;
+    }
+    if (seconds < 10){
+    seconds = "0" + seconds;
+    }
+    myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
+    myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?only_warning="+only_warning, function () {
+        myDonut.refresh();                
+        globalLayout.progressOff();
+        globalLayout.cells("a").progressOff();
+        myBarChart.load( "{{ url('xml_ATS_jobs_barchart') }}?only_warning="+only_warning, function () {
+            myBarChartGroup.load( "{{ url('xml_ATS_jobs_barchart') }}?tag=GROUP&only_warning="+only_warning, function () {
+                myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?only_warning="+only_warning, function () {
+                    myGrid.filterBy(2, status);
+                    myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_tree') }}");                    
+            });
+            });
+        });
+    });    
+}
+
+</script>
+</body>
+{% endblock %}

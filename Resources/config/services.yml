@@ -1,0 +1,12 @@
+services:
+#    arii_ats.example:
+#        class: Arii\ATSBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
+    arii_ats.autosys:
+        class: Arii\ATSBundle\Service\AriiAutosys 
+        arguments: [ %color_status% ]
+        
+    arii_ats.state:
+        class: Arii\ATSBundle\Service\AriiState
+        arguments: ["@arii_core.dhtmlx", "@arii_core.sql", "@arii_core.date", "@arii_core.tools"]
+

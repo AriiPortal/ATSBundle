@@ -1,0 +1,181 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<body>
+<script type="text/javascript">
+var max_history = 0; // pas d'historique
+var chained = 0; // que des standalone
+var only_warning = 0; // que les problemes
+var update=30;
+var autorefresh;
+var status;
+
+dhtmlxEvent(window,"load",function(){     
+    globalLayout = new dhtmlXLayoutObject(document.body,"4C");  
+    globalLayout.cells("a").setWidth(355); 
+    globalLayout.cells("a").hideHeader(); 
+    globalLayout.cells("b").setText("{{ "Servers" | trans }}"); 
+    globalLayout.cells("b").setHeight(220); 
+
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('/bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    myDonut =  globalLayout.cells("a").attachChart({
+            view:"donut",
+            container:"pie_chart_container",
+            value:"#JOBS#",
+            label:"",
+            tooltip: "#STATUS#",
+            color: "#COLOR#",
+            border:false,
+            pieInnerText: "#JOBS#",
+            shadow: 0,
+            legend:{
+                width: 0,
+                template: "#STATUS#",
+                valign:"top",
+                align:"left"
+            } 
+    });
+    myDonut.load( "{{ url('xml_ATS_events_pie') }}" );
+
+    myGrid = globalLayout.cells("b").attachGrid();
+    myGrid.selMultiRows = true;
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid.setHeader("{{ "Time" | trans }},{{ "Role" | trans }},{{ "Hostname" | trans }},{{ "Status" | trans }},{{ "PID" | trans }},{{ "Port" | trans }},{{ "Queue" | trans }}");
+    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+    myGrid.setInitWidths("140,120,*,120,120,120,120");
+    myGrid.setColAlign("left,left,left,left,right,right,right");
+    myGrid.setColTypes("ro,ro,ro,ch,ro,ro,ro");
+    myGrid.setColSorting("date,str,str,str,str,str,str");
+    myGrid.enableAlterCss("","");
+    myGrid.init();
+    
+    myGrid.load( "{{ url('xml_ATS_servers_grid') }}");
+    myGrid.attachEvent("onRowDblClicked",Detail );
+
+    myDonut.attachEvent("onItemClick",function(id, value){
+        status = id;
+        myGrid.filterBy(4, status);  
+    });
+/*
+    myGridToolbar = globalLayout.cells("b").attachToolbar();
+    myGridToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myGridToolbar.loadStruct( "{{ url('xml_ATS_servers_grid_toolbar') }}");
+    myGridToolbar.attachEvent("onClick",function(itemid){
+         switch (itemid) {
+            case 'refresh':
+                globalLayout.cells("b").progressOn();
+                GlobalRefresh();
+                break;
+            case "print":
+                myGrid.printView();
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+    myGridToolbar.attachEvent("onStateChange",function(itemid, state){
+         switch (itemid) {
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+*/    
+    globalLayout.cells("c").setText("{{ "Application servers" | trans }}"); 
+    globalLayout.cells("c").setHeight(220); 
+    myGrid2 = globalLayout.cells("c").attachGrid();
+    myGrid2.selMultiRows = true;
+    myGrid2.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid2.setHeader("{{ "Time" | trans }},{{ "Hostname" | trans }},{{ "Status" | trans }},{{ "PID" | trans }},{{ "Port" | trans }},{{ "Queue" | trans }},{{ "Comm." | trans }},{{ "Alias" | trans }}");
+    myGrid2.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+    myGrid2.setInitWidths("140,*,120,120,120,120,200,200");
+    myGrid2.setColAlign("left,left,left,right,right,right,left,left");
+    myGrid2.setColTypes("ro,ro,ch,ro,ro,ro,ro,ro");
+    myGrid2.setColSorting("date,str,str,str,str,str,str,str");
+    myGrid2.enableAlterCss("","");
+    myGrid2.init();
+    
+    myGrid2.load( "{{ url('xml_ATS_servers2_grid') }}");
+/*            $list .= '<cell>'.$line['MACH_NAME'].'</cell>';
+            $list .= '<cell>'.$line['MACH_STATUS'].'</cell>';
+            $list .= '<cell>'.$line['AGENT_NAME'].'</cell>';
+            $list .= '<cell>'.$line['DESCRIPTION'].'</cell>';
+            $list .= '<cell>'.$line['PARENT_NAME'].'</cell>';
+            $list .= '<cell>'.$line['QUE_NAME'].'</cell>';
+            $list .= '<cell>'.$line['TYPE'].'</cell>';
+            $list .= '<cell>'.$line['PORT'].'</cell>';
+            $list .= '<cell>'.$line['CHARACTER_CODE'].'</cell>';
+            $list .= '<cell>'.$line['MAX_LOAD'].'</cell>';
+            $list .= '<cell>'.$line['FACTOR'].'</cell>';
+            $list .= '<cell>'.$line['HEARTBEAT_ATTEMPTS'].'</cell>';
+            $list .= '<cell>'.$line['HEARTBEAT_FREQ'].'</cell>';
+            $list .= '<cell>'.$line['NODE_NAME'].'</cell>';
+            $list .= '<cell>'.$line['OPSYS'].'</cell>';
+*/
+    globalLayout.cells("d").setText("{{ "Agents" | trans }}"); 
+    myGrid3 = globalLayout.cells("d").attachGrid();
+    myGrid3.selMultiRows = true;
+    myGrid3.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid3.setHeader("{{ "Machine" | trans }},{{ "Status" | trans }},{{ "Agent" | trans }},{{ "Description" | trans }},{{ "Queue" | trans }},{{ "Type" | trans }},{{ "OS" | trans }},{{ "Max load" | trans }},{{ "Factor" | trans }},{{ "Hostname" | trans }},{{ "Port" | trans }}");
+    myGrid3.attachHeader("#text_filter,#select_filter,#text_filter,#text_filter,#text_filter,#select_filter,#select_filter,#select_filter,#select_filter,#text_filter,#select_filter");
+    myGrid3.setInitWidths("200,100,120,*,150,80,80,80,80,200,80");
+    myGrid3.setColAlign("left,left,left,left,left,left,left,left,left,left,left");
+    myGrid3.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+    myGrid3.setColSorting("date,str,str,str,str,str,str,str,str,str,str");
+    myGrid3.enableAlterCss("","");
+    myGrid3.init();
+    
+    myGrid3.load( "{{ url('xml_ATS_servers3_grid') }}");
+
+    // Premier chargement avant le smart rendering
+    autorefresh = setInterval( "GridRefresh()",update*1000);
+});
+
+function GlobalRefresh() {
+    clearInterval( autorefresh );
+    GridRefresh();
+    autorefresh = setInterval( "GridRefresh()", update*1000 );
+}
+
+function GridRefresh() {
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
+    var seconds = currentTime.getSeconds();
+    if (minutes < 10){
+    minutes = "0" + minutes;
+    }
+    if (seconds < 10){
+    seconds = "0" + seconds;
+    }
+    myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
+    myGrid.load("{{ url('xml_ATS_servers_grid') }}?time="+seconds+"&history="+max_history+"&chained="+chained+"&only_warning="+only_warning, function(){    
+        globalLayout.cells("b").progressOff();
+        myGrid.refreshFilters();
+        myGrid.filterByAll();
+//        myGrid.filterBy(4, status);  
+        myDonut.load( "{{ url('xml_ATS_events_pie') }}?chained="+chained+"&only_warning="+only_warning, function () {
+            myDonut.refresh();                
+            globalLayout.progressOff();
+            globalLayout.cells("a").progressOff();
+        });
+    });    
+}
+
+function Detail(id) {
+}
+
+
+</script>
+</body>
+{% endblock %}

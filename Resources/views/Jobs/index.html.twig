@@ -1,0 +1,300 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<body>
+<script type="text/javascript">
+var max_history = 0; // pas d'historique
+var chained = 0; // que des standalone
+var only_warning = 0; // que les problemes
+var update=30;
+var autorefresh;
+var jobtype = "CMD"; // Type de job en cours
+var myGridToolbar;
+var status;
+
+dhtmlxEvent(window,"load",function(){     
+    globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
+    globalLayout.cells("a").setWidth(345); 
+    globalLayout.cells("a").hideHeader(); 
+    globalLayout.cells("b").hideHeader(); 
+    globalLayout.cells("c").setHeight(260); 
+
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('/bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    var myTab = globalLayout.cells("a").attachTabbar();
+    myTab.addTab("b1","{{ "Status" | trans }}","100px", null, true);
+    myTab.addTab("b2","{{ "Folders" | trans }}","100px");
+
+    myDonut =  myTab.cells("b1").attachChart({
+            view:"donut",
+            container:"pie_chart_container",
+            value:"#JOBS#",
+            label:"",
+            tooltip: "#STATUS#",
+            color: "#COLOR#",
+            border:false,
+            pieInnerText: "#JOBS#",
+            shadow: 0,
+            legend:{
+                width: 0,
+                template: "#STATUS#",
+                valign:"top",
+                align:"left"
+            } 
+    });
+    myDonut.load( "{{ url('xml_ATS_jobs_pie') }}" );
+    
+    myTree = myTab.cells("b2").attachTree();
+    myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
+    myTree.load( "{ { url('xml_ATS_jobs_tree') }}" );
+    
+    myGrid = globalLayout.cells("b").attachGrid();
+    myGrid.selMultiRows = true;
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid.setHeader("{{ "Folder" | trans }},{{ "Job" | trans }},{{ "Type" | trans }},{{ "Status" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
+    myGrid.attachHeader("#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
+    myGrid.setInitWidths("*,300,90,90,150,150,100,80");
+    myGrid.setColAlign("left,left,center,center,right,right,right,right");
+    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
+    myGrid.setColSorting("str,str,str,str,date,date,str,int");
+    myGrid.enableAlterCss("","");
+    myGrid.init();
+    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}");
+    myGrid.attachEvent("onRowDblClicked",JobDetail );
+
+    myDonut.attachEvent("onItemClick",function(id, value){
+        status = id;
+        myGrid.filterBy(4, status);  
+    });
+
+    myGridToolbar = globalLayout.cells("b").attachToolbar();
+    myGridToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myGridToolbar.loadStruct( "{{ url('xml_ATS_jobs_grid_toolbar') }}");
+    myGridToolbar.attachEvent("onClick",function(itemid){
+         switch (itemid) {
+            case 'refresh':
+                globalLayout.cells("b").progressOn();
+                GlobalRefresh();
+                break;
+            case "print":
+                myGrid.printView();
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+    myGridToolbar.attachEvent("onStateChange",function(itemid, state){
+    });
+
+    var myTabbar = globalLayout.cells("c").attachTabbar();
+    myTabbar.addTab("b1","{{ "Job" | trans }}","100px", null, true);
+
+    myDetailLayout = myTabbar.cells("b1").attachLayout("2U");
+    myDetailLayout.cells("a").hideHeader(); 
+    myDetailLayout.cells("b").hideHeader(); 
+    myDetailLayout.cells("a").setWidth(640); 
+    
+    myForm = myDetailLayout.cells("a").attachForm();
+    myForm.loadStruct("{{ url('json_ATS_job_form') }}?type=JOB");
+
+    myForm2 = myDetailLayout.cells("b").attachForm();
+    myForm2.loadStruct("{{ url('json_ATS_job_form') }}?type="+jobtype);
+
+  
+
+    myDetailToolbar = myDetailLayout.cells("a").attachToolbar();
+    myDetailToolbar.setIconsPath("{ { asset('bundles/ariicore/images/toolbar/') }}");
+    myDetailToolbar.loadStruct( "{ { url('xml_JID_jobs_form_toolbar') }}" , function(){
+        GBCalendar = new dhtmlXCalendarObject(myDetailToolbar.getInput('ref_date'));
+        GBCalendar.setDateFormat("%Y-%m-%d %H:%i:%s");
+        GBCalendar.setWeekStartDay(1);
+    });
+        
+    myDetailToolbar.attachEvent("onClick",function(itemid){
+        Text = '';
+        var id = myForm.getItemValue('ID');
+        switch(itemid) {
+            case "start_job":
+                Text = "{{ "Start job" | trans }}";
+                break;
+            case "stop_job":
+                Text = "{{ "Stop job" | trans }}";
+                break;
+            case "unstop_job":
+                Text = "{{ "Unstop job" | trans }}";
+                break;
+            case "delete_task":
+            case "kill_task":
+                Text = "{{ "Kill task" | trans }}";
+                break;
+        }
+        switch(itemid) {
+            case "start_job":
+            case "stop_job":
+            case "unstop_job":
+            case "delete_task":
+            case "kill_task":
+                var params = new Array();
+                myParameters.forEachRow(function(id){
+                    var param = myParameters.cells(id,0).getValue() + "=" + encodeURIComponent(myParameters.cells(id,1).getValue());
+                    params.push(param);
+                });
+                var paramsStr = params.join(",");
+                var start_time = '';
+                start_time = myDetailToolbar.getValue("ref_date");
+                // alert("{{ url('arii_XML_Command') }}?command="+Command+"&params="+encodeURIComponent(params)+"&time="+start_time+"&job_id="+id); 
+                dhtmlx.message({
+                type: "Notice",
+                text: Text });
+                globalLayout.cells("a").progressOn();        
+                globalLayout.cells("b").progressOn();
+                dhx4.ajax.post("{{ url('arii_XML_Command') }}","command="+itemid+"&params="+encodeURIComponent(params)+"&time="+start_time+"&job_id="+id,function(loader,response){
+                    dhtmlx.message({
+                    type: "Notice",
+                    expire: 10000,
+                    width: "500px",
+                    text: loader.xmlDoc.responseText });
+                    GlobalRefresh();
+                });
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+        return true;
+    });
+    
+    // Premier chargement avant le smart rendering
+    autorefresh = setInterval( "GridRefresh()",update*1000);
+});
+
+function GlobalRefresh() {
+    clearInterval( autorefresh );
+    GridRefresh();
+    autorefresh = setInterval( "GridRefresh()", update*1000 );
+}
+
+function GridRefresh() {
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
+    var seconds = currentTime.getSeconds();
+    if (minutes < 10){
+    minutes = "0" + minutes;
+    }
+    if (seconds < 10){
+    seconds = "0" + seconds;
+    }
+    myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
+    myGrid.load("{{ url('xml_ATS_jobs_grid') }}?time="+seconds+"&history="+max_history+"&chained="+chained+"&only_warning="+only_warning, function(){    
+        globalLayout.cells("b").progressOff();
+        myGrid.refreshFilters();
+        myGrid.filterByAll();
+//        myGrid.filterBy(4, status);  
+        myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?chained="+chained+"&only_warning="+only_warning, function () {
+            myDonut.refresh();                
+            globalLayout.progressOff();
+            globalLayout.cells("a").progressOff();
+            myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_tree') }}?chained="+chained+"&only_warning="+only_warning);                    
+        });
+    });    
+}
+
+function JobDetail(id) {
+    globalLayout.cells("c").progressOn();
+    
+    type = myGrid.cells(id, 3 ).getValue(); 
+    if (type != jobtype) {
+        myForm2.unload();
+        myForm2 = myDetailLayout.cells("b").attachForm();
+        alert("{{ url('json_ATS_job_form') }}?type="+type);
+        myForm2.loadStruct("{{ url('json_ATS_job_form') }}?type="+type);
+        jobtype = type;
+    }
+
+    myForm.load("{{ url('xml_ATS_job_form') }}?id="+id);
+    myForm2.load("{{ url('xml_ATS_job_form') }}?id="+id+"&type="+type, function() {
+        globalLayout.cells("c").progressOff();
+    });
+
+}
+
+function onShowMenu(rowId, celInd, grid) {
+
+    var status = grid.cells(rowId, 3 ).getValue();
+
+    // si on est operator 
+    {% if is_granted('ROLE_OPERATOR') %}
+    if (status !=='RUNNING') {
+        myGridMenu.hideItem('kill_task');    
+    }
+    else {
+        myGridMenu.showItem('kill_task');    
+    }
+    if (status !=='QUEUED')  {
+        myGridMenu.hideItem('delete_task');    
+    }
+    else {
+        myGridMenu.showItem('delete_task');    
+    }
+    // job stoppé
+    if ((grid.cells(rowId, 3).getValue()== 'STOPPED') 
+         || (grid.cells(rowId, 3).getValue()== 'STOPPING') ){    
+        myGridMenu.hideItem("stop_job");
+        myGridMenu.showItem("unstop_job");
+    }
+    else {
+        myGridMenu.hideItem("unstop_job");
+        myGridMenu.showItem("stop_job");
+    }
+    {% else %}
+        myGridMenu.hideItem('start_job');
+        myGridMenu.hideItem('kill_task');
+        myGridMenu.hideItem('stop_job');
+        myGridMenu.hideItem('unstop_job');
+        myGridMenu.hideItem('pause_spooler');    
+        myGridMenu.hideItem('continue_spooler');    
+    {% endif %} 
+ return true;
+}
+
+// Fonctions
+function CheckSpooler(rid) 
+{
+    dhx4.ajax.get("{{ url('arii_JID_spooler_update') }}?id="+rid,function(loader,response){
+        dhtmlx.message({
+            type: "Notice",
+            expire: 10000,
+            width: "500px",
+            text: loader.xmlDoc.responseText
+        });
+    });
+return true;
+}
+
+function Spooler(url,rid)
+{
+    dhx4.ajax.get.get(url+"="+rid,function(loader,response){
+        dhtmlx.message({
+            type: "Notice",
+            expire: 10000,
+            width: "500px",
+            text: loader.xmlDoc.responseText
+        });
+        CheckSpooler(rid);
+    });
+    return true;
+}
+
+</script>
+</body>
+{% endblock %}

@@ -1,0 +1,163 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<body>
+<script type="text/javascript">
+var max_history = 0; // pas d'historique
+var chained = 0; // que des standalone
+var only_warning = 0; // que les problemes
+var update=30;
+var autorefresh;
+var status;
+
+dhtmlxEvent(window,"load",function(){     
+    globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
+    globalLayout.cells("a").setWidth(355); 
+    globalLayout.cells("a").hideHeader(); 
+    globalLayout.cells("b").hideHeader(); 
+    globalLayout.cells("c").setHeight(260); 
+
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('/bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    myDonut =  globalLayout.cells("a").attachChart({
+            view:"donut",
+            container:"pie_chart_container",
+            value:"#JOBS#",
+            label:"",
+            tooltip: "#STATUS#",
+            color: "#COLOR#",
+            border:false,
+            pieInnerText: "#JOBS#",
+            shadow: 0,
+            legend:{
+                width: 0,
+                template: "#STATUS#",
+                valign:"top",
+                align:"left"
+            } 
+    });
+    myDonut.load( "{{ url('xml_ATS_events_pie') }}" );
+    
+    myGrid = globalLayout.cells("b").attachGrid();
+    myGrid.selMultiRows = true;
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid.setHeader("{{ "Spooler" | trans }},{{ "Folder" | trans }},{{ "Job" | trans }},{{ "Type" | trans }},{{ "Status" | trans }},{{ "Alarm" | trans }},{{ "Start time" | trans }},{{ "Message" | trans }},{{ "Machine" | trans }},{{ "Exit" | trans }},{{ "Run" | trans }},{{ "Try" | trans }},{{ "Key" | trans }},{{ "Value" | trans }}");
+    myGrid.attachHeader("#select_filter,#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+    myGrid.setInitWidths("80,*,300,120,120,120,150,*,150,80,90,80,120,120");
+    myGrid.setColAlign("left,left,left,center,center,center,right,left,left,right,right,right,left,left");
+    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+    myGrid.setColSorting("str,str,str,str,str,str,date,str,str,int,int,int,str,str");
+    myGrid.enableAlterCss("","");
+    myGrid.init();
+    // Localisation
+    myGrid.setColumnHidden(0,true);
+    myGrid.setColumnHidden(1,true);
+    // Execution
+    myGrid.setColumnHidden(8,true);
+    myGrid.setColumnHidden(9,true);
+    myGrid.setColumnHidden(10,true);
+    myGrid.setColumnHidden(11,true);
+    // Variables
+    myGrid.setColumnHidden(12,true);
+    myGrid.setColumnHidden(13,true);
+    
+    myGrid.load( "{{ url('xml_ATS_events_grid') }}");
+    myGrid.attachEvent("onRowDblClicked",JobDetail );
+
+    myDonut.attachEvent("onItemClick",function(id, value){
+        status = id;
+        myGrid.filterBy(4, status);  
+    });
+
+    myGridToolbar = globalLayout.cells("b").attachToolbar();
+    myGridToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myGridToolbar.loadStruct( "{{ url('xml_ATS_events_grid_toolbar') }}");
+    myGridToolbar.attachEvent("onClick",function(itemid){
+         switch (itemid) {
+            case 'refresh':
+                globalLayout.cells("b").progressOn();
+                GlobalRefresh();
+                break;
+            case "print":
+                myGrid.printView();
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+    myGridToolbar.attachEvent("onStateChange",function(itemid, state){
+         switch (itemid) {
+            case 'location':
+                myGrid.setColumnHidden(0,!state);      
+                myGrid.setColumnHidden(1,!state);      
+                break;
+            case 'execution':
+                myGrid.setColumnHidden(8,!state);  
+                myGrid.setColumnHidden(9,!state);  
+                myGrid.setColumnHidden(10,!state);  
+                myGrid.setColumnHidden(11,!state);  
+                break;
+            case 'variable':
+                myGrid.setColumnHidden(12,!state);  
+                myGrid.setColumnHidden(13,!state);  
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+    
+    myForm = globalLayout.cells("c").attachForm();
+    myForm.loadStruct("{{ url('json_ATS_job_form') }}?type=JOB");
+    
+    // Premier chargement avant le smart rendering
+    autorefresh = setInterval( "GridRefresh()",update*1000);
+});
+
+function GlobalRefresh() {
+    clearInterval( autorefresh );
+    GridRefresh();
+    autorefresh = setInterval( "GridRefresh()", update*1000 );
+}
+
+function GridRefresh() {
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
+    var seconds = currentTime.getSeconds();
+    if (minutes < 10){
+    minutes = "0" + minutes;
+    }
+    if (seconds < 10){
+    seconds = "0" + seconds;
+    }
+    myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
+    myGrid.load("{{ url('xml_ATS_events_grid') }}?time="+seconds+"&history="+max_history+"&chained="+chained+"&only_warning="+only_warning, function(){    
+        globalLayout.cells("b").progressOff();
+        myGrid.refreshFilters();
+        myGrid.filterByAll();
+//        myGrid.filterBy(4, status);  
+        myDonut.load( "{{ url('xml_ATS_events_pie') }}?chained="+chained+"&only_warning="+only_warning, function () {
+            myDonut.refresh();                
+            globalLayout.progressOff();
+            globalLayout.cells("a").progressOff();
+        });
+    });    
+}
+
+function JobDetail(id) {
+}
+
+
+</script>
+</body>
+{% endblock %}
