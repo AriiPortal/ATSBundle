@@ -28,6 +28,13 @@ class AlarmsController extends Controller
         return $this->render('AriiATSBundle:Alarms:grid_toolbar.xml.twig',array(), $response );
     }
 
+    public function grid_menuAction()
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/xml');
+        return $this->render('AriiATSBundle:Alarms:grid_menu.xml.twig',array(), $response );
+    }
+
     public function gridAction($only_warning=0)
     {
         $request = Request::createFromGlobals();

@@ -48,6 +48,7 @@ xml_ATS_jobs_barchart:
     pattern:  /jobs/barchart.xml
     defaults: { _controller: AriiATSBundle:Jobs:barchart }
 
+
 # --------------------------------------------------------------------------
 # JOB
 # --------------------------------------------------------------------------
@@ -59,6 +60,10 @@ xml_ATS_job_form:
     pattern:  /job/form.xml
     defaults: { _controller: AriiATSBundle:Job:xml }
 
+xml_ATS_job_history:
+    pattern:  /job/history.xml
+    defaults: { _controller: AriiATSBundle:Job:history }
+    
 # --------------------------------------------------------------------------
 # EVENTS
 # --------------------------------------------------------------------------
@@ -170,6 +175,10 @@ xml_ATS_alarms_grid_toolbar:
     pattern:  /alarms/toolbar.xml
     defaults: { _controller: AriiATSBundle:Alarms:toolbar }
 
+xml_ATS_alarms_grid_menu:
+    pattern:  /alarms/grid_menu.xml
+    defaults: { _controller: AriiATSBundle:Alarms:grid_menu }
+
 # --------------------------------------------------------------------------
 # ERRORS
 # --------------------------------------------------------------------------
@@ -193,6 +202,41 @@ xml_ATS_errors_grid_toolbar:
     pattern:  /errors/toolbar.xml
     defaults: { _controller: AriiATSBundle:Errors:toolbar }
 
+# --------------------------------------------------------------------------
+# CALENDARS
+# --------------------------------------------------------------------------
+arii_ATS_calendars:
+    pattern:  /calendars
+    defaults: { _controller: AriiATSBundle:Calendars:timeline }
+
+xml_ATS_calendars_runtimes:
+    pattern:  /calendars/runtimes.xml
+    defaults: { _controller: AriiATSBundle:Calendars:runtimes }
+
+xml_ATS_calendars_tree:
+    pattern:  /calendars/tree.xml
+    defaults: { _controller: AriiATSBundle:Calendars:tree }
+
+xml_ATS_calendars_detail:
+    pattern:  /calendars/detail.xml
+    defaults: { _controller: AriiATSBundle:Calendars:detail }
+
+xml_ATS_calendars_list:
+    pattern:  /calendars/list.xml
+    defaults: { _controller: AriiATSBundle:Calendars:list }
+
+xml_ATS_calendars_grid_toolbar:
+    pattern:  /calendars/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Calendars:toolbar }
+
+xml_ATS_calendar:
+    pattern:  /calendars/calendar.xml
+    defaults: { _controller: AriiATSBundle:Calendars:calendar }
+
+xml_ATS_calendar_jobs:
+    pattern:  /calendars/jobs.xml
+    defaults: { _controller: AriiATSBundle:Calendars:jobs }
+    
 # --------------------------------------------------------------------------
 # INSTRUCTIONS
 # --------------------------------------------------------------------------

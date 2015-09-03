@@ -96,9 +96,10 @@ dhtmlxEvent(window,"load",function(){
     });
 
     var myTabbar = globalLayout.cells("c").attachTabbar();
-    myTabbar.addTab("b1","{{ "Job" | trans }}","100px", null, true);
+    myTabbar.addTab("job","{{ "Job" | trans }}","100px", null, true);
+    myTabbar.addTab("history","{{ "History" | trans }}","100px");
 
-    myDetailLayout = myTabbar.cells("b1").attachLayout("2U");
+    myDetailLayout = myTabbar.cells("job").attachLayout("2U");
     myDetailLayout.cells("a").hideHeader(); 
     myDetailLayout.cells("b").hideHeader(); 
     myDetailLayout.cells("a").setWidth(640); 
@@ -172,7 +173,19 @@ dhtmlxEvent(window,"load",function(){
         }
         return true;
     });
-    
+// RUN_NUM,NTRY,STARTIME,ENDTIME,RUN_MACHINE,STATUS,EXIT_CODE,RUNTIME,EVT_NUM,STD_OUT_FILE,STD_ERR_FILE,REPLY_MESSAGE,REPLY_RESPONSE,HAS_EXTENDED_INFO,JOB_VER,OVER_RUN'
+    myHistory = myTabbar.cells("history").attachGrid();
+    myHistory.selMultiRows = true;
+    myHistory.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myHistory.setHeader("{{ "Run" | trans }},#cspan,{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Status" | trans }},{{ "Exit" | trans }},{{ "Machine" | trans }},REPLY_MESSAGE,REPLY_RESPONSE,STD_OUT_FILE,STD_ERR_FILE,EVT_NUM,{{ "Ver." | trans }},OVER_RUN,HAS_EXTENDED_INFO");
+    myHistory.attachHeader("#numeric_filter,#numeric_filter,#text_filter,#text_filter,#text_filter,#select_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+    myHistory.setInitWidths("90,50,140,140,100,80,80,120,*,*,*,*,100,80,40,30");
+    myHistory.setColAlign("right,right,right,right,right,right,right,left,right,right,right,right,right,right,right,center");
+    myHistory.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+    myHistory.setColSorting("str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,ch");
+    myHistory.enableAlterCss("","");
+    myHistory.init();
+
     // Premier chargement avant le smart rendering
     autorefresh = setInterval( "GridRefresh()",update*1000);
 });
@@ -216,7 +229,6 @@ function JobDetail(id) {
     if (type != jobtype) {
         myForm2.unload();
         myForm2 = myDetailLayout.cells("b").attachForm();
-        alert("{{ url('json_ATS_job_form') }}?type="+type);
         myForm2.loadStruct("{{ url('json_ATS_job_form') }}?type="+type);
         jobtype = type;
     }
@@ -224,6 +236,7 @@ function JobDetail(id) {
     myForm.load("{{ url('xml_ATS_job_form') }}?id="+id);
     myForm2.load("{{ url('xml_ATS_job_form') }}?id="+id+"&type="+type, function() {
         globalLayout.cells("c").progressOff();
+        myHistory.load( "{{ url('xml_ATS_job_history') }}?id="+id);
     });
 
 }

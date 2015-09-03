@@ -28,22 +28,12 @@ class DefaultController extends Controller
     public function docAction() {
         $request = Request::createFromGlobals();
         $lang = $this->getRequest()->getLocale();
+        $template = $this->container->getParameter('ats_doc');
 
-        $doc = $request->get('doc');
-        if ($doc != '')
-            $file = "../src/Arii/ATSBundle/Docs/$lang/$doc.md";
-        else 
-            $file = "../src/Arii/ATSBundle/README.md";
-
-        $content = @file_get_contents($file);
-        if ($content == '') {
-            print "$doc ?!";
-            exit();
-        }
-
-        $doc = $this->container->get('arii_core.doc');
-        $parsedown =  $doc->Parsedown($content);
-
-        return $this->render('AriiATSBundle:Default:bootstrap.html.twig',array( 'content' => $parsedown ) );
+        $doc = $this->container->get('arii_doc.doc');
+        $url = $doc->Url($template);
+        
+        header("Location: $url");
+        die();
     }
 }

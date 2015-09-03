@@ -26,6 +26,28 @@ class JobController extends Controller
         return $this->render("AriiATSBundle:Forms:$type.json.twig",array(), $response );
     }
 
+    public function historyAction()
+    {
+        $request = Request::createFromGlobals();
+        $id = $request->get('id');
+        
+        $sql = $this->container->get('arii_core.sql');  
+        $qry = $sql->Select(array('JOID','RUN_NUM','NTRY','STARTIME','ENDTIME','STATUS','OVER_NUM','EXIT_CODE','RUNTIME','EVT_NUM','STD_OUT_FILE','STD_ERR_FILE','REPLY_MESSAGE','REPLY_RESPONSE','HAS_EXTENDED_INFO','JOB_VER','RUN_MACHINE'))
+                .$sql->From(array('UJO_JOB_RUNS'))
+                .$sql->Where(array( 
+                    'JOID' => $id ))
+                .$sql->OrderBy(array('RUN_NUM desc,NTRY desc'));
+
+        $dhtmlx = $this->container->get('arii_core.dhtmlx');
+        $data = $dhtmlx->Connector('grid');
+        $data->event->attach("beforeRender",array($this,"grid_render"));
+        $data->render_sql($qry,'ID','RUN_NUM,NTRY,STARTIME,ENDTIME,RUNTIME,STATUS,EXIT_CODE,RUN_MACHINE,REPLY_MESSAGE,REPLY_RESPONSE,STD_OUT_FILE,STD_ERR_FILE,EVT_NUM,JOB_VER,OVER_RUN,HAS_EXTENDED_INFO');
+    }
+
+    function grid_render ($data){
+        $data->set_value( 'ID', $data->get_value('RUN_NUM').'-'.$data->get_value('NTRY') );
+    }
+
     public function xmlAction()
     {
         $request = Request::createFromGlobals();

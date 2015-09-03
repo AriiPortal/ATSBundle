@@ -28,6 +28,11 @@ dhtmlxEvent(window,"load",function(){
     myRibbon.attachEvent("onStateChange", StateRibbon );
     myRibbon.attachEvent("onClick", ClickRibbon );
 
+    myGridMenu = new dhtmlXMenuObject(null);
+    myGridMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/wa/') }}" );
+    myGridMenu.renderAsContextMenu();
+    myGridMenu.loadStruct("{{ url('xml_ATS_alarms_grid_menu') }}");
+
     myDonut =  globalLayout.cells("a").attachChart({
             view:"donut",
             container:"pie_chart_container",
@@ -66,10 +71,25 @@ dhtmlxEvent(window,"load",function(){
     myGrid.setColAlign("left,left,left,left,left,left,left,left");
     myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
     myGrid.setColSorting("date,str,str,str,str,str,str,int");
+    myGrid.enableContextMenu(myGridMenu);    
     myGrid.enableAlterCss("","");
     myGrid.init();
 
-    
+    myGridMenu.attachEvent("onClick", function (menuitemId, type) {
+        var data = myGrid.contextID.split("_");
+        //rowInd_colInd;
+        var rId = data[0];
+        var cInd = data[1];
+        switch (menuitemId) {
+            case "doc":
+                window.open('{{ url('arii_JID_job_doc') }}?id='+rId,'arii_doc');
+                break;
+            default:
+                alert("inconnu ! "+menuitemId);    
+        }
+        return true;
+    });
+
     myGrid.load( "{{ url('xml_ATS_alarms_grid') }}");
     myGrid.attachEvent("onRowDblClicked", Detail );
 
