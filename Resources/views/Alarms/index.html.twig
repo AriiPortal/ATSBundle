@@ -55,19 +55,10 @@ dhtmlxEvent(window,"load",function(){
     myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
-    /*
-           $list .= '<cell>'.$date->Time2Local($line['ALARM_TIME'],'',true).'</cell>';
-            $list .= '<cell>'.$autosys->Alarm($line['ALARM']).'</cell>';
-            $list .= '<cell>'.$autosys->AlarmState($line['STATE']).'</cell>';
-            $list .= '<cell>'.$line['JOB_NAME'].'</cell>';
-            $list .= '<cell>'.$line['THE_USER'].'</cell>';
-            $list .= '<cell>'.$line['EVENT_COMMENT'].'</cell>';
-            $list .= '<cell>'.$line['RESPONSE'].'</cell>';
-            $list .= '<cell>'.$line['EVT_NUM'].'</cell>';
-*/
+
     myGrid.setHeader("{{ "Date" | trans }},{{ "Alarm" | trans }},{{ "State" | trans }},{{ "Job name" | trans }},{{ "User" | trans }},{{ "Comment" | trans }},{{ "Response" | trans }},{{ "#Event" | trans }}");
     myGrid.attachHeader("#text_filter,#select_filter,#select_filter,#text_filter,#select_filter,#text_filter,#text_filter,#numeric_filter");
-    myGrid.setInitWidths("140,140,180,*,150,200,200,40");
+    myGrid.setInitWidths("140,180,180,200,150,*,200,40");
     myGrid.setColAlign("left,left,left,left,left,left,left,left");
     myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
     myGrid.setColSorting("date,str,str,str,str,str,str,int");

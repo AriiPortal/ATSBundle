@@ -5,6 +5,10 @@ arii_ATS_index:
     pattern:  /
     defaults: { _controller: AriiATSBundle:Default:index }
 
+arii_ATS_readme:
+    pattern:  /readme
+    defaults: { _controller: AriiATSBundle:Default:readme }
+
 xml_ATS_toolbar:
     pattern:  /toolbar.xml
     defaults: { _controller: AriiATSBundle:Default:toolbar }
@@ -20,6 +24,22 @@ xml_ATS_menu:
 arii_ATS_doc:
     pattern:  /doc
     defaults: { _controller: AriiATSBundle:Default:doc }
+
+arii_ATS_sendevent:
+    pattern:  /sendevent
+    defaults: { _controller: AriiATSBundle:Default:sendevent }
+
+arii_ATS_autorep:
+    pattern:  /autorep
+    defaults: { _controller: AriiATSBundle:Default:autorep }
+
+arii_ATS_autosyslog:
+    pattern:  /autosyslog
+    defaults: { _controller: AriiATSBundle:Default:autosyslog }
+
+xml_ATS_autosyslog:
+    pattern:  /autosyslog.xml
+    defaults: { _controller: AriiATSBundle:Default:autosyslog_grid }
 
 # --------------------------------------------------------------------------
 # JOBS
@@ -63,7 +83,11 @@ xml_ATS_job_form:
 xml_ATS_job_history:
     pattern:  /job/history.xml
     defaults: { _controller: AriiATSBundle:Job:history }
-    
+
+xml_ATS_job_sendevent:
+    pattern:  /job/sendevent.xml
+    defaults: { _controller: AriiATSBundle:Job:sendevent }
+
 # --------------------------------------------------------------------------
 # EVENTS
 # --------------------------------------------------------------------------
@@ -259,3 +283,25 @@ xml_ATS_instructions_detail:
 xml_ATS_instructions_grid_toolbar:
     pattern:  /instructions/toolbar.xml
     defaults: { _controller: AriiATSBundle:Instructions:toolbar }
+    
+# --------------------------------------------------------------------------
+# JOBS
+# --------------------------------------------------------------------------
+arii_ATS_generate:
+    pattern:  /generate
+    defaults: { _controller: AriiATSBundle:Graphviz:generate }
+
+# --------------------------------------------------------------------------
+# REQUESTS
+# --------------------------------------------------------------------------
+arii_ATS_requests:
+    pattern:  /requests
+    defaults: { _controller: AriiATSBundle:Requests:index }
+
+arii_ATS_requests_result:
+    pattern:  /requests/result.html
+    defaults: { _controller: AriiATSBundle:Requests:result }
+
+arii_ATS_requests_summary:
+    pattern:  /requests/summary.html
+    defaults: { _controller: AriiATSBundle:Requests:summary }

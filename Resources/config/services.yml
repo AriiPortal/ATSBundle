@@ -10,3 +10,6 @@ services:
         class: Arii\ATSBundle\Service\AriiState
         arguments: ["@arii_core.dhtmlx", "@arii_core.sql", "@arii_core.date", "@arii_core.tools"]
 
+    arii_ats.exec:
+        class: Arii\ATSBundle\Service\AriiExec
+        arguments: [ "%ATS%" ]

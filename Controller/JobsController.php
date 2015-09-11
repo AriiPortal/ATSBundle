@@ -59,7 +59,7 @@ class JobsController extends Controller
             if ($only_warning and ($line['STATUS']==4)) continue;
             $status = $autosys->Status($line['STATUS']);            
             $joid = $line['JOID'];
-            $Job[$joid] = $line;
+            $Job[$joid] = $line;            
         }
 
         $response = new Response();

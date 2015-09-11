@@ -16,6 +16,13 @@ class JobController extends Controller
           $this->images = $request->getUriForPath('/../bundles/ariicore/images/wa');          
     }
 
+    public function sendeventAction()
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/xml');
+        return $this->render('AriiATSBundle:Job:sendevent.xml.twig',array(), $response );
+    }
+
     public function formAction()
     {
         $request = Request::createFromGlobals();
@@ -45,7 +52,13 @@ class JobController extends Controller
     }
 
     function grid_render ($data){
+        $autosys = $this->container->get('arii_ats.autosys');
         $data->set_value( 'ID', $data->get_value('RUN_NUM').'-'.$data->get_value('NTRY') );
+        $data->set_value( 'STATUS',  $autosys->Status($data->get_value('STATUS')));
+        
+        $date = $this->container->get('arii_core.date');
+        $data->set_value('STARTIME', $date->Time2Local($data->get_value('STARTIME'),'VA1',true));
+        $data->set_value('ENDTIME', $date->Time2Local($data->get_value('ENDTIME'),'VA1',true));
     }
 
     public function xmlAction()

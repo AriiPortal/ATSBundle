@@ -9,15 +9,13 @@ var only_warning = 0; // que les problemes
 var update=30;
 var autorefresh;
 var jobtype = "CMD"; // Type de job en cours
-var myGridToolbar;
 var status;
 
 dhtmlxEvent(window,"load",function(){     
     globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
-    globalLayout.cells("a").setWidth(345); 
+    globalLayout.cells("a").setWidth(350); 
     globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").hideHeader(); 
-    globalLayout.cells("c").setHeight(260); 
 
     globalMenu = globalLayout.cells("a").attachMenu();
     globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
@@ -61,7 +59,7 @@ dhtmlxEvent(window,"load",function(){
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
     myGrid.setHeader("{{ "Folder" | trans }},{{ "Job" | trans }},{{ "Type" | trans }},{{ "Status" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
     myGrid.attachHeader("#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
-    myGrid.setInitWidths("*,300,90,90,150,150,100,80");
+    myGrid.setInitWidths("*,320,120,90,160,160,140,80");
     myGrid.setColAlign("left,left,center,center,right,right,right,right");
     myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
     myGrid.setColSorting("str,str,str,str,date,date,str,int");
@@ -95,9 +93,21 @@ dhtmlxEvent(window,"load",function(){
     myGridToolbar.attachEvent("onStateChange",function(itemid, state){
     });
 
-    var myTabbar = globalLayout.cells("c").attachTabbar();
+    myTabbar = globalLayout.cells("c").attachTabbar();
     myTabbar.addTab("job","{{ "Job" | trans }}","100px", null, true);
+    myTabbar.addTab("output","{{ "Output" | trans }}","100px");
+    myTabbar.addTab("output_I5","{{ "Output" | trans }}","100px");
     myTabbar.addTab("history","{{ "History" | trans }}","100px");
+    myTabbar.addTab("schema","{{ "Schema" | trans }}","100px");
+    myTabbar.addTab("jil","{{ "JIL" | trans }}","100px");
+    myTabbar.addTab("events","{{ "Events" | trans }}","100px");
+    myTabbar.addTab("agent","{{ "Agent" | trans }}","100px");
+    
+    myTabbar.tabs("output_I5").hide();
+    
+    myTabbar.attachEvent("onContentLoaded", function(id){
+        myTabbar.cells(id).progressOff();
+    });
 
     myDetailLayout = myTabbar.cells("job").attachLayout("2U");
     myDetailLayout.cells("a").hideHeader(); 
@@ -110,46 +120,22 @@ dhtmlxEvent(window,"load",function(){
     myForm2 = myDetailLayout.cells("b").attachForm();
     myForm2.loadStruct("{{ url('json_ATS_job_form') }}?type="+jobtype);
 
-  
-
-    myDetailToolbar = myDetailLayout.cells("a").attachToolbar();
-    myDetailToolbar.setIconsPath("{ { asset('bundles/ariicore/images/toolbar/') }}");
-    myDetailToolbar.loadStruct( "{ { url('xml_JID_jobs_form_toolbar') }}" , function(){
+    myDetailToolbar = myTabbar.cells("job").attachToolbar();
+    myDetailToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myDetailToolbar.loadStruct( "{{ url('xml_ATS_job_sendevent') }}" , function(){
         GBCalendar = new dhtmlXCalendarObject(myDetailToolbar.getInput('ref_date'));
         GBCalendar.setDateFormat("%Y-%m-%d %H:%i:%s");
         GBCalendar.setWeekStartDay(1);
     });
-        
+
     myDetailToolbar.attachEvent("onClick",function(itemid){
         Text = '';
         var id = myForm.getItemValue('ID');
         switch(itemid) {
-            case "start_job":
-                Text = "{{ "Start job" | trans }}";
+            case 'FORCE_STARTJOB':
+                alert("ok!!");
                 break;
-            case "stop_job":
-                Text = "{{ "Stop job" | trans }}";
-                break;
-            case "unstop_job":
-                Text = "{{ "Unstop job" | trans }}";
-                break;
-            case "delete_task":
             case "kill_task":
-                Text = "{{ "Kill task" | trans }}";
-                break;
-        }
-        switch(itemid) {
-            case "start_job":
-            case "stop_job":
-            case "unstop_job":
-            case "delete_task":
-            case "kill_task":
-                var params = new Array();
-                myParameters.forEachRow(function(id){
-                    var param = myParameters.cells(id,0).getValue() + "=" + encodeURIComponent(myParameters.cells(id,1).getValue());
-                    params.push(param);
-                });
-                var paramsStr = params.join(",");
                 var start_time = '';
                 start_time = myDetailToolbar.getValue("ref_date");
                 // alert("{{ url('arii_XML_Command') }}?command="+Command+"&params="+encodeURIComponent(params)+"&time="+start_time+"&job_id="+id); 
@@ -173,7 +159,7 @@ dhtmlxEvent(window,"load",function(){
         }
         return true;
     });
-// RUN_NUM,NTRY,STARTIME,ENDTIME,RUN_MACHINE,STATUS,EXIT_CODE,RUNTIME,EVT_NUM,STD_OUT_FILE,STD_ERR_FILE,REPLY_MESSAGE,REPLY_RESPONSE,HAS_EXTENDED_INFO,JOB_VER,OVER_RUN'
+    
     myHistory = myTabbar.cells("history").attachGrid();
     myHistory.selMultiRows = true;
     myHistory.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
@@ -186,6 +172,44 @@ dhtmlxEvent(window,"load",function(){
     myHistory.enableAlterCss("","");
     myHistory.init();
 
+    myOut = myTabbar.cells("output").attachLayout("2E");
+    myOut.cells("a").setText("{{ "Standard output" | trans }}");
+    myOut.cells("b").setText("{{ "Error output" | trans }}");
+
+    myOutI5 = myTabbar.cells("output_I5").attachLayout("2U");
+    myOutI5.cells("a").setText("{{ "Files" | trans }}");
+    myOutI5.cells("a").setWidth(640);
+    myOutI5.cells("b").setText("{{ "Content" | trans }}");
+    
+    myGridOut = myOutI5.cells("a").attachGrid();
+    myGridOut.selMultiRows = true;
+    myGridOut.setHeader("{{ "File" | trans }},{{ "Num" | trans }},{{ "Status" | trans }},{{ "Size" | trans }},{{ "Date" | trans }},{{ "Time" | trans }},{{ "User data" | trans }},{{ "Queue name" | trans }}");
+    myGridOut.attachHeader("#text_filter,#numeric_filter,#select_filter,#numeric_filter,#numeric_filter,#numeric_filter,#text_filter,#text_filter");
+    myGridOut.setInitWidths("140,60,120,120,90,90,140,140");
+    myGridOut.setColAlign("left,right,left,right,right,right,left,left");
+    myGridOut.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
+    myGridOut.setColSorting("str,int,str,int,int,int,str,str");
+    myGridOut.enableAlterCss("","");
+    myGridOut.init();
+    myGridOut.attachEvent("onRowDblClicked",LogDetail );
+    
+    myAgent = myTabbar.cells("agent").attachLayout("2E");
+    myAgent.cells("a").hideHeader();
+    myAgent.cells("b").setText("{{ "Spool" | trans }}");
+    
+    myTabbar.attachEvent("onContentLoaded", function(id){
+        myTabbar.cells(id).progressOff();
+    });
+    myOut.attachEvent("onContentLoaded", function(id){
+        myOut.cells(id).progressOff();
+    });
+    myOutI5.attachEvent("onContentLoaded", function(id){
+        myOutI5.cells(id).progressOff();
+    });
+    myAgent.attachEvent("onContentLoaded", function(id){
+        myAgent.cells(id).progressOff();
+    });
+    
     // Premier chargement avant le smart rendering
     autorefresh = setInterval( "GridRefresh()",update*1000);
 });
@@ -223,9 +247,36 @@ function GridRefresh() {
 }
 
 function JobDetail(id) {
-    globalLayout.cells("c").progressOn();
-    
+    job = myGrid.cells(id, 1 ).getValue(); 
+    status = myGrid.cells(id, 2 ).getValue(); 
     type = myGrid.cells(id, 3 ).getValue(); 
+    
+    myTabbar.cells("job").progressOn();
+    myTabbar.tabs("agent").hide();               
+    myTabbar.tabs("output").hide();
+    myTabbar.tabs("output_I5").hide();
+    if (type == 'I5') {
+        myTabbar.tabs("output_I5").show();
+        myTabbar.tabs("output_I5").progressOn();
+    }
+    else if (type == 'BOX'){
+        // rien
+    }
+    else {
+        myTabbar.tabs("output").show();
+        myOut.cells("a").progressOn();
+        myOut.cells("b").progressOn();
+        if (status != 'SUCCESS') {
+            myTabbar.tabs("agent").show();
+            myAgent.cells("a").progressOn();
+            myAgent.cells("b").progressOn();
+        }
+    }
+    
+    myTabbar.cells("schema").progressOn();
+    myTabbar.cells("jil").progressOn();
+    myTabbar.cells("events").progressOn(); 
+        
     if (type != jobtype) {
         myForm2.unload();
         myForm2 = myDetailLayout.cells("b").attachForm();
@@ -235,77 +286,42 @@ function JobDetail(id) {
 
     myForm.load("{{ url('xml_ATS_job_form') }}?id="+id);
     myForm2.load("{{ url('xml_ATS_job_form') }}?id="+id+"&type="+type, function() {
+        myTabbar.cells("job").progressOff();
         globalLayout.cells("c").progressOff();
-        myHistory.load( "{{ url('xml_ATS_job_history') }}?id="+id);
-    });
-
-}
-
-function onShowMenu(rowId, celInd, grid) {
-
-    var status = grid.cells(rowId, 3 ).getValue();
-
-    // si on est operator 
-    {% if is_granted('ROLE_OPERATOR') %}
-    if (status !=='RUNNING') {
-        myGridMenu.hideItem('kill_task');    
-    }
-    else {
-        myGridMenu.showItem('kill_task');    
-    }
-    if (status !=='QUEUED')  {
-        myGridMenu.hideItem('delete_task');    
-    }
-    else {
-        myGridMenu.showItem('delete_task');    
-    }
-    // job stoppé
-    if ((grid.cells(rowId, 3).getValue()== 'STOPPED') 
-         || (grid.cells(rowId, 3).getValue()== 'STOPPING') ){    
-        myGridMenu.hideItem("stop_job");
-        myGridMenu.showItem("unstop_job");
-    }
-    else {
-        myGridMenu.hideItem("unstop_job");
-        myGridMenu.showItem("stop_job");
-    }
-    {% else %}
-        myGridMenu.hideItem('start_job');
-        myGridMenu.hideItem('kill_task');
-        myGridMenu.hideItem('stop_job');
-        myGridMenu.hideItem('unstop_job');
-        myGridMenu.hideItem('pause_spooler');    
-        myGridMenu.hideItem('continue_spooler');    
-    {% endif %} 
- return true;
-}
-
-// Fonctions
-function CheckSpooler(rid) 
-{
-    dhx4.ajax.get("{{ url('arii_JID_spooler_update') }}?id="+rid,function(loader,response){
-        dhtmlx.message({
-            type: "Notice",
-            expire: 10000,
-            width: "500px",
-            text: loader.xmlDoc.responseText
+        myHistory.clearAndLoad( "{{ url('xml_ATS_job_history') }}?id="+id, function () {
+            myTabbar.cells("history").progressOff();
+            if (type == 'I5') {
+                myGridOut.load("{{ url('xml_ATS_autosyslog') }}?options=-z&job="+job, function() {
+                    myTabbar.tabs("output_I5").progressOff();
+                });
+            }
+            else if (type == 'BOX'){
+                // rien
+            }
+            else {
+                myOut.cells("a").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tO&job="+job);            
+                myOut.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tE&job="+job);
+                
+                if (status != 'SUCCESS') {
+                    myAgent.cells("a").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tA&job="+job);                            
+                    myAgent.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tS&job="+job);                            
+                }            
+            }
+            myTabbar.cells("jil").attachURL("{{ url('arii_ATS_autorep') }}?options=-q -l0&job="+job);
+            myTabbar.cells("events").attachURL("{{ url('arii_ATS_autorep') }}?options=-d -l0&job="+job);            
+            var url = "{{ url('arii_ATS_generate') }}";
+            url += "?id="+id;
+            myTabbar.cells("schema").attachURL(url);            
         });
     });
-return true;
 }
 
-function Spooler(url,rid)
-{
-    dhx4.ajax.get.get(url+"="+rid,function(loader,response){
-        dhtmlx.message({
-            type: "Notice",
-            expire: 10000,
-            width: "500px",
-            text: loader.xmlDoc.responseText
-        });
-        CheckSpooler(rid);
-    });
-    return true;
+function LogDetail(id) {
+    file = this.cells(id, 0 ).getValue(); 
+    num = this.cells(id, 1 ).getValue(); 
+    status = this.cells(id, 2 ).getValue(); 
+    myOutI5.cells("b").progressOn();
+    myOutI5.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-d "+file+":"+num+"&job="+job);
 }
 
 </script>
