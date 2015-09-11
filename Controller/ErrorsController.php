@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 class ErrorsController extends Controller
 {
     protected $images;
-     
+
     public function __construct( )
     {
           $request = Request::createFromGlobals();

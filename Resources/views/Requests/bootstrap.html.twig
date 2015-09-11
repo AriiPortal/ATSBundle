@@ -17,8 +17,13 @@
   
 <div class="table-responsive">
   <table class="table">
+      <tr><td>#</td>
+    {% for cell in result.columns %}
+        <th>{{ cell }}</th>
+    {% endfor %}
+    </tr>
     {% for id, row in result.line %}
-        <tr>
+        <tr><th>{{ id }}</th>
         {% for cell in row %}
             <td>{{ cell }}</td>
         {% endfor %}

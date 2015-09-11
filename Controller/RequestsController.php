@@ -30,7 +30,28 @@ class RequestsController extends Controller
     // Temps d'exécution trop long
     public function summaryAction()
     {
-        print "test";
+        $lang = $this->getRequest()->getLocale();
+        $basedir = '../src/Arii/ATSBundle/Resources/views/Requests/'.$lang;
+        
+        $yaml = new Parser();
+        $value['title'] = $this->get('translator')->trans('Summary');
+        $value['description'] = $this->get('translator')->trans('List of requests');
+        $value['columns'] = array(
+            $this->get('translator')->trans('title'),
+            $this->get('translator')->trans('description') );
+        
+        if ($dh = @opendir($basedir)) {
+            $nb=0;
+            while (($file = readdir($dh)) !== false) {
+                if (substr($file,-4)=='.yml') {
+                    $content = file_get_contents("$basedir/$file");
+                    $v = $yaml->parse($content);
+                    $value['line'][$nb] = array($v['title'],$v['description']);
+                    $nb++;
+                }
+            }
+        }
+        return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value));
     }
     
     // Temps d'exécution trop long
@@ -60,12 +81,19 @@ class RequestsController extends Controller
         $autosys = $this->container->get('arii_ats.autosys');
         $date = $this->container->get('arii_core.date');
         $nb=0;
+        $value['columns'] = explode(',',$value['header']);
         while ($line = $data->sql->get_next($res))
         {
-            $value['line'][$nb] = $line;
+            $r = array();
+            foreach ($value['columns'] as $h) {
+                if (isset($line[$h])) $val = $line[$h];
+                    else  $val = $h;
+                array_push($r,$val);
+            }
+            $value['line'][$nb] = $r;
             $nb++;
         }
-         return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value));
+        return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value));
     }
 
 }
