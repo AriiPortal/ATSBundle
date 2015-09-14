@@ -54,7 +54,18 @@ class ServersController extends Controller
         while ($line = $data->sql->get_next($res))
         {
             $bgcolor = $color = '';
+            # Code couleur
+            $delay =  time() - $line['TIME_STAMP'];
             $list .= '<row';
+            if ($delay > 300) {
+                $list .= ' style="background-color: #fbb4ae;"';
+            }
+            elseif ($delay > 30) {
+                $list .= ' style="background-color: #ffffcc;"';
+            }
+            else {
+                $list .= ' style="background-color: #ccebc5;"';
+            }
             $list .= '>';
                 
             $list .= '<cell>'.$date->Time2Local($line['TIME_STAMP'],'VA1',true).'</cell>';             
@@ -179,32 +190,34 @@ class ServersController extends Controller
     }
 
     public function pieAction() {
+        $sql = $this->container->get('arii_core.sql');                  
+        $qry = $sql->Select(array('TIME_STAMP'))
+                .$sql->From(array('UJO_HA_PROCESS'))
+                .$sql->OrderBy(array('HA_DESIGNATOR_ID'));
+
         $dhtmlx = $this->container->get('arii_core.dhtmlx');
         $data = $dhtmlx->Connector('data');
-        // Jobs
-        $Fields = array( '{job_name}'   => 'JOB_NAME' );
-        
-        $sql = $this->container->get('arii_core.sql');
-        $qry = $sql->Select(array('EVENTTXT','STATUSTXT','count(JOID) as NB'))
-                .$sql->From(array('UJO_EVENTVU'))
-                .$sql->GroupBy(array('EVENTTXT','STATUSTXT'));
 
         $res = $data->sql->query($qry);
         $autosys = $this->container->get('arii_ats.autosys');
+        $ok = $late = $ko = 0;
         while ($line = $data->sql->get_next($res))
-        {            
-            if ($line['STATUSTXT'] == '')
-                $status = $autosys->Status($line['EVENTTXT']);
-            else
-                $status = $autosys->Status($line['STATUSTXT']);
-
-            $Status[$status] = $line['NB'];
-        }
+        {
+            $delay =  time() - $line['TIME_STAMP'];
+            if ($delay > 300) {
+                $ko++;
+            }
+            elseif ($delay > 30) {
+                $late++;
+            }
+            else {
+                $ok++;
+            }
+         }
         $pie = '<data>';
-        foreach ($Status as $s=>$nb) {
-            list($bgcolor) = $autosys->ColorStatus($s);
-            $pie .= '<item id="'.$s.'"><STATUS>'.$s.'</STATUS><JOBS>'.$nb.'</JOBS><COLOR>'.$bgcolor.'</COLOR></item>';
-        }
+        $pie .= '<item id="RUNNING"><STATUS>RUNNING</STATUS><PROCESSES>'.$ok.'</PROCESSES><COLOR>#ccebc5</COLOR></item>';
+        $pie .= '<item id="LATE"><STATUS>LATE</STATUS><PROCESSES>'.$late.'</PROCESSES><COLOR>#ffffcc</COLOR></item>';
+        $pie .= '<item id="STOPPED"><STATUS>STOPPED</STATUS><PROCESSES>'.$ko.'</PROCESSES><COLOR>#fbb4ae</COLOR></item>';
         $pie .= '</data>';
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
@@ -212,4 +225,5 @@ class ServersController extends Controller
         return $response;
     }
 
+    
 }

@@ -11,10 +11,11 @@ var autorefresh;
 var status;
 
 dhtmlxEvent(window,"load",function(){     
-    globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
+    globalLayout = new dhtmlXLayoutObject(document.body,"4C");  
     globalLayout.cells("a").setWidth(360); 
     globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").setText("{{ "Servers" | trans }}"); 
+    globalLayout.cells("b").setHeight(220); 
 
     globalMenu = globalLayout.cells("a").attachMenu();
     globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
@@ -43,15 +44,9 @@ dhtmlxEvent(window,"load",function(){
                 align:"left"
             } 
     });
-    
-    
     myDonut.load( "{{ url('xml_ATS_processes_pie') }}" );
 
-    var myTab = globalLayout.cells("b").attachTabbar();
-    myTab.addTab("status","{{ "Status" | trans }}","100px", null, true);
-    myTab.addTab("check","{{ "Auto Check" | trans }}","100px");
-
-    myGrid = myTab.cells("status").attachGrid();
+    myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
     myGrid.setHeader("{{ "Time" | trans }},{{ "Role" | trans }},{{ "Hostname" | trans }},{{ "Status" | trans }},{{ "PID" | trans }},{{ "Port" | trans }},{{ "Queue" | trans }}");
@@ -66,7 +61,38 @@ dhtmlxEvent(window,"load",function(){
     myGrid.load( "{{ url('xml_ATS_servers_grid') }}");
     myGrid.attachEvent("onRowDblClicked",Detail );
 
+    myDonut.attachEvent("onItemClick",function(id, value){
+        status = id;
+        myGrid.filterBy(4, status);  
+    });
+/*
+    myGridToolbar = globalLayout.cells("b").attachToolbar();
+    myGridToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myGridToolbar.loadStruct( "{{ url('xml_ATS_servers_grid_toolbar') }}");
+    myGridToolbar.attachEvent("onClick",function(itemid){
+         switch (itemid) {
+            case 'refresh':
+                globalLayout.cells("b").progressOn();
+                GlobalRefresh();
+                break;
+            case "print":
+                myGrid.printView();
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+    myGridToolbar.attachEvent("onStateChange",function(itemid, state){
+         switch (itemid) {
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+*/    
     globalLayout.cells("c").setText("{{ "Application servers" | trans }}"); 
+    globalLayout.cells("c").setHeight(220); 
     myGrid2 = globalLayout.cells("c").attachGrid();
     myGrid2.selMultiRows = true;
     myGrid2.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
@@ -80,9 +106,37 @@ dhtmlxEvent(window,"load",function(){
     myGrid2.init();
     
     myGrid2.load( "{{ url('xml_ATS_servers2_grid') }}");
-
-    myTab.cells("check").attachURL("{{ url('html_ATS_chk_auto_up') }}");
+/*            $list .= '<cell>'.$line['MACH_NAME'].'</cell>';
+            $list .= '<cell>'.$line['MACH_STATUS'].'</cell>';
+            $list .= '<cell>'.$line['AGENT_NAME'].'</cell>';
+            $list .= '<cell>'.$line['DESCRIPTION'].'</cell>';
+            $list .= '<cell>'.$line['PARENT_NAME'].'</cell>';
+            $list .= '<cell>'.$line['QUE_NAME'].'</cell>';
+            $list .= '<cell>'.$line['TYPE'].'</cell>';
+            $list .= '<cell>'.$line['PORT'].'</cell>';
+            $list .= '<cell>'.$line['CHARACTER_CODE'].'</cell>';
+            $list .= '<cell>'.$line['MAX_LOAD'].'</cell>';
+            $list .= '<cell>'.$line['FACTOR'].'</cell>';
+            $list .= '<cell>'.$line['HEARTBEAT_ATTEMPTS'].'</cell>';
+            $list .= '<cell>'.$line['HEARTBEAT_FREQ'].'</cell>';
+            $list .= '<cell>'.$line['NODE_NAME'].'</cell>';
+            $list .= '<cell>'.$line['OPSYS'].'</cell>';
+*/
+    globalLayout.cells("d").setText("{{ "Agents" | trans }}"); 
+    myGrid3 = globalLayout.cells("d").attachGrid();
+    myGrid3.selMultiRows = true;
+    myGrid3.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid3.setHeader("{{ "Machine" | trans }},{{ "Status" | trans }},{{ "Agent" | trans }},{{ "Description" | trans }},{{ "Queue" | trans }},{{ "Type" | trans }},{{ "OS" | trans }},{{ "Max load" | trans }},{{ "Factor" | trans }},{{ "Hostname" | trans }},{{ "Port" | trans }}");
+    myGrid3.attachHeader("#text_filter,#select_filter,#text_filter,#text_filter,#text_filter,#select_filter,#select_filter,#select_filter,#select_filter,#text_filter,#select_filter");
+    myGrid3.setInitWidths("200,100,120,*,150,80,80,80,80,200,80");
+    myGrid3.setColAlign("left,left,left,left,left,left,left,left,left,left,left");
+    myGrid3.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+    myGrid3.setColSorting("date,str,str,str,str,str,str,str,str,str,str");
+    myGrid3.enableAlterCss("","");
+    myGrid3.init();
     
+    myGrid3.load( "{{ url('xml_ATS_servers3_grid') }}");
+
     // Premier chargement avant le smart rendering
     autorefresh = setInterval( "GridRefresh()",update*1000);
 });

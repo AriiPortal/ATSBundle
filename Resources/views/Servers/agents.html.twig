@@ -43,46 +43,23 @@ dhtmlxEvent(window,"load",function(){
                 align:"left"
             } 
     });
-    
-    
-    myDonut.load( "{{ url('xml_ATS_processes_pie') }}" );
+    myDonut.load( "{{ url('xml_ATS_agents_pie') }}" );
 
-    var myTab = globalLayout.cells("b").attachTabbar();
-    myTab.addTab("status","{{ "Status" | trans }}","100px", null, true);
-    myTab.addTab("check","{{ "Auto Check" | trans }}","100px");
-
-    myGrid = myTab.cells("status").attachGrid();
+    globalLayout.cells("b").setText("{{ "Agents" | trans }}"); 
+    myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
-    myGrid.setHeader("{{ "Time" | trans }},{{ "Role" | trans }},{{ "Hostname" | trans }},{{ "Status" | trans }},{{ "PID" | trans }},{{ "Port" | trans }},{{ "Queue" | trans }}");
-    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
-    myGrid.setInitWidths("140,120,*,120,120,120,120");
-    myGrid.setColAlign("left,left,left,left,right,right,right");
-    myGrid.setColTypes("ro,ro,ro,ch,ro,ro,ro");
-    myGrid.setColSorting("date,str,str,str,str,str,str");
+    myGrid.setHeader("{{ "Machine" | trans }},{{ "Status" | trans }},{{ "Agent" | trans }},{{ "Description" | trans }},{{ "Queue" | trans }},{{ "Type" | trans }},{{ "OS" | trans }},{{ "Max load" | trans }},{{ "Factor" | trans }},{{ "Hostname" | trans }},{{ "Port" | trans }}");
+    myGrid.attachHeader("#text_filter,#select_filter,#text_filter,#text_filter,#text_filter,#select_filter,#select_filter,#select_filter,#select_filter,#text_filter,#select_filter");
+    myGrid.setInitWidths("200,100,120,*,150,80,80,80,80,200,80");
+    myGrid.setColAlign("left,left,left,left,left,left,left,left,left,left,left");
+    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+    myGrid.setColSorting("date,str,str,str,str,str,str,str,str,str,str");
     myGrid.enableAlterCss("","");
     myGrid.init();
     
-    myGrid.load( "{{ url('xml_ATS_servers_grid') }}");
-    myGrid.attachEvent("onRowDblClicked",Detail );
+    myGrid.load( "{{ url('xml_ATS_agents_grid') }}");
 
-    globalLayout.cells("c").setText("{{ "Application servers" | trans }}"); 
-    myGrid2 = globalLayout.cells("c").attachGrid();
-    myGrid2.selMultiRows = true;
-    myGrid2.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
-    myGrid2.setHeader("{{ "Time" | trans }},{{ "Hostname" | trans }},{{ "Status" | trans }},{{ "PID" | trans }},{{ "Port" | trans }},{{ "Queue" | trans }},{{ "Comm." | trans }},{{ "Alias" | trans }}");
-    myGrid2.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
-    myGrid2.setInitWidths("140,*,120,120,120,120,200,200");
-    myGrid2.setColAlign("left,left,left,right,right,right,left,left");
-    myGrid2.setColTypes("ro,ro,ch,ro,ro,ro,ro,ro");
-    myGrid2.setColSorting("date,str,str,str,str,str,str,str");
-    myGrid2.enableAlterCss("","");
-    myGrid2.init();
-    
-    myGrid2.load( "{{ url('xml_ATS_servers2_grid') }}");
-
-    myTab.cells("check").attachURL("{{ url('html_ATS_chk_auto_up') }}");
-    
     // Premier chargement avant le smart rendering
     autorefresh = setInterval( "GridRefresh()",update*1000);
 });
@@ -105,16 +82,11 @@ function GridRefresh() {
         seconds = "0" + seconds;
     }
     myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
-    myGrid.load("{{ url('xml_ATS_servers_grid') }}?time="+seconds+"&history="+max_history+"&chained="+chained+"&only_warning="+only_warning, function(){    
+    myGrid.load("{{ url('xml_ATS_agents_grid') }}?time="+seconds+"&history="+max_history+"&chained="+chained+"&only_warning="+only_warning, function(){    
+        myDonut.load( "{{ url('xml_ATS_agents_pie') }}" );
         globalLayout.cells("b").progressOff();
         myGrid.refreshFilters();
         myGrid.filterByAll();
-//        myGrid.filterBy(4, status);  
-        myDonut.load( "{{ url('xml_ATS_processes_pie') }}?chained="+chained+"&only_warning="+only_warning, function () {
-            myDonut.refresh();                
-            globalLayout.progressOff();
-            globalLayout.cells("a").progressOff();
-        });
     });    
 }
 

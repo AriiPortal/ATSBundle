@@ -119,4 +119,34 @@ QPJOBLOG   1        *READY     24        150911 093940 EJOBOTOSY1 QEZJOBLOG
         return $response;
     }
 
+    public function chk_auto_upAction() {
+        $request = Request::createFromGlobals();
+        $job = $request->query->get( 'job' );
+        $options = $request->query->get( 'options' );
+        
+        $exec = $this->container->get('arii_ats.exec');
+        $Check = array();
+        foreach (explode("\n",$exec->Exec("chk_auto_up")) as $line) {
+            if (strpos($line, "Connected with")) {
+                $line = '<font color="green">'.$line.'</font>';
+            }
+            elseif (strpos($line, "is RUNNING")) {
+                $line = '<font color="green">'.$line.'</font>';
+            }
+            elseif (strpos($line, "not RUNNING")) {
+                $line = '<font color="red">'.$line.'</font>';
+            }
+            elseif (strpos($line, "***")) {
+                $line = '<strong>'.$line.'</strong>';
+            }
+            array_push($Check, $line);            
+        }
+        header('Content-Type: text/html; charset=utf-8');        
+        print "<pre>";
+        print implode("\n",$Check);
+        print "</pre>";
+        
+        exit();
+    }
+
 }

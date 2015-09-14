@@ -41,6 +41,10 @@ xml_ATS_autosyslog:
     pattern:  /autosyslog.xml
     defaults: { _controller: AriiATSBundle:Default:autosyslog_grid }
 
+html_ATS_chk_auto_up:
+    pattern:  /chk_auto_up.html
+    defaults: { _controller: AriiATSBundle:Default:chk_auto_up }
+
 # --------------------------------------------------------------------------
 # JOBS
 # --------------------------------------------------------------------------
@@ -108,7 +112,7 @@ xml_ATS_events_grid_toolbar:
     defaults: { _controller: AriiATSBundle:Events:toolbar }
 
 # --------------------------------------------------------------------------
-# EVENTS
+# SERVERS
 # --------------------------------------------------------------------------
 arii_ATS_servers:
     pattern:  /servers
@@ -126,14 +130,32 @@ xml_ATS_servers2_grid:
     pattern:  /servers/grid2.xml
     defaults: { _controller: AriiATSBundle:Servers:grid2 }
 
-xml_ATS_servers3_grid:
-    pattern:  /servers/grid3.xml
-    defaults: { _controller: AriiATSBundle:Servers:grid3 }
-
 xml_ATS_servers_grid_toolbar:
     pattern:  /servers/toolbar.xml
     defaults: { _controller: AriiATSBundle:Servers:toolbar }
-    
+
+xml_ATS_processes_pie:
+    pattern:  /servers/pie.xml
+    defaults: { _controller: AriiATSBundle:Servers:pie }    
+
+# AGENTS
+
+arii_ATS_agents:
+    pattern:  /agents
+    defaults: { _controller: AriiATSBundle:Agents:index }
+
+xml_ATS_agents_grid:
+    pattern:  /agents/grid.xml
+    defaults: { _controller: AriiATSBundle:Agents:agents }
+
+xml_ATS_agents_pie:
+    pattern:  /agents/pie.xml
+    defaults: { _controller: AriiATSBundle:Agents:pie }
+
+xml_ATS_agents_pie:
+    pattern:  /agents/pie.xml
+    defaults: { _controller: AriiATSBundle:Agents:pie }
+
 # --------------------------------------------------------------------------
 # PROCESSED
 # --------------------------------------------------------------------------
