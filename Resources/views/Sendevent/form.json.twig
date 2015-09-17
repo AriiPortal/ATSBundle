@@ -1,0 +1,35 @@
+[
+    {type:"settings",
+        position: "label-left", 
+        labelAlign:"right", 
+        labelWidth:"80",
+        inputWidth:"500" },
+    {   type:"input",    
+            name: "JOB", 
+            label:"{{ "Job" | trans}}"
+    },
+    {   type:"input",    
+            name: "STATUS", 
+            label:"{{ "Status" | trans}}"
+    },
+    {   type:"input",    
+            name: "COMMENT", 
+            label:"{{ "Comment" | trans}}"
+    },
+    {   type:"input",    
+            name: "RESPONSE", 
+            label:"{{ "Response" | trans}}"
+    },
+    {   type:"checkbox",    
+            name: "FORCE", 
+            label:"{{ "Force start" | trans}}",
+            value: 1,
+            checked: true
+    },
+    {   type:"button",    
+            name: "SUBMIT",
+            value: "{{ "Execution" | trans }}"
+    },
+    {type:"hidden",    name: "ID" },
+    {type:"hidden",    name: "ACTION" }
+]

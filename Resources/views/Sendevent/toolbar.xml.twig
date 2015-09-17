@@ -1,0 +1,22 @@
+<toolbar>
+    <item type="button" id="STARTJOB" text="{{ "Start" | trans }}" img="start.png"/>
+    <item type="button" id="KILLJOB" text="{{ "Kill" | trans }}" img="kill.png"/>
+    <item type="separator"/>
+    <item type="buttonSelect" id="EXEC" text="{{ "Execution" | trans }}" img="block.png">
+        <item type="button" id="JOB_ON_ICE" text="{{ "Ice" | trans }}"/>
+        <item type="button" id="JOB_OFF_ICE" text="{{ "De-Ice" | trans }}"/>
+        <item type="button" id="JOB_ON_HOLD" text="{{ "Hold" | trans }}"/>
+        <item type="button" id="JOB_OFF_HOLD" text="{{ "De-Hold" | trans }}"/>
+        <item type="button" id="JOB_ON_NOEXEC" text="{{ "No Exec" | trans }}"/>
+        <item type="button" id="JOB_OFF_NOEXEC" text="{{ "Exec" | trans }}"/>
+    </item>
+    <item type="separator"/>
+    <item type="buttonSelect" id="STATUS" text="{{ "Status" | trans }}" img="view.png">
+        <item type="button" id="INACTIVE" text="INACTIVE"/>
+        <item type="button" id="SUCCESS" text="SUCCESS"/>
+        <item type="button" id="FAILURE" text="FAILURE"/>
+        <item type="button" id="TERMINATED" text="TERMINATED"/>
+    </item>
+    <item type="separator"/>
+    <item type="button" id="WAIT_REPLY" text="{{ "Reply" | trans }}" img="reply.png"/>
+</toolbar>

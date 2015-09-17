@@ -45,6 +45,23 @@ html_ATS_chk_auto_up:
     pattern:  /chk_auto_up.html
     defaults: { _controller: AriiATSBundle:Default:chk_auto_up }
 
+# SENDEVENT
+json_ATS_sendevent_form:
+    pattern:  /sendevent/form.json
+    defaults: { _controller: AriiATSBundle:Sendevent:form }
+
+xml_ATS_sendevent_form_toolbar:
+    pattern:  /sendevent/form_toolbar.xml
+    defaults: { _controller: AriiATSBundle:Sendevent:form_toolbar }
+
+xml_ATS_sendevent_toolbar:
+    pattern:  /sendevent/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Sendevent:toolbar }
+
+html_ATS_sendevent_exec:
+    pattern:  /sendevent/exec.html
+    defaults: { _controller: AriiATSBundle:Sendevent:sendevent }
+
 # --------------------------------------------------------------------------
 # JOBS
 # --------------------------------------------------------------------------
@@ -87,10 +104,6 @@ xml_ATS_job_form:
 xml_ATS_job_history:
     pattern:  /job/history.xml
     defaults: { _controller: AriiATSBundle:Job:history }
-
-xml_ATS_job_sendevent:
-    pattern:  /job/sendevent.xml
-    defaults: { _controller: AriiATSBundle:Job:sendevent }
 
 # --------------------------------------------------------------------------
 # EVENTS

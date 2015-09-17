@@ -16,13 +16,6 @@ class JobController extends Controller
           $this->images = $request->getUriForPath('/../bundles/ariicore/images/wa');          
     }
 
-    public function sendeventAction()
-    {
-        $response = new Response();
-        $response->headers->set('Content-Type', 'text/xml');
-        return $this->render('AriiATSBundle:Job:sendevent.xml.twig',array(), $response );
-    }
-
     public function formAction()
     {
         $request = Request::createFromGlobals();

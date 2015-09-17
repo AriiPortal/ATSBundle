@@ -115,6 +115,127 @@ function ClickRibbon (itemid,state) {
     }
 }
 
+function Sendevent( Job, Event )
+{
+    Time = false;
+    var largeur = 640;
+    var dhxWins = new dhtmlXWindows();
+
+    msg = dhxWins.createWindow( "sendevent" ,  (document.body.offsetWidth-largeur)/2, 50, largeur, 400 );
+    
+    var form = msg.attachForm();
+    form.loadStruct("{{ url('json_ATS_sendevent_form') }}", function(){
+        form.setItemValue("JOB",Job);
+        form.setItemValue("ACTION",Event);
+        form.setItemValue("STATUS",Event);
+        form.hideItem("FORCE");
+        form.hideItem("RESPONSE");
+        form.hideItem("STATUS");
+        switch(Event) {
+            case 'KILLJOB':
+                Text = "{{ "Kill Job" | trans }}";
+                break;
+            case 'STARTJOB':
+                Text = "{{ "Start Job" | trans }}";
+                form.showItem("FORCE");
+                break;
+            case 'JOB_ON_NOEXEC':
+            case 'JOB_ON_ICE':
+            case 'JOB_ON_HOLD':
+                Text = "{{ "Block job" | trans }}";
+                break;
+            case 'JOB_OFF_NOEXEC':
+            case 'JOB_OFF_ICE':
+            case 'JOB_OFF_HOLD':
+                Text = "{{ "Unblock job" | trans }}";
+                break;
+            case 'INACTIVE':
+            case 'SUCCESS':
+            case 'FAILURE':
+            case 'TERMINATED':
+                Text = "{{ "Change status" | trans }} "+Event;
+                form.showItem("STATUS");
+                break;
+            case 'REPLY_RESPONSE':
+            case 'WAIT_REPLY':
+                Text = "{{ "Reply" | trans }}";
+                form.hideItem("COMMENT");
+                form.showItem("RESPONSE");
+                break;
+            default:
+                Text = "{{ "Send event" | trans }}";
+                break;
+        }
+        msg.setText( Text );    
+    });
+            
+    var toolbar;
+    toolbar = msg.attachToolbar();
+    toolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    toolbar.loadStruct( "{{ url('xml_ATS_sendevent_form_toolbar') }}" ,function(){
+        if (Time) {
+            GBCalendar = new dhtmlXCalendarObject(toolbar.getInput('ref_date'));
+            GBCalendar.setDateFormat("%Y-%m-%d %H:%i:%s");
+            GBCalendar.setWeekStartDay(1);
+        }
+    });
+
+    form.attachEvent("onButtonClick", function(name) {
+        dhtmlx.message({
+            type: "Notice",
+            text: Text,
+            width: "800"
+        });
+        msg.progressOn();
+        var job = form.getItemValue('JOB');
+        var action = form.getItemValue('ACTION');
+        var comment = form.getItemValue('COMMENT');
+        var force = form.getItemValue('FORCE');
+        form.send("{{ url('html_ATS_sendevent_exec') }}","POST",function(loader,response){
+            dhtmlx.message({
+                type: "Notice",
+                expire: 10000,
+                width: "800px",
+                text: loader.xmlDoc.responseText
+            });
+            msg.progressOff();
+            msg.close();
+            
+            GridRefresh();
+            globalLayout.cells("b").progressOn();
+        });               
+    });
+
+    toolbar.attachEvent("onClick",function(itemid){
+        switch(itemid) {
+            case "execute":
+                if (Time)
+                    start_time = toolbar.getValue("ref_date");
+                break;
+            case "cancel":
+                msg.close();
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+        return true;
+    });
+/*            
+    dhtmlXCalendarObject.prototype.langData["fr"] = {
+            monthesFNames: ["Janvier","Février","Маrs","Аvril","Маi","Juin","Juillet","Аoût","Septembre","Оctobre","Novembre","Décembre"],
+            monthesSNames: ["Jan.","Fév.","Маrs","Аvr","Маi","Juin","Jui.","Août","Sep.","Оct.","Nov.","Déc."],
+            daysFNames: ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"],
+            daysSNames: ["Di","Lu","Ma","Me","Je","Ve","Sa"],
+            weekstart: 1
+    };
+    dhxCalendar = new dhtmlXCalendarObject(dhxForm.getInput("at"));
+    dhxCalendar.loadUserLanguage("fr");
+    dhxCalendar.setDateFormat("%Y-%m-%d %H:%i:%s");
+    dhxCalendar.showTime();
+*/      
+    return true;    
+}
 
 </script>
 {% endblock script %}

@@ -29,7 +29,7 @@ dhtmlxEvent(window,"load",function(){
 
     var myTab = globalLayout.cells("a").attachTabbar();
     myTab.addTab("b1","{{ "Status" | trans }}","100px", null, true);
-    myTab.addTab("b2","{{ "Folders" | trans }}","100px");
+//    myTab.addTab("b2","{{ "Folders" | trans }}","100px");
 
     myDonut =  myTab.cells("b1").attachChart({
             view:"donut",
@@ -50,10 +50,10 @@ dhtmlxEvent(window,"load",function(){
     });
     myDonut.load( "{{ url('xml_ATS_jobs_pie') }}" );
     
-    myTree = myTab.cells("b2").attachTree();
+/*    myTree = myTab.cells("b2").attachTree();
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
     myTree.load( "{ { url('xml_ATS_jobs_tree') }}" );
-    
+*/    
     myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
@@ -122,36 +122,24 @@ dhtmlxEvent(window,"load",function(){
 
     myDetailToolbar = myTabbar.cells("job").attachToolbar();
     myDetailToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
-    myDetailToolbar.loadStruct( "{{ url('xml_ATS_job_sendevent') }}" , function(){
-        GBCalendar = new dhtmlXCalendarObject(myDetailToolbar.getInput('ref_date'));
-        GBCalendar.setDateFormat("%Y-%m-%d %H:%i:%s");
-        GBCalendar.setWeekStartDay(1);
+    myDetailToolbar.loadStruct( "{{ url('xml_ATS_sendevent_toolbar') }}" , function() {
     });
 
     myDetailToolbar.attachEvent("onClick",function(itemid){
-        Text = '';
-        var id = myForm.getItemValue('ID');
         switch(itemid) {
-            case 'FORCE_STARTJOB':
-                alert("ok!!");
-                break;
-            case "kill_task":
-                var start_time = '';
-                start_time = myDetailToolbar.getValue("ref_date");
-                // alert("{{ url('arii_XML_Command') }}?command="+Command+"&params="+encodeURIComponent(params)+"&time="+start_time+"&job_id="+id); 
-                dhtmlx.message({
-                type: "Notice",
-                text: Text });
-                globalLayout.cells("a").progressOn();        
-                globalLayout.cells("b").progressOn();
-                dhx4.ajax.post("{{ url('arii_XML_Command') }}","command="+itemid+"&params="+encodeURIComponent(params)+"&time="+start_time+"&job_id="+id,function(loader,response){
-                    dhtmlx.message({
-                    type: "Notice",
-                    expire: 10000,
-                    width: "500px",
-                    text: loader.xmlDoc.responseText });
-                    GlobalRefresh();
-                });
+            case 'KILLJOB':
+            case 'SUCCESS':
+            case 'FAILURE':
+            case 'INACTIVE':
+            case 'JOB_ON_ICE':
+            case 'JOB_OFF_ICE':
+            case 'JOB_ON_HOLD':
+            case 'JOB_OFF_HOLD':
+            case 'JOB_ON_NOEXEC':
+            case 'JOB_OFF_NOEXEC':
+            case 'STARTJOB':
+            case 'WAIT_REPLY':
+                Sendevent(myForm.getItemValue('JOB_NAME'),itemid);
                 break;
             default:
                 alert(itemid);
@@ -241,7 +229,7 @@ function GridRefresh() {
             myDonut.refresh();                
             globalLayout.progressOff();
             globalLayout.cells("a").progressOff();
-            myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_tree') }}?chained="+chained+"&only_warning="+only_warning);                    
+            // myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_tree') }}?chained="+chained+"&only_warning="+only_warning);                    
         });
     });    
 }
@@ -251,6 +239,62 @@ function JobDetail(id) {
     status = myGrid.cells(id, 2 ).getValue(); 
     type = myGrid.cells(id, 3 ).getValue(); 
     
+    myDetailToolbar.showItem("STARTJOB");    
+    myDetailToolbar.hideItem("KILLJOB");
+
+    myDetailToolbar.showItem("EXEC");    
+    myDetailToolbar.showListOption("EXEC","JOB_ON_ICE");    
+    myDetailToolbar.hideListOption("EXEC","JOB_OFF_ICE");    
+    myDetailToolbar.showListOption("EXEC","JOB_ON_HOLD");    
+    myDetailToolbar.hideListOption("EXEC","JOB_OFF_HOLD");
+    myDetailToolbar.showListOption("EXEC","JOB_ON_NOEXEC");    
+    myDetailToolbar.hideListOption("EXEC","JOB_OFF_NOEXEC");
+    
+    myDetailToolbar.showItem("STATUS");    
+    myDetailToolbar.showListOption("STATUS","SUCCESS");    
+    myDetailToolbar.showListOption("STATUS","FAILURE");    
+    myDetailToolbar.showListOption("STATUS","INACTIVE");
+    myDetailToolbar.showListOption("STATUS","TERMINATED"); 
+    
+    myDetailToolbar.hideItem("WAIT_REPLY");
+    // Toolbar
+    switch (status) {
+        case 'RUNNING':
+            myDetailToolbar.hideItem("STARTJOB");
+            myDetailToolbar.showItem("KILLJOB");
+            break;
+        case 'WAIT_REPLY':
+            myDetailToolbar.showItem("WAIT_REPLY");
+            myDetailToolbar.showItem("KILLJOB");
+            
+            myDetailToolbar.hideItem("STARTJOB");
+            myDetailToolbar.hideItem("BLOCK");
+            myDetailToolbar.hideItem("STATUS");
+            break;
+        case 'ON_ICE':
+            myDetailToolbar.hideListOption("EXEC","JOB_ON_ICE");    
+            myDetailToolbar.showListOption("EXEC","JOB_OFF_ICE"); 
+            break;
+        case 'ON_HOLD':
+            myDetailToolbar.hideListOption("EXEC","JOB_ON_HOLD");    
+            myDetailToolbar.showListOption("EXEC","JOB_OFF_HOLD"); 
+            break;
+        case 'NO_EXEC':
+            myDetailToolbar.hideListOption("EXEC","JOB_ON_NOEXEC");    
+            myDetailToolbar.showListOption("EXEC","JOB_OFF_NOEXEC"); 
+            break;
+        case 'SUCCESS':
+        case 'FAILURE':
+        case 'INACTIVE':
+        case 'TERMINATED':
+            myDetailToolbar.hideListOption("STATUS",status);
+            break;
+        default:
+            // alert(status);
+            break;
+    }
+   
+    // Infos
     myTabbar.cells("job").progressOn();
     myTabbar.tabs("agent").hide();               
     myTabbar.tabs("output").hide();
@@ -288,7 +332,7 @@ function JobDetail(id) {
     myForm2.load("{{ url('xml_ATS_job_form') }}?id="+id+"&type="+type, function() {
         myTabbar.cells("job").progressOff();
         globalLayout.cells("c").progressOff();
-        myHistory.clearAndLoad( "{{ url('xml_ATS_job_history') }}?id="+id, function () {
+        myHistory.clearAndLoad( "{{ url('xml_ATS_job_history') }}?id="+id, function () {            
             myTabbar.cells("history").progressOff();
             if (type == 'I5') {
                 myGridOut.load("{{ url('xml_ATS_autosyslog') }}?options=-z&job="+job, function() {
@@ -312,6 +356,7 @@ function JobDetail(id) {
             var url = "{{ url('arii_ATS_generate') }}";
             url += "?id="+id;
             myTabbar.cells("schema").attachURL(url);            
+            globalLayout.cells("c").progressOff();
         });
     });
 }

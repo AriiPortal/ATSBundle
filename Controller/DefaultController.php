@@ -22,6 +22,13 @@ class DefaultController extends Controller
         return $this->render('AriiATSBundle:Default:readme.html.twig');
     }
 
+    public function sendevent_toolbarAction()
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/xml');
+        return $this->render('AriiATSBundle:Default:sendevent_toolbar.xml.twig',array(), $response );
+    }
+
     public function ribbonAction()
     {
         $response = new Response();
@@ -44,12 +51,19 @@ class DefaultController extends Controller
 
     public function sendeventAction() {
         $request = Request::createFromGlobals();
-        $job = $request->query->get( 'job' );
+        $job = $request->request->get( 'JOB' );
+        $action = $request->request->get( 'ACTION' );
+        $comment = $request->request->get( 'COMMENT' );
         
         $exec = $this->container->get('arii_ats.exec');
         
-        print $exec->Exec("sendevent -E JOB_ON_ICE -J $job");
+        $sendevent = 'sendevent -E '.$action.' -J '.$job.' -c "'.$comment.'"';
+        print "$sendevent";
+        exit();
+        print $exec->Exec($sendevent);
         
+        // On recupere l'evenement immediatement
+        print "$sendevent";
         exit();
     }
 
@@ -92,7 +106,6 @@ QPJOBLOG   1        *READY     24        150911 093940 EJOBOTOSY1 QEZJOBLOG
         $job = $request->query->get( 'job' );
         $options = $request->query->get( 'options' );
         
-        $exec = $this->container->get('arii_ats.exec');
         
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
@@ -103,6 +116,8 @@ QPJOBLOG   1        *READY     24        150911 093940 EJOBOTOSY1 QEZJOBLOG
                 <call command="clearAll"/>
             </afterInit>
         </head>';
+        
+        $exec = $this->container->get('arii_ats.exec');
         $result = $exec->Exec("autosyslog -J $job $options");
         foreach (explode("\n",$result) as $l) {
             if (preg_match("/^(.{10}) (.{8}) (.{10}) (.{9}) (\d{6}) (\d{6}) (.{10}) (.*)/",$l,$matches)) {

@@ -83,7 +83,8 @@ class AriiAutosys
             12 => 'QUEUE_WAIT',
             13 => 'WAIT_REPLY',
             14 => 'PEND_MACH',
-            15 => 'RES_WAIT'
+            15 => 'RES_WAIT',
+            16 => 'NO_EXEC'
         );
         if (isset($Status[$status])) {
             return $Status[$status];

@@ -161,7 +161,7 @@ class JobsController extends Controller
                 $Status[$status] = $line['NB'];
         }
         $pie = '<data>';
-        foreach (array('SUCCESS','FAILURE','TERMINATED','RUNNING','INACTIVE','ACTIVATED') as $s) {
+        foreach (array('SUCCESS','FAILURE','TERMINATED','RUNNING','INACTIVE','ACTIVATED','WAIT_REPLY','JOB_ON_ICE','JOB_ON_HOLD','JOB_ON_NOEXEC') as $s) {
             list($bgcolor,$color) = $autosys->ColorStatus($s);
             if (isset($Status[$s]))
                 $pie .= '<item id="'.$s.'"><STATUS>'.$s.'</STATUS><JOBS>'.$Status[$s].'</JOBS><COLOR>'.$bgcolor.'</COLOR></item>';
