@@ -1,0 +1,128 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<body>
+<script type="text/javascript">
+var max_history = 0; // pas d'historique
+var chained = 0; // que des standalone
+var only_warning = 0; // que les problemes
+var update=30;
+var autorefresh;
+var jobtype = "CMD"; // Type de job en cours
+var status;
+var num = ntry = 0;
+
+dhtmlxEvent(window,"load",function(){     
+    globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
+    globalLayout.cells("a").setWidth(350); 
+    globalLayout.cells("a").hideHeader(); 
+    globalLayout.cells("b").hideHeader(); 
+
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('/bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    HistoryGrid = globalLayout.cells("b").attachGrid();
+    HistoryGrid.setHeader("{{ "Run num" | trans }},{{ "Ntry" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Status" | trans }},{{ "Exit" | trans }},{{ "Machine" | trans }},{{ "Message" | trans }},{{ "Response" | trans }}");
+    HistoryGrid.attachHeader("#numeric_filter,#numeric_filter,#text_filter,#text_filter,#numeric_filter,#select_filter,#numeric_filter,#select_filter,#text_filter,#text_filter");
+    HistoryGrid.setInitWidths("100,80,140,140,100,100,80,200,*,*");
+    HistoryGrid.setColAlign("right,right,right,right,right,right,right,left,left,left");
+    HistoryGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro,ro");
+    HistoryGrid.setColSorting("int,int,date,date,int,str,int,str,str,str");
+    HistoryGrid.load( "{{ url('xml_ATS_job_history') }}?id={{ id }}" );
+    HistoryGrid.enableAlterCss("even_row","odd_row");
+    HistoryGrid.init();
+    HistoryGrid.attachEvent("onRowDblClicked", function(id){
+        Log(id);
+    });
+    globalLayout.cells("a").setText( "{{"Graph" | trans }}" );
+    var BarChart = globalLayout.cells("a").attachChart( {
+        view: "scatter",
+        xValue: "#START#",
+        yValue: "#DURATION#",
+        color: "#COLOR#",
+        item:{
+            label: "",
+            borderColor: "#COLOR#" ,
+            color: "#COLOR#",
+            type: 'r'
+        },
+        yAxis:{
+            title: "{{ "Duration" | trans }} (s)"
+        },
+        xAxis:{
+            title: "{{ "Start time" | trans }}",
+            template: ""
+        }
+       });
+
+    BarChart.attachEvent("onItemClick", function(id){
+        HistoryGrid.selectRowById(id);
+        Log(id);
+    });
+    BarChart.load( "{{ url('xml_ATS_job_history_chart') }}?id={{ id }}", "xml" );
+    {% if type == 220 %}    
+    myOut = globalLayout.cells("c").attachLayout("2U");
+    myOut.cells("a").setText("{{ "Files" | trans }}");
+    myOut.cells("a").setWidth(640);
+    myOut.cells("b").setText("{{ "Content" | trans }}");
+    
+    myGridOut = myOut.cells("a").attachGrid();
+    myGridOut.selMultiRows = true;
+    myGridOut.setHeader("{{ "File" | trans }},{{ "Num" | trans }},{{ "Status" | trans }},{{ "Size" | trans }},{{ "Date" | trans }},{{ "Time" | trans }},{{ "User data" | trans }},{{ "Queue name" | trans }}");
+    myGridOut.attachHeader("#text_filter,#numeric_filter,#select_filter,#numeric_filter,#numeric_filter,#numeric_filter,#text_filter,#text_filter");
+    myGridOut.setInitWidths("140,60,120,120,90,90,140,140");
+    myGridOut.setColAlign("left,right,left,right,right,right,left,left");
+    myGridOut.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
+    myGridOut.setColSorting("str,int,str,int,int,int,str,str");
+    myGridOut.enableAlterCss("","");
+    myGridOut.init();
+    myGridOut.attachEvent("onRowDblClicked",LogDetail );
+    {% else %}
+    myOut =  globalLayout.cells("c").attachLayout("2E");
+    myOut.cells("a").setText("{{ "Standard output" | trans }}");
+    myOut.cells("b").setHeight(100);
+    myOut.cells("b").setText("{{ "Error output" | trans }}");
+    {% endif %}
+    myOut.attachEvent("onContentLoaded", function(id){
+        myOut.cells(id).progressOff();
+    });
+
+});
+
+function Log(id) {
+    num = HistoryGrid.cells(id, 0 ).getValue(); 
+    ntry = HistoryGrid.cells(id, 1 ).getValue(); 
+    {% if type == 220 %}    
+        myOut.cells("a").progressOn();
+        myOut.cells("b").progressOn();
+        // on en profite pour afficher le QPJOLOG
+        myOut.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-d QPJOBLOG:1 -r "+num+" -n "+ntry+"&job={{ job }}");
+        myGridOut.clearAll();
+        myGridOut.load("{{ url('xml_ATS_autosyslog') }}?options=-z -r "+num+" -n "+ntry+"&job={{ job }}", function() {
+            myOut.cells("a").progressOff();
+    });
+    {% else %}  
+        myOut.cells("a").progressOn();
+        myOut.cells("a").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tO -r "+num+" -n "+ntry+"&job={{ job }}");
+        myOut.cells("b").progressOn();
+        myOut.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tE -r "+num+" -n "+ntry+"&job={{ job }}");
+    {% endif %}  
+}
+
+function LogDetail(id) {
+    file = myGridOut.cells(id, 0 ).getValue(); 
+    list = myGridOut.cells(id, 1 ).getValue(); 
+    status = myGridOut.cells(id, 2 ).getValue(); 
+    myOut.cells("b").progressOn();
+    myOut.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-d "+file+":"+list+" -r "+num+" -n "+ntry+"&job={{ job }}");
+}
+</script>
+</body>
+{% endblock %}

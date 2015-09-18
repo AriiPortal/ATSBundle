@@ -28,6 +28,13 @@ class JobsController extends Controller
         return $this->render('AriiATSBundle:Jobs:grid_toolbar.xml.twig',array(), $response );
     }
 
+    public function grid_menuAction()
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/xml');
+        return $this->render('AriiATSBundle:Jobs:grid_menu.xml.twig',array(), $response );
+    }
+
     public function statusAction($only_warning=0,$job_only=0)
     {
         $request = Request::createFromGlobals();

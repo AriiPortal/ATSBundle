@@ -85,10 +85,13 @@ xml_ATS_jobs_grid_toolbar:
     pattern:  /jobs/toolbar.xml
     defaults: { _controller: AriiATSBundle:Jobs:grid_toolbar }
 
+xml_ATS_jobs_grid_menu:
+    pattern:  /jobs/menu.xml
+    defaults: { _controller: AriiATSBundle:Jobs:grid_menu }
+
 xml_ATS_jobs_barchart:
     pattern:  /jobs/barchart.xml
     defaults: { _controller: AriiATSBundle:Jobs:barchart }
-
 
 # --------------------------------------------------------------------------
 # JOB
@@ -101,9 +104,17 @@ xml_ATS_job_form:
     pattern:  /job/form.xml
     defaults: { _controller: AriiATSBundle:Job:xml }
 
+arii_ATS_job_history:
+    pattern:  /job/history
+    defaults: { _controller: AriiATSBundle:Job:history }
+
 xml_ATS_job_history:
     pattern:  /job/history.xml
-    defaults: { _controller: AriiATSBundle:Job:history }
+    defaults: { _controller: AriiATSBundle:Job:history_grid }
+
+xml_ATS_job_history_chart:
+    pattern:  /job/history_chart.xml
+    defaults: { _controller: AriiATSBundle:Job:history_chart  }
 
 # --------------------------------------------------------------------------
 # EVENTS

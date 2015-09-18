@@ -54,6 +54,11 @@ dhtmlxEvent(window,"load",function(){
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
     myTree.load( "{ { url('xml_ATS_jobs_tree') }}" );
 */    
+    myGridMenu = new dhtmlXMenuObject(null);
+    myGridMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/wa/') }}" );
+    myGridMenu.renderAsContextMenu();
+    myGridMenu.loadStruct("{{ url('xml_ATS_jobs_grid_menu') }}");
+          
     myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
@@ -64,6 +69,8 @@ dhtmlxEvent(window,"load",function(){
     myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
     myGrid.setColSorting("str,str,str,str,date,date,str,int");
     myGrid.enableAlterCss("","");
+    myGrid.enableContextMenu(myGridMenu);
+    myGrid.attachEvent("onBeforeContextMenu", onShowMenu );
     myGrid.init();
     myGrid.load( "{{ url('xml_ATS_jobs_grid') }}");
     myGrid.attachEvent("onRowDblClicked",JobDetail );
@@ -200,6 +207,27 @@ dhtmlxEvent(window,"load",function(){
     
     // Premier chargement avant le smart rendering
     autorefresh = setInterval( "GridRefresh()",update*1000);
+    
+    function onShowMenu(rowId, celInd, grid) {
+        var job = grid.cells(rowId, 1 ).getValue();
+     return true;
+    }
+
+    myGridMenu.attachEvent("onClick", function (menuitemId, type) {
+        var data = myGrid.contextID.split("_");
+        var rId = data[0];
+        var cInd = data[1];
+        job = myGrid.cells(rId,1).getValue();
+        switch (menuitemId) {
+           case "job_history":
+                document.location.href = "{{ url('arii_ATS_job_history') }}?joid="+rId;
+            break;
+            default:
+                alert("inconnu ! "+menuitemId);    
+        }
+        return true;
+    });
+
 });
 
 function GlobalRefresh() {

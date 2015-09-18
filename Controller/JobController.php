@@ -16,6 +16,35 @@ class JobController extends Controller
           $this->images = $request->getUriForPath('/../bundles/ariicore/images/wa');          
     }
 
+    public function historyAction()
+    {
+        $request = Request::createFromGlobals();
+        $id = $request->get('joid');
+        $sql = $this->container->get('arii_core.sql');                  
+        $qry = $sql->Select(array('JOID','JOB_NAME','JOB_TYPE'))
+                .$sql->From(array('UJO_JOB'))
+                .$sql->Where(
+                        array(  'IS_ACTIVE' => 1, 
+                                'JOID' => $id ));
+        
+        $dhtmlx = $this->container->get('arii_core.dhtmlx');
+        $data = $dhtmlx->Connector('data');
+
+        $res = $data->sql->query($qry);
+        $autosys = $this->container->get('arii_ats.autosys');
+        $type = $job = '';
+        while ($line = $data->sql->get_next($res))
+        {     
+            $job = $line['JOB_NAME'];
+            $type = $line['JOB_TYPE'];
+        }
+        if ($job=='') {
+            print "$id ?";
+            exit();
+        }
+        return $this->render('AriiATSBundle:Job:history.html.twig',array('id' => $id, 'type' => $type, 'job' => $job));
+    }
+
     public function formAction()
     {
         $request = Request::createFromGlobals();
@@ -26,7 +55,7 @@ class JobController extends Controller
         return $this->render("AriiATSBundle:Forms:$type.json.twig",array(), $response );
     }
 
-    public function historyAction()
+    public function history_gridAction()
     {
         $request = Request::createFromGlobals();
         $id = $request->get('id');
@@ -48,10 +77,41 @@ class JobController extends Controller
         $autosys = $this->container->get('arii_ats.autosys');
         $data->set_value( 'ID', $data->get_value('RUN_NUM').'-'.$data->get_value('NTRY') );
         $data->set_value( 'STATUS',  $autosys->Status($data->get_value('STATUS')));
+        list($bgcolor,$color) =  $autosys->ColorStatus($autosys->Status($data->get_value('STATUS')));
+        $data->set_row_color($bgcolor);
+        $data->set_row_style("color: $color;");
         
         $date = $this->container->get('arii_core.date');
         $data->set_value('STARTIME', $date->Time2Local($data->get_value('STARTIME'),'VA1',true));
         $data->set_value('ENDTIME', $date->Time2Local($data->get_value('ENDTIME'),'VA1',true));
+    }
+
+    public function history_chartAction()
+    {
+        $request = Request::createFromGlobals();
+        $id = $request->get('id');
+        
+        $sql = $this->container->get('arii_core.sql');  
+        $qry = $sql->Select(array('RUN_NUM','NTRY','STARTIME','ENDTIME','STATUS'))
+                .$sql->From(array('UJO_JOB_RUNS'))
+                .$sql->Where(array( 
+                    'JOID' => $id ))
+                .$sql->OrderBy(array('RUN_NUM desc','NTRY desc'));
+
+        $dhtmlx = $this->container->get('arii_core.dhtmlx');
+        $data = $dhtmlx->Connector('chart');
+        $data->event->attach("beforeRender",array($this,"chart_render"));
+        $data->render_sql($qry,'ID','START,DURATION,COLOR');
+    }
+
+    function chart_render ($data){
+        $autosys = $this->container->get('arii_ats.autosys');
+        $data->set_value( 'ID', $data->get_value('RUN_NUM').'-'.$data->get_value('NTRY') );
+        list($bgcolor,$color) =  $autosys->ColorStatus($autosys->Status($data->get_value('STATUS')));
+        $data->set_value( 'COLOR', $bgcolor );
+        
+        $data->set_value('START', $data->get_value('STARTIME'));
+        $data->set_value('DURATION', $data->get_value('ENDTIME')-$data->get_value('STARTIME'));
     }
 
     public function xmlAction()
