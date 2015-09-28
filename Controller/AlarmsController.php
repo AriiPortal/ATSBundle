@@ -82,14 +82,13 @@ class AlarmsController extends Controller
                 $list .= ' bgColor="#ccebc5"';
             }
             $list .= '>';
-            
             $list .= '<cell>'.$date->Time2Local($line['ALARM_TIME'],'',true).'</cell>';
             $list .= '<cell>'.$autosys->Alarm($line['ALARM']).'</cell>';
             $list .= '<cell>'.$autosys->AlarmState($line['STATE']).'</cell>';
             $list .= '<cell>'.$line['JOB_NAME'].'</cell>';
             $list .= '<cell>'.$line['THE_USER'].'</cell>';
-            $list .= '<cell>'.$line['EVENT_COMMENT'].'</cell>';
-            $list .= '<cell>'.$line['RESPONSE'].'</cell>';
+            $list .= '<cell><![CDATA['.$line['EVENT_COMMENT'].']]></cell>';
+            $list .= '<cell><![CDATA['.$line['RESPONSE'].']]></cell>';
             $list .= '<cell>'.$line['EVT_NUM'].'</cell>';
             $list .= '</row>'; 
         }

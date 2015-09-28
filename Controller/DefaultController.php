@@ -42,7 +42,7 @@ class DefaultController extends Controller
         $lang = $this->getRequest()->getLocale();
         $template = $this->container->getParameter('ats_doc');
 
-        $doc = $this->container->get('arii_doc.doc');
+        $doc = $this->container->get('arii_core.doc');
         $url = $doc->Url($template);
         
         header("Location: $url");
