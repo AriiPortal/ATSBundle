@@ -94,6 +94,25 @@ xml_ATS_jobs_barchart:
     defaults: { _controller: AriiATSBundle:Jobs:barchart }
 
 # --------------------------------------------------------------------------
+# RUNTIMES
+# --------------------------------------------------------------------------
+arii_ATS_runtimes:
+    pattern:  /runtimes
+    defaults: { _controller: AriiATSBundle:Runtimes:index }
+
+xml_ATS_runtimes_grid:
+    pattern:  /runtimes/grid.xml
+    defaults: { _controller: AriiATSBundle:Runtimes:grid }
+
+xml_ATS_runtimes_grid_toolbar:
+    pattern:  /runtimes/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Runtimes:grid_toolbar }
+
+xml_ATS_runtimes_grid_menu:
+    pattern:  /runtimes/menu.xml
+    defaults: { _controller: AriiATSBundle:Runtimes:grid_menu }
+
+# --------------------------------------------------------------------------
 # JOB
 # --------------------------------------------------------------------------
 json_ATS_job_form:
