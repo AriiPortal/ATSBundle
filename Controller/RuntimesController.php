@@ -69,6 +69,7 @@ class RuntimesController extends Controller
 
         $res = $data->sql->query($qry);
         $autosys = $this->container->get('arii_ats.autosys');
+        $date = $this->container->get('arii_core.date');
         $now = time();
         while ($j = $data->sql->get_next($res))
         {            
@@ -91,7 +92,7 @@ class RuntimesController extends Controller
             }
             $list .= '<row id="'.$j['JOID'].'" style="background-color: '.$bgcolor.'">';
             $list .= '<cell>'.$j['JOB_NAME'].'</cell>';            
-            $list .= '<cell>'.$duration.'</cell>';               
+            $list .= '<cell>'.$date->FormatTime($duration).'</cell>';               
             $list .= '<cell>'.sprintf("%3d",$gap).'</cell>';
             $list .= '</row>';
         }

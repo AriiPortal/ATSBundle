@@ -16,6 +16,7 @@ dhtmlxEvent(window,"load",function(){
     globalLayout.cells("a").setWidth(350); 
     globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").hideHeader(); 
+    globalLayout.cells("b").setHeight(280); 
     globalLayout.cells("c").hideHeader(); 
 
     globalMenu = globalLayout.cells("a").attachMenu();
@@ -232,6 +233,7 @@ function JobDetail(id) {
 
     globalLayout.cells("c").progressOn();
     BarChart.clearAll();
+    alert("{{ url('xml_ATS_job_history_chart') }}?id="+id);
     BarChart.load( "{{ url('xml_ATS_job_history_chart') }}?id="+id );
     
     myDetailToolbar.showItem("STARTJOB");    

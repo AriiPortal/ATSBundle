@@ -109,9 +109,18 @@ class JobController extends Controller
         $data->set_value( 'ID', $data->get_value('RUN_NUM').'-'.$data->get_value('NTRY') );
         list($bgcolor,$color) =  $autosys->ColorStatus($autosys->Status($data->get_value('STATUS')));
         $data->set_value( 'COLOR', $bgcolor );
-        
+
         $data->set_value('START', $data->get_value('STARTIME'));
-        $data->set_value('DURATION', $data->get_value('ENDTIME')-$data->get_value('STARTIME'));
+        if ($data->get_value('ENDTIME')!=0) {
+            $end = $data->get_value('ENDTIME');
+
+        }
+        else {
+            $end = time();
+                        print "OK";
+        }
+        $duration = ($end - $data->get_value('STARTIME'));
+        $data->set_value('DURATION',$duration );
     }
 
     public function xmlAction()
