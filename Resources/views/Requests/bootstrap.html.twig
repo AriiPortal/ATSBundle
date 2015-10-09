@@ -11,15 +11,16 @@
 <body>
 <div class="container-fluid">
 <div class="jumbotron">
-  <h1>{{ result.title }}</h1>
-  <p>{{ result.description }}</p>
+  <h1>{{ result.title | trans }}</h1>
+  <p>{{ result.description | trans }}</p>
 </div>
   
 <div class="table-responsive">
+{% if result.count > 0 %}
   <table class="table">
       <tr><td>#</td>
     {% for cell in result.columns %}
-        <th>{{ cell }}</th>
+        <th>{{ cell | trans }}</th>
     {% endfor %}
     </tr>
     {% for id, row in result.line %}
@@ -30,6 +31,15 @@
         </tr>
     {% endfor %}
   </table>
+{% else %}
+<div class="alert alert-success" role="alert">
+{{ "No result" | trans }}
+</div>
+{% endif %}
+{% if result.sql.oracle is defined %}
+    <h2>{{ "SQL request" | trans }}</h2>
+    <pre>{{ result.sql.oracle }} </pre>
+{% endif %}
 </div>
 </div>    
 </body>

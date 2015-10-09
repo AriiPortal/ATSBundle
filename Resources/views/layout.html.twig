@@ -86,6 +86,9 @@ function ClickRibbon (itemid,state) {
     case 'menu_errors':
         window.location = "{{ url('arii_ATS_runtimes') }}";
         break;
+    case 'menu_requests':
+        window.location = "{{ url('arii_ATS_requests') }}";
+        break;
     case 'menu_servers':
         window.location = "{{ url('arii_ATS_servers') }}";
         break;
@@ -94,6 +97,9 @@ function ClickRibbon (itemid,state) {
         break;
     case 'menu_audit':
         window.location = "{{ url('arii_ATS_audit') }}";
+        break;
+    case 'filter_edit':
+        window.location = "{{ url('arii_filters') }}";
         break;
     case 'filter_all':
             globalLayout.cells("a").progressOn();

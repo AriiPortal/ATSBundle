@@ -363,6 +363,10 @@ arii_ATS_requests:
     pattern:  /requests
     defaults: { _controller: AriiATSBundle:Requests:index }
 
+xml_ATS_requests_list:
+    pattern:  /requests/list.xml
+    defaults: { _controller: AriiATSBundle:Requests:list }
+
 arii_ATS_requests_result:
     pattern:  /requests/result.html
     defaults: { _controller: AriiATSBundle:Requests:result }

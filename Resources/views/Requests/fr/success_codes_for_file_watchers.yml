@@ -1,0 +1,24 @@
+title:          "Attente de fichiers sans success_codes"
+description: |
+    Un file watcher qui ne trouve pas de fichiers termine en exit code 100, si ce code est traité par le successeur, il ne doit pas remonter d'erreur.
+    La requête recherche les jobs qui n'ont pas de success_codes égal à 100 mais qui ont un succcesseur avec e(JOB)=100.
+header:         PREDECESSOR,SUCCESSOR,COMMAND,SUCCESS_CODES,JOB_VER
+sql:
+    oracle: |
+        select distinct 
+            j.JOB_NAME as SUCCESSOR,j.IS_CURRVER,
+            jc.COND_JOB_NAME as PREDECESSOR,jc.TYPE,jc.VALUE,
+            jp.COMMAND,
+            si.SUCCESS_CODES,si.JOB_VER
+        from UJO_JOBST j
+            left join UJO_JOB_COND jc
+                on j.JOID=jc.JOID
+                left join UJO_JOBST jp
+                    on jc.COND_JOB_NAME=jp.JOB_NAME
+                left join UJO_SCHED_INFO si
+                    on jp.JOID=si.JOID
+        where (jp.JOB_VER=si.JOB_VER)
+            and (jc.TYPE='e' and jc.VALUE=100)
+            and ((si.SUCCESS_CODES is null) or (not(si.SUCCESS_CODES like '%100%')))
+            and j.JOB_TYPE=99
+        order by j.JOB_NAME

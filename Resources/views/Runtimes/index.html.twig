@@ -233,7 +233,7 @@ function JobDetail(id) {
 
     globalLayout.cells("c").progressOn();
     BarChart.clearAll();
-    alert("{{ url('xml_ATS_job_history_chart') }}?id="+id);
+
     BarChart.load( "{{ url('xml_ATS_job_history_chart') }}?id="+id );
     
     myDetailToolbar.showItem("STARTJOB");    

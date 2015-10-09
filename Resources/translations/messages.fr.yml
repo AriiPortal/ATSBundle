@@ -1,3 +1,14 @@
 module.ATS: Autosys
 summary.ATS: Module de suivi des traitements Autosys.
 text.ATS: Interface pour l'ordonnanceur "Workload Automation Autosys Edition" de CA.
+Summary: Sommaire
+List of requests: Liste des requêtes
+SQL request: Requête SQL
+No result: Aucun résultat
+JOB_NAME: Nom du traitement
+SUCCESS_CODES: Codes 'SUCCESS'
+DESCRIPTION: Description
+SUCCESSOR: Successeur
+PREDECESSOR: Prédécesseur
+COMMAND: Commande
+Title: Titre

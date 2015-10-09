@@ -27,40 +27,68 @@ class RequestsController extends Controller
         return $response;        
     }
 
+    public function listAction()
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/xml');
+        $list = '<?xml version="1.0" encoding="UTF-8"?>';
+        $list .= '<rows>';
+        
+        $yaml = new Parser();
+        $lang = $this->getRequest()->getLocale();
+        $basedir = '../src/Arii/ATSBundle/Resources/views/Requests/'.$lang;
+        if ($dh = @opendir($basedir)) {
+            while (($file = readdir($dh)) !== false) {
+                if (substr($file,-4) == '.yml') {
+                    $content = file_get_contents("$basedir/$file");
+                    $v = $yaml->parse($content);
+                    $list .= '<row id="'.substr($file,0,strlen($file)-4).'"><cell>'.$v['title'].'</cell></row>';
+                }
+            }
+        }
+        $list .= '</rows>';
+
+        $response->setContent( $list );
+        return $response;        
+    }
+    
     // Temps d'exécution trop long
     public function summaryAction()
     {
         $lang = $this->getRequest()->getLocale();
         $basedir = '../src/Arii/ATSBundle/Resources/views/Requests/'.$lang;
-        
+
         $yaml = new Parser();
         $value['title'] = $this->get('translator')->trans('Summary');
         $value['description'] = $this->get('translator')->trans('List of requests');
         $value['columns'] = array(
-            $this->get('translator')->trans('title'),
-            $this->get('translator')->trans('description') );
+            $this->get('translator')->trans('Title'),
+            $this->get('translator')->trans('Description') );
         
+        $nb=0;
         if ($dh = @opendir($basedir)) {
-            $nb=0;
             while (($file = readdir($dh)) !== false) {
                 if (substr($file,-4)=='.yml') {
                     $content = file_get_contents("$basedir/$file");
                     $v = $yaml->parse($content);
-                    $value['line'][$nb] = array($v['title'],$v['description']);
                     $nb++;
+                    $value['line'][$nb] = array($v['title'],$v['description']);
                 }
             }
         }
+        $value['count'] = $nb;
         return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value));
     }
     
-    // Temps d'exécution trop long
     public function resultAction()
     {
+        $lang = $this->getRequest()->getLocale();
         $request = Request::createFromGlobals();
         if ($request->query->get( 'request' ))
             $req=$request->query->get( 'request');
-        $page = '../src/Arii/ATSBundle/Resources/views/Requests/'.$req.'.yml';
+        if (!isset($req)) return $this->summaryAction();
+        
+        $page = '../src/Arii/ATSBundle/Resources/views/Requests/'.$lang.'/'.$req.'.yml';
         $content = file_get_contents($page);
         
         $yaml = new Parser();
@@ -87,12 +115,13 @@ class RequestsController extends Controller
             $r = array();
             foreach ($value['columns'] as $h) {
                 if (isset($line[$h])) $val = $line[$h];
-                    else  $val = $h;
+                    else  $val = '';
                 array_push($r,$val);
             }
-            $value['line'][$nb] = $r;
             $nb++;
+            $value['line'][$nb] = $r;
         }
+        $value['count'] = $nb;
         return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value));
     }
 
