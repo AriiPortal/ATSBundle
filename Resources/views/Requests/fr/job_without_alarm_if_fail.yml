@@ -1,0 +1,9 @@
+title:          Jobs sans l'option alarm_if_fail
+description:    Les jobs doivent remonter une erreur, sauf ceux qui sont dans une boite d'exploitation et dont le rôle est d'effectuer une reprise.
+header:         JOB_NAME,BOX_NAME,DESCRIPTION
+sql:
+    oracle: | 
+        select JOB_NAME,BOX_NAME,DESCRIPTION 
+        from UJO_JOBST 
+        where ALARM_IF_FAIL=0 and JOB_TYPE=99 
+        order by JOB_NAME

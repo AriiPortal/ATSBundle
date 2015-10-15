@@ -1,0 +1,15 @@
+title:          "Conditions manquantes"
+description:    Traitements attendant la fin d'un job qui n'existe pas.
+header:         COND_JOB_NAME,JOB_NAME,TYPE
+sql:
+    oracle: |
+        select distinct 
+            j.JOB_NAME,j.IS_CURRVER,
+            jc.COND_JOB_NAME,jc.TYPE
+        from UJO_JOB_COND jc
+            left join UJO_JOBST j
+                on jc.JOID=j.JOID and j.JOB_VER=jc.JOB_VER
+                left join UJO_JOBST jt
+                    on jc.COND_JOB_NAME=jt.JOB_NAME
+        where (jc.type in ('s','f','d','n')) and (jt.JOB_NAME is null) and (j.JOB_NAME is not null)
+        order by jc.COND_JOB_NAME
