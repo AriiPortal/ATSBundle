@@ -113,6 +113,15 @@ function ClickRibbon (itemid,state) {
                 GridRefresh();
             });
         }
+        else if (itemid.substr(0,2)=='DB') {
+            dhx4.ajax.get( "{{ url('arii_session_update') }}?database="+itemid.substr(2), function(loader,response) {
+                dhtmlx.message({
+                    type: "Notice",
+                    text: loader.xmlDoc.responseText,
+                    width: "800"
+                });
+            } );
+        }
         else {
             alert(itemid);
         }

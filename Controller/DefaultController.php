@@ -31,10 +31,22 @@ class DefaultController extends Controller
 
     public function ribbonAction()
     {
+        // On recupere la liste des base de données
+        // si il y en a plus d'une, pour ats, on cree une liste de choix
+        $session = $this->container->get('arii_core.session');
+        $Databases = array();
+        $n=0;
+        foreach ($session->getDatabases() as $d) {
+            $n++;
+            if ($d['type']!='waae') continue;
+            $d['id'] = "DB$n";
+            array_push($Databases,$d);
+        }
+
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         
-        return $this->render('AriiATSBundle:Default:ribbon.json.twig',array(), $response );
+        return $this->render('AriiATSBundle:Default:ribbon.json.twig',array('Databases' => $Databases), $response );
     }
 
     public function docAction() {

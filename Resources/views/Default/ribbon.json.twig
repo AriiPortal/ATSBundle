@@ -130,7 +130,22 @@
                   type : "group", 
                   list : 
                   [   {id:"chained","type":"buttonTwoState",text:"","img":"ordered.png"},
-                      {id:"only_warning","type":"buttonTwoState",text:"","img":"warning.png" /*, state: true*/ }                  ]
+                      {id:"only_warning","type":"buttonTwoState",text:"","img":"warning.png" /*, state: true*/ }
+{% if Databases|length > 1 %}
+,
+ {   id: "ref_past", 
+                  "type":"buttonSelect", 
+                  text:"", 
+                  "img": "database.png",
+                  "items": 
+                  [ 
+{% for database in Databases %}
+{id:"{{ database.id }}", text:"{{ database.name }}" },
+{% endfor %}
+                  ]
+                }
+{% endif %}
+                  ]
               }
           ]
       }
