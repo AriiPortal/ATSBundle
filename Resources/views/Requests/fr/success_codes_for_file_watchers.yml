@@ -3,6 +3,7 @@ description: |
     Un file watcher qui ne trouve pas de fichiers termine en exit code 100, si ce code est traité par le successeur, il ne doit pas remonter d'erreur.
     La requête recherche les jobs qui n'ont pas de success_codes égal à 100 mais qui ont un succcesseur avec e(JOB)=100.
 header:         PREDECESSOR,SUCCESSOR,COMMAND,SUCCESS_CODES,JOB_VER
+icon:           file
 sql:
     oracle: |
         select distinct 

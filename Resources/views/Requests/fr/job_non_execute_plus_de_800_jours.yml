@@ -1,6 +1,7 @@
 title:          Job non executé depuis plus de 800 jours
 description:    Sans commentaire
 header:         DAYS,LAST_END,JOB_NAME,STATUS,DESCRIPTION
+icon:           job
 sql:
     oracle: |
         select round((SYSDATE - TO_DATE('01-01-1970 00:00:00', 'DD-MM-YYYY HH24:MI:SS')) - LAST_END/(24 * 60 *60)) as DAYS,To_Char( To_Date( '01.01.1970 06:00:00','DD.MM.YYYY HH24:Mi:Ss')+ last_end / 86400,'YYYY-DD-MM') as LAST_END,

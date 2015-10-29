@@ -10,9 +10,13 @@ dhtmlxEvent(window,"load",function(){
     globalLayout.cells("a").setWidth(355); 
     globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").hideHeader(); 
-    
+
+    {% if  app.request.query.get('id') is defined %}
+    globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request={{ app.request.query.get('id') }}" );
+    {% else %}
     globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_summary') }}");
-    
+    {% endif %}
+
     globalMenu = globalLayout.cells("a").attachMenu();
     globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
     globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
@@ -33,6 +37,7 @@ dhtmlxEvent(window,"load",function(){
         last = id;
         globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request="+id);
     });
+    
     autorefresh = setInterval( "GlobalRefresh()",update*1000);
 });
 

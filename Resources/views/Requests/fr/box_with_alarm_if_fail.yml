@@ -1,6 +1,7 @@
 title:          Boites avec l'option alarm_if_fail
 description:    Une boite n'a pas besoin de remonter une alarme car une alarme est généralement déjà générée lorsque le job est en erreur.
 header:         JOB_NAME,DESCRIPTION
+icon:           box
 sql:
     oracle: |
         select JOB_NAME,DESCRIPTION 

@@ -55,18 +55,22 @@
               },
              {   type:  "buttonSelect", 
                  text:  "", 
-                 img:   "database.png", 
+                 img:   "table.png", 
                  items:
                  [ 
-                    { id:"menu_requests", text: "{{ "Requests" | trans }}", img: "database.png" }
+{% for k,request in Requests %}
+                    { id:"request_{{ request.id }}", text: "{{ request.title }}", img: "{{ request.icon }}.png" },
+{% endfor %}                 
                  ]
               },
              {   type:  "buttonSelect", 
                  text:  "", 
-                 img:   "config.png", 
+                 img:   "tools.png", 
                  items:
                  [ 
-                    { id:"menu_templates", text: "{{ "Requests" | trans }}", img: "config.png" }
+                    { id:"menu_templates", text: "{{ "Templates" | trans }}", img: "package.png" },
+                    { id:"menu_cron", text: "{{ "Cron converter" | trans }}", img: "cron.png" },
+                    { id:"menu_config", text: "{{ "Config" | trans }}", img: "config.png" },
                  ]
               },
             ]
