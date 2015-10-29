@@ -15,7 +15,7 @@ var id=0;
 
 dhtmlxEvent(window,"load",function(){     
     globalLayout = new dhtmlXLayoutObject(document.body,"2U");  
-    globalLayout.cells("a").setWidth(360); 
+    globalLayout.cells("a").setWidth(410); 
     globalLayout.cells("b").hideHeader(); 
 
     globalMenu = globalLayout.cells("a").attachMenu();
@@ -32,7 +32,7 @@ dhtmlxEvent(window,"load",function(){
         icons_path: "{{ asset('/bundles/ariicore/images/sidebar/') }}",
 /*        template: "tiles",
         skin: "dhx_skyblue",
-*/        width: 360,
+*/        width: 410,
         items: [
             {id: 0, text: "{{ "Servers" | trans }}", icon: "server.png"},
             {id: 1, text: "{{ "Alarms" | trans }}", icon: "alarms.png"}

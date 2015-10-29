@@ -1,0 +1,60 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiToolsBundle::layout.html.twig" %}
+{% block body %}
+<script type="text/javascript">
+dhtmlxEvent(window,"load",function() { 
+    globalLayout = new dhtmlXLayoutObject(document.body,"2U");  
+    globalLayout.cells("a").hideHeader();
+    globalLayout.cells("a").setWidth(300);
+    globalLayout.cells("b").hideHeader();
+    
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_Tools_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    mySidebar = globalLayout.cells("a").attachSidebar({
+        icons_path: "{{ asset('/bundles/ariicore/images/sidebar/') }}",
+        width: 360,
+        header: false,
+        items: [
+            {id: "ats_templates", text: "{{ "Autosys Jil templates" | trans }}", icon: "job.png"},
+            {id: "ats_cron", text: "{{ "Cron to Autosys" | trans }}", icon: "cron.png"},
+            {id: "sep0", type: "separator" },
+            {id: "osjs_silent", text: "{{ "JobScheduler Installation" | trans }}", icon: "config.png"},
+            {id: "osjs_cron", text: "{{ "Cron to JobScheduler" | trans }}", icon: "cron.png"},
+        ]
+    });
+    mySidebar.attachEvent("onSelect", function(id, value){
+        switch(id) {
+            case 'ats_templates': 
+                window.location = "{{ url('arii_Tools_templates') }}";
+                break;
+            case 'osjs_silent': 
+                window.location = "{{ url('arii_Tools_silent') }}";
+                break;
+            case 'osjs_cron': 
+                window.location = "{{ url('arii_Tools_cron') }}";
+                break;
+        }
+        return true;
+    });
+    globalLayout.cells("a").hideHeader();
+    globalLayout.cells("b").attachURL('{{ asset('/bundles/ariicore/images/arii.jpg') }}'); 
+    
+    globalMenu.attachEvent("onClick", function(id) {
+        switch(id) {
+            case 'login':
+                break;
+            default:
+        }
+    });
+});
+
+</script>
+{% endblock %}

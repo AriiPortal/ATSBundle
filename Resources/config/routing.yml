@@ -374,3 +374,22 @@ arii_ATS_requests_result:
 arii_ATS_requests_summary:
     pattern:  /requests/summary.html
     defaults: { _controller: AriiATSBundle:Requests:summary }
+
+#--------------------------------------------------------------------
+# Templates
+#--------------------------------------------------------------------
+arii_ATS_templates:
+    pattern:  /templates
+    defaults: { _controller: AriiATSBundle:Templates:index }
+
+xml_ATS_templates_tree:
+    pattern:  /templates/tree.xml
+    defaults: { _controller: AriiATSBundle:Templates:tree }
+
+arii_ATS_template:
+    pattern:  /template
+    defaults: { _controller: AriiATSBundle:Templates:template }
+
+arii_ATS_template_diff:
+    pattern:  /template/diff
+    defaults: { _controller: AriiATSBundle:Templates:diff }
