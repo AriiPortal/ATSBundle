@@ -63,6 +63,17 @@ html_ATS_sendevent_exec:
     defaults: { _controller: AriiATSBundle:Sendevent:sendevent }
 
 # --------------------------------------------------------------------------
+# Config
+# --------------------------------------------------------------------------
+arii_ATS_config:
+    pattern:  /config
+    defaults: { _controller: AriiATSBundle:Config:index }
+
+html_ATS_config:
+    pattern:  /config.html
+    defaults: { _controller: AriiATSBundle:Config:config }
+
+# --------------------------------------------------------------------------
 # JOBS
 # --------------------------------------------------------------------------
 arii_ATS_jobs:

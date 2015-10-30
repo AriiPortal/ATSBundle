@@ -93,6 +93,12 @@ function ClickRibbon (itemid,state) {
     case 'menu_audit':
         window.location = "{{ url('arii_ATS_audit') }}";
         break;
+    case 'menu_templates':
+        window.location = "{{ url('arii_ATS_templates') }}";
+        break;
+    case 'menu_config':
+        window.location = "{{ url('arii_ATS_config') }}";
+        break;
     case 'filter_edit':
         window.location = "{{ url('arii_filters') }}";
         break;
@@ -100,7 +106,7 @@ function ClickRibbon (itemid,state) {
             globalLayout.cells("a").progressOn();
             globalLayout.cells("b").progressOn();
             dhx4.ajax.get( "{{ url('arii_session_update') }}?filter=-1"+itemid.substr(7), function(){
-                GridRefresh();
+                if (typeof GlobalRefresh == 'function') { GlobalRefresh(); }
             });
         break;
     default:
@@ -110,7 +116,7 @@ function ClickRibbon (itemid,state) {
 //            this.setItemText( 'filter', this.getListOptionText('filter',itemid));
             this.setItemText("current_filter",myRibbon.getItemOptionText('Filters',itemid));
             dhx4.ajax.get( "{{ url('arii_session_update') }}?filter="+itemid.substring(7), function(){
-                GridRefresh();
+                if (typeof GlobalRefresh == 'function') { GlobalRefresh(); }
             });
         }
         else if (itemid.substring(0,7)=='request') {
@@ -123,6 +129,7 @@ function ClickRibbon (itemid,state) {
                     text: loader.xmlDoc.responseText,
                     width: "800"
                 });
+                if (typeof GlobalRefresh == 'function') { GlobalRefresh(); }
             } );
         }
         else {

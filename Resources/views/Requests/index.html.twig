@@ -12,7 +12,8 @@ dhtmlxEvent(window,"load",function(){
     globalLayout.cells("b").hideHeader(); 
 
     {% if  app.request.query.get('id') is defined %}
-    globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request={{ app.request.query.get('id') }}" );
+    last = "{{ app.request.query.get('id') }}";
+    globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request="+last );
     {% else %}
     globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_summary') }}");
     {% endif %}
@@ -54,6 +55,8 @@ function GlobalRefresh() {
     }
     myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
     globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request="+last);
+    globalLayout.cells("a").progressOff();
+    globalLayout.cells("b").progressOff();
     globalLayout.progressOff();
 }
 </script>
