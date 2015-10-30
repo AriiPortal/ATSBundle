@@ -126,6 +126,7 @@
 ,                      
                   ]
               }
+{% set current_db = app.session.get('database') %} 
 {% if Databases|length > 1 %}
 ,
               {   id: "database", 
@@ -135,7 +136,7 @@
                   "items": 
                   [ 
 {% for database in Databases %}
-{id:"{{ database.id }}", text:"{{ database.name }}" },
+{id:"{{ database.id }}", text:"{{ database.name }}"{% if database.name == current_db.name %}, img: "accept.png"{% endif %} },
 {% endfor %}
                   ]
                },
@@ -149,10 +150,10 @@
               {id:"filter_edit","type":"button",text:"{{ "New" | trans }}","img":"zoom_in.png","tooltip": "{{ "Edit filter" | trans }}" },
      {% if (app.session.get('UserFilters')|length) >0 %}
             { id:"sepf0", type: "separator" },    
-    {% set filter = app.session.get('user_filter') %}     
+    {% set current = app.session.get('user_filter') %}     
        {% set filters = app.session.get('UserFilters') %}     
         {% for k,filter in filters %}
-            { id:"filter_{{ filter.id }}", text: "{{ filter.name }}" },
+            { id:"filter_{{ filter.id }}", text: "{{ filter.name }}" {% if filter.name == current.name %}, img: "accept.png"{% endif %}  },
         {% endfor %}
     {% endif %}
                   ]

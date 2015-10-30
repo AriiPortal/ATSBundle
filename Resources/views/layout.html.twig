@@ -113,10 +113,12 @@ function ClickRibbon (itemid,state) {
         if (itemid.substring(0,6)=='filter') {
             globalLayout.cells("a").progressOn();
             globalLayout.cells("b").progressOn();
-//            this.setItemText( 'filter', this.getListOptionText('filter',itemid));
-            this.setItemText("current_filter",myRibbon.getItemOptionText('Filters',itemid));
+            // this.setItemText("current_filter",myRibbon.getItemOptionText('Filters',itemid));
             dhx4.ajax.get( "{{ url('arii_session_update') }}?filter="+itemid.substring(7), function(){
                 if (typeof GlobalRefresh == 'function') { GlobalRefresh(); }
+                else if (typeof GridRefresh == 'function') { GridRefresh(); }
+                // on recree le ruban 
+                myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
             });
         }
         else if (itemid.substring(0,7)=='request') {
@@ -130,6 +132,9 @@ function ClickRibbon (itemid,state) {
                     width: "800"
                 });
                 if (typeof GlobalRefresh == 'function') { GlobalRefresh(); }
+                else if (typeof GridRefresh == 'function') { GridRefresh(); }
+                // on recree le ruban 
+                myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
             } );
         }
         else {

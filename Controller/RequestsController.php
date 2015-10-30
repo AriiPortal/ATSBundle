@@ -114,8 +114,13 @@ class RequestsController extends Controller
         {
             $r = array();
             foreach ($value['columns'] as $h) {
-                if (isset($line[$h])) $val = $line[$h];
-                    else  $val = '';
+                if (isset($line[$h])) {
+                    $val = $line[$h];
+                    // on a un statut ?
+                    if ($h == 'STATUS')
+                        $value['status'] = $val;
+                }
+                else  $val = '';
                 array_push($r,$val);
             }
             $nb++;

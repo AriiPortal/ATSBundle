@@ -13,6 +13,7 @@
 <div class="jumbotron">
   <h1>{{ result.title | trans }}</h1>
   <p>{{ result.description | trans }}</p>
+  {% set current_db = app.session.get('database') %}[{{ current_db.name }}]
 </div>
   
 <div class="table-responsive">
@@ -24,7 +25,12 @@
     {% endfor %}
     </tr>
     {% for id, row in result.line %}
-        <tr><th>{{ id }}</th>
+        {% if result.status is defined %}
+        <tr{% if result.status == 'SUCCESS' %} class="success"{% endif %}{%if result.status == 'FAILURE' %} class="failure"{% endif %}>
+        {% else %}
+        <tr>
+        {% endif %}
+        <th>{{ id }}</th>
         {% for cell in row %}
             <td>{{ cell }}</td>
         {% endfor %}
