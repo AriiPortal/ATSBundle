@@ -61,6 +61,7 @@ class JobsController extends Controller
 
         $res = $data->sql->query($qry);
         $autosys = $this->container->get('arii_ats.autosys');
+        $Job = array();
         while ($line = $data->sql->get_next($res))
         {            
             if ($only_warning and ($line['STATUS']==4)) continue;

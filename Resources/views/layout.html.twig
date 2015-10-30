@@ -63,6 +63,9 @@ function ClickRibbon (itemid,state) {
             GlobalRefresh();
         });
         break;
+    case 'menu_index':
+        window.location = "{{ url('arii_ATS_index') }}";
+        break;
     case 'menu_jobs':
         window.location = "{{ url('arii_ATS_jobs') }}";
         break;
@@ -110,22 +113,22 @@ function ClickRibbon (itemid,state) {
             });
         break;
     default:
-        if (itemid.substring(0,6)=='filter') {
+        if (itemid.substr(0,6)=='filter') {
             globalLayout.cells("a").progressOn();
             globalLayout.cells("b").progressOn();
             // this.setItemText("current_filter",myRibbon.getItemOptionText('Filters',itemid));
-            dhx4.ajax.get( "{{ url('arii_session_update') }}?filter="+itemid.substring(7), function(){
+            dhx4.ajax.get( "{{ url('arii_session_update') }}?filter="+itemid.substr(7), function(){
                 if (typeof GlobalRefresh == 'function') { GlobalRefresh(); }
                 else if (typeof GridRefresh == 'function') { GridRefresh(); }
                 // on recree le ruban 
                 myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
             });
         }
-        else if (itemid.substring(0,7)=='request') {
-            window.location = "{{ url('arii_ATS_requests') }}?id="+itemid.substring(8);
+        else if (itemid.substr(0,7)=='request') {
+            window.location = "{{ url('arii_ATS_requests') }}?id="+itemid.substr(8);
         }
-        else if (itemid.substring(0,2)=='DB') {
-            dhx4.ajax.get( "{{ url('arii_session_update') }}?database="+itemid.substring(2), function(loader,response) {
+        else if (itemid.substr(0,2)=='DB') {
+            dhx4.ajax.get( "{{ url('arii_session_update') }}?database="+itemid.substr(2), function(loader,response) {
                 dhtmlx.message({
                     type: "Notice",
                     text: loader.xmlDoc.responseText,
