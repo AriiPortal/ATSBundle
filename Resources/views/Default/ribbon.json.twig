@@ -126,10 +126,8 @@
                       {id:"only_warning","type":"buttonTwoState",text:"","img":"warning.png" /*, state: true*/ }
 ,                      
                   ]
-              }
+              },
 {% set current_db = app.session.get('database') %} 
-{% if Databases|length > 1 %}
-,
               {   id: "database", 
                   "type":"buttonSelect", 
                   text:"", 
@@ -141,7 +139,6 @@
 {% endfor %}
                   ]
                },
-{% endif %}
             {   "type": "buttonSelect", 
                  text:"",
                  "id": "Filters",

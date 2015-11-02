@@ -1,0 +1,14 @@
+title:          Sauvegardes Oracle
+description:    Récapitulatif des sauvegardes Oracle par instance
+header:         INSTANCE,LAST_START(timestamp),LAST_END(timestamp),DURATION(duration),STATUS(status),DESCRIPTION,JOB_NAME
+icon:           database
+sql:
+    oracle: |
+        select 
+            SUBSTR(JOB_NAME,6,4) as INSTANCE,
+            JOB_NAME,TEXT as STATUS,DESCRIPTION,LAST_START,LAST_END,LAST_END - LAST_START as DURATION
+        from UJO_JOBST
+            left join UJO_INTCODES
+                on STATUS=CODE
+        where JOB_NAME like 'ORA%.BOX.BackupFull'
+        order by JOB_NAME

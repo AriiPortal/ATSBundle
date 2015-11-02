@@ -1,4 +1,4 @@
-title:          Sauvegardes Oracle
+title:          Sauvegardes Oracle (Full SQL)
 description:    Récapitulatif des sauvegardes Oracle par instance
 header:         INSTANCE,LAST_START,LAST_END,DURATION,STATUS,DESCRIPTION,JOB_NAME
 icon:           database

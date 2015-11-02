@@ -34,8 +34,9 @@ dhtmlxEvent(window,"load",function(){
         skin: "dhx_skyblue",
 */        width: 410,
         items: [
-            {id: 0, text: "{{ "Servers" | trans }}", icon: "server.png"},
-            {id: 1, text: "{{ "Alarms" | trans }}", icon: "alarms.png"}
+//            {id: 'jobs', text: "{{ "Jobs" | trans }}", icon: "jobs.png"},
+            {id: 'servers', text: "{{ "Servers" | trans }}", icon: "server.png"},
+            {id: 'alarms', text: "{{ "Alarms" | trans }}", icon: "alarms.png"}
         ]
     });
     mySidebar.attachEvent("onBubbleClick", function(id, value){
@@ -135,20 +136,21 @@ function GridRefresh() {
     mySidebar.cells(id).setActive();
     
     // On remet les bulles à jour en fonction des graphiques
+    
     myServers.load( "{{ url('xml_ATS_processes_pie') }}", function() {
         val = myServers.get("STOPPED");
         if (val["PROCESSES"]>0)
-            mySidebar.cells(0).setBubble(val["PROCESSES"]);
+            mySidebar.cells('servers').setBubble(val["PROCESSES"]);
         else
-            mySidebar.cells(0).clearBubble();
+            mySidebar.cells('servers').clearBubble();
     });
 
     myAlarms.load( "{{ url('xml_ATS_alarms_pie') }}?only_warning="+1, function() {
         val = myAlarms.get("OPEN");
         if (val["JOBS"]>0)
-            mySidebar.cells(1).setBubble(val["JOBS"]);
+            mySidebar.cells('alarms').setBubble(val["JOBS"]);
         else
-            mySidebar.cells(1).clearBubble();
+            mySidebar.cells('alarms').clearBubble();
     });
     
     globalLayout.progressOff();
