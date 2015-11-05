@@ -42,8 +42,13 @@ class RequestsController extends Controller
                 if (substr($file,-4) == '.yml') {
                     $content = file_get_contents("$basedir/$file");
                     $v = $yaml->parse($content);
-                    $list .= '<row id="'.substr($file,0,strlen($file)-4).'"><cell>'.$v['title'].'</cell></row>';
+                    $title = $v['title'];
+                    $Files[$title] = '<row id="'.substr($file,0,strlen($file)-4).'"><cell>'.$title.'</cell></row>';
                 }
+            }
+            ksort($Files);
+            foreach ($Files as $k=>$v) {
+                $list .= $v;
             }
         }
         $list .= '</rows>';
