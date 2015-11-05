@@ -61,7 +61,12 @@ class DefaultController extends Controller
             $d['id'] = "DB$n";
             array_push($Databases,$d);
         }
-
+        // Si la base par defaut n'est pas de type waae, on prend la première
+        $current = $session->getDatabase();
+        if ($current['type'] != 'waae') {
+            $session->setDatabase($Databases[0]);
+        }
+        
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         

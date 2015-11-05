@@ -17,7 +17,9 @@ dhtmlxEvent(window,"load",function() {
     myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
     myRibbon.attachEvent("onStateChange", StateRibbon );
     myRibbon.attachEvent("onClick", ClickRibbon );
-
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+    
     var myTab = globalLayout.cells("b").attachTabbar();
     myTab.addTab("jil","JIL","100px", null, true);
     myTab.addTab("diff","{{ "Diff." | trans }}","100px");

@@ -32,7 +32,7 @@
         {% endif %}
         <th>{{ id }}</th>
         {% for cell in row %}
-            <td>{{ cell }}</td>
+            <td>{{ cell | raw }}</td>
         {% endfor %}
         </tr>
     {% endfor %}

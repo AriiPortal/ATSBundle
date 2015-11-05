@@ -120,6 +120,7 @@ class RequestsController extends Controller
             array_push($value['columns'],$c);
         }
         // bibliothèques
+        $ats  = $this->container->get('arii_ats.autosys'); 
         $date = $this->container->get('arii_core.date');   
         while ($line = $data->sql->get_next($res))
         {
@@ -136,8 +137,17 @@ class RequestsController extends Controller
                                 $val = $date->FormatTime($line[$h]);
                                 break;
                             case 'status':
-                                $val = $line[$h];
+                                $val = $ats->Status($line[$h]);
                                 $value['status'] = $val;
+                                break;
+                            case 'event':
+                                $val = $ats->Event($line[$h]);
+                                break;
+                            case 'alarm':
+                                $val = $ats->Alarm($line[$h]);
+                                break;
+                            case 'br':
+                                $val = str_replace(array("\t","\n"),array("     ","<br/>"),utf8_encode($line[$h]));
                                 break;
                             default:
                                 $val = $line[$h].'('.$Format[$h].')';

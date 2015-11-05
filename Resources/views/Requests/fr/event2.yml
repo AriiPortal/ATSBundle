@@ -1,0 +1,14 @@
+title:          Table des évènements non traités
+description:    Cette table contient les évènements posant problèmes, elle devrait donc être vide.
+header:         EVENT_TIME_GMT(timestamp),EOID,EVENT(event),ALARM(alarm),JOB_NAME,STATUS(status),MACH_NAME,ALARM
+icon:           config
+sql:
+    oracle: |
+        select 
+            e.EVENT_TIME_GMT,e.EOID,e.EVENT,e.ALARM,e.STATUS,e.MACH_NAME,e.ALARM,
+            j.JOB_NAME
+        from UJO_EVENT2 e
+        left join UJO_JOB j
+            on e.JOID=j.JOID
+            
+            

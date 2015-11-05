@@ -1,0 +1,12 @@
+title:          Variables globales
+description:    Table des variables globales.
+header:         GLO_NAME,VALUE,VALUE_SET_TIME(timestamp),OWNER,PERMISSION
+icon:           config
+sql:
+    oracle: |
+        select 
+            GLO_NAME,VALUE,VALUE_SET_TIME,OWNER,PERMISSION
+        from UJO_GLOB
+        order by VALUE_SET_TIME desc
+            
+            
