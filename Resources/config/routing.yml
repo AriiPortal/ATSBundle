@@ -416,3 +416,11 @@ arii_ATS_template_read:
 arii_ATS_template_diff:
     pattern:  /template/diff
     defaults: { _controller: AriiATSBundle:Templates:diff }
+
+arii_ATS_template_mep:
+    pattern:  /template/mep
+    defaults: { _controller: AriiATSBundle:Templates:mep }
+
+xml_ATS_templates_mep_toolbar:
+    pattern:  template/mep/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Templates:toolbar }

@@ -14,6 +14,13 @@ class TemplatesController extends Controller
         return $this->render('AriiATSBundle:Templates:index.html.twig');            
     }
 
+    public function toolbarAction()
+    {
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/xml');
+        return $this->render('AriiATSBundle:Templates:toolbar.xml.twig',array(), $response );
+    }
+
     public function templateAction()
     {   
         $request = Request::createFromGlobals();
@@ -208,22 +215,57 @@ class TemplatesController extends Controller
         $arg = $request->query->get( 'file' );
         $path = $this->container->getParameter('workspace')."/Autosys/Templates";
 
+        // On crée le dump
+        $ats = $this->container->get('arii_ats.exec');
+        $job = basename($arg);
+        $job = substr($job,0,strlen($job)-4);
+        $current = $ats->Exec('autorep -J '.$job.' -q');
+        
         $ref = str_replace('.jil','.dump',$arg);
         $reffile = "$path/$ref";
-        if (!file_exists($reffile)) {
-            print "<p><font color='red'>$ref ?!</font></p>";
-            exit();
-        }
+        file_put_contents($reffile,$current);
+        
+        //$gvz_cmd = $this->container->getParameter('graphviz_cmd');
+        $cmd = $this->container->getParameter('perl').' '.dirname(__FILE__).str_replace('/',DIRECTORY_SEPARATOR,'/../Perl/jildiff.pl ');
+        $cmd .= ' jil="'."$path/$arg".'" del=y < "'.$reffile.'"';
+//        print $cmd;
+        $res = `$cmd`;         
+        $upd = str_replace('.dump','.update',$reffile);
+        print "<pre>";
+        print "/* $upd */\n";
+        print $res;
+        print "</pre>";
+        file_put_contents($upd,$res);
+        exit();
+    }
 
+    public function mepAction()
+    {   
+        $request = Request::createFromGlobals();
+        $arg = $request->query->get( 'file' );
+        $path = $this->container->getParameter('workspace')."/Autosys/Templates";
+
+        // On crée le dump
+        $ats = $this->container->get('arii_ats.exec');
+        $job = basename($arg);
+        $job = substr($job,0,strlen($job)-4);
+        $current = $ats->Exec('autorep -J '.$job.' -q');
+        
+        $ref = str_replace('.jil','.dump',$arg);
+        $reffile = "$path/$ref";
+        file_put_contents($reffile,$current);
+        
         //$gvz_cmd = $this->container->getParameter('graphviz_cmd');
         $cmd = $this->container->getParameter('perl').' '.dirname(__FILE__).str_replace('/',DIRECTORY_SEPARATOR,'/../Perl/jildiff.pl ');
         $cmd .= ' jil="'.$reffile.'" del=y < "'."$path/$arg".'"';
 //        print $cmd;
+        $res = `$cmd`;         
+        $upd = str_replace('.dump','.update',$reffile);
         print "<pre>";
-        print `$cmd`; 
+        print "/* $upd */\n";
+        print $res;
         print "</pre>";
+        file_put_contents($upd,$res);
         exit();
-    }
-
-      
+    }     
 }

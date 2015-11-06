@@ -32,7 +32,7 @@ dhtmlxEvent(window,"load",function() {
     
     var myTab = globalLayout.cells("c").attachTabbar();
     myTab.addTab("jil","JIL","100px", null, true);
-    myTab.addTab("diff","{{ "Diff." | trans }}","100px");
+    myTab.addTab("diff","{{ "Check" | trans }}","100px");
 
     myTree = globalLayout.cells("a").attachTree();
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
@@ -61,7 +61,21 @@ dhtmlxEvent(window,"load",function() {
         myTab.cells("jil").attachURL("{{ url('arii_ATS_template_read') }}?file="+encodeURIComponent(id));
         myTab.cells("diff").attachURL("{{ url('arii_ATS_template_diff') }}?file="+encodeURIComponent(id));
     });
-    
+
+    myMEPToolbar = myTab.cells("diff").attachToolbar();
+    myMEPToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myMEPToolbar.loadStruct( "{{ url('xml_ATS_templates_mep_toolbar') }}");
+    myMEPToolbar.attachEvent("onClick",function(itemid){
+         switch (itemid) {
+            case 'go':
+                myTab.cells("diff").attachURL("{{ url('arii_ATS_template_mep') }}?file="+encodeURIComponent(id));
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+
     globalLayout.cells("a").hideHeader();
     myTab.cells("jil").attachURL('{{ asset('/bundles/ariicore/images/arii.jpg') }}'); 
 });

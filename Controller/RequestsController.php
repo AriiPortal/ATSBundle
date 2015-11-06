@@ -133,6 +133,7 @@ class RequestsController extends Controller
             foreach ($value['columns'] as $h) {
                 if (isset($line[$h])) {
                     // format special
+                    $value['status'] = '';
                     if (isset($Format[$h])) {
                         switch ($Format[$h]) {
                             case 'timestamp':

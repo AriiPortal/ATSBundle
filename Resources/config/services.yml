@@ -12,7 +12,7 @@ services:
 
     arii_ats.exec:
         class: Arii\ATSBundle\Service\AriiExec
-        arguments: [ "%ATS%" ]
+        arguments: [ "@arii_core.session", "@arii_core.audit","@arii_core.log" ]
 
     arii_ats.twig_string_loader:
         class:        "Twig_Loader_String"

@@ -3,28 +3,48 @@ namespace Arii\ATSBundle\Service;
 
 class AriiExec {
     
-    protected $host; 
-    protected $user; 
-    protected $password; 
-    protected $profile;
+    protected $session;
+    protected $audit;
+    protected $log;
     
-    public function __construct( $ats ) {
-        $this->host = $ats['host'];
-        $this->user = $ats['user'];
-        $this->password = $ats['password'];
-        $this->profile = $ats['profile'];
+    public function __construct(
+            \Arii\CoreBundle\Service\AriiSession $session, 
+            \Arii\CoreBundle\Service\AriiAudit $audit,  
+            \Arii\CoreBundle\Service\AriiLog $log
+    ) {
+        $this->session = $session;
+        $this->audit = $audit;
+        $this->log = $log;
     }
     
     public function Exec($command) {
+        
+        $database = $this->session->getDatabase();
+        $name = $database['name'];
+        
+        $engine = $this->session->getSpoolerByName($name,'waae');
+        
+        if (!isset($engine[0]['shell'])) {
+            print "?!";
+            exit();
+        }
+        
+        $shell = $engine[0]['shell'];
+        $host = $shell['host'];
+        $user = $shell['user'];
+        $password = $shell['password'];
+        
+        $method = 'CURL';
+
         set_include_path(get_include_path() . PATH_SEPARATOR . '../vendor/phpseclib');
         include('Net/SSH2.php');
-
-        $ssh = new \Net_SSH2($this->host);
-        if (!$ssh->login($this->user, $this->password)) {
+        
+        $ssh = new \Net_SSH2($host);
+        if (!$ssh->login($user, $password)) {
             exit('Login Failed');
         }
 
-        return $ssh->exec(". ".$this->profile.";$command");
+        return $ssh->exec(". ~/.bash_profile;$command");
     }
 }
 ?>
