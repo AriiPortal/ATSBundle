@@ -19,7 +19,7 @@ class TemplatesController extends Controller
         $request = Request::createFromGlobals();
         $arg = $request->query->get( 'template' );
         list($content, $config) = $this->template($arg);
-        print "<pre>".$this->get('arii_tools.twig_string')->render( $content, $config )."</pre>";        
+        print "<pre>".$this->get('arii_ats.twig_string')->render( $content, $config )."</pre>";        
         exit();
     }
 
@@ -41,6 +41,11 @@ class TemplatesController extends Controller
         }
         
         # Ouverture du template
+        if (!isset($config['template'])) {
+            print "$template ?!";
+            exit();
+        }
+        
         $temp = $config['template'];
         $content = file_get_contents("$path/$temp");
         
@@ -81,36 +86,142 @@ class TemplatesController extends Controller
         return $response;
     }
 
+    public function filesAction()
+    {        
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/xml');
+        $xml = "<?xml version='1.0' encoding='utf-8'?>";                
+        $xml .= '<rows><head><afterInit>
+                <call command="clearAll"/>
+            </afterInit>
+        </head>
+';
+        
+        # On parse le fichier 
+        $yaml = new Parser();
+        
+        $basedir = $this->container->getParameter('workspace')."/Autosys/Templates"; 
+        if ($dh = @opendir($basedir)) {
+            while (($file = readdir($dh)) !== false) {
+                if (is_dir("$basedir/$file") and (substr($file,0,1)!='.')) {
+                    $path = "$basedir/$file";
+                    if ($ds = @opendir($path)) {                    
+                        while (($newfile = readdir($ds)) !== false) {
+                            if (substr($newfile,-4)=='.jil') {
+                                $stat = stat("$path/$newfile");
+                                $Time = localtime($stat[9],true);
+                                $xml .= '<row id="'."$file/$newfile".'"><cell>'.$file.'</cell><cell>'.$newfile.'</cell><cell>'.sprintf("%04d-%02d-%02d %02d:%02d:%02d",$Time['tm_year']+1900,$Time['tm_mon']+1,$Time['tm_mday'],$Time['tm_hour'],$Time['tm_min'],$Time['tm_sec']).'</cell><cell>'.$stat[7].'</cell></row>';
+                            }
+                        }
+                    }
+}
+            }
+        }
+        $xml .= '</rows>';        
+        $response->setContent($xml);
+        return $response;
+    }
+
+    // on appelle les templates liés au fichier de configuration
+    public function recalcAction()
+    {   
+        $request = Request::createFromGlobals();
+        $arg = $request->query->get( 'config' );
+        $path = $this->container->getParameter('workspace')."/Autosys/Templates";
+       
+        $config = @file_get_contents("$path/$arg");
+        if (!$config) {
+            print "$path/$arg";
+            exit();            
+        }
+        
+        # On parse le fichier 
+        $yaml = new Parser();
+        try {
+            $cfg = $yaml->parse($config);          
+        } catch (ParseException $e) {
+            $error = array( 'text' =>  "Unable to parse the YAML string: %s<br/>".$e->getMessage() );
+            return $this->render('AriiATSBundle:Requests:ERROR.html.twig', array('error' => $error));
+        }
+        
+        # Ouverture du template
+        if (!isset($cfg['templates'])) {
+            print "Templates ?!";
+            print_r($cfg);
+            exit();
+        }
+
+        # Parametres globaux
+        $global = $cfg['global'];
+        
+        $dir = dirname("$path/$arg");
+        foreach ($cfg['templates'] as $parameters) {
+            $template = $parameters['file'];
+            $code = @file_get_contents("$dir/$template");
+            if ($code == '') {
+                print "<p><font color='red'>TWIG $template ?!</font></p>";
+            }
+            $config = array_merge($global,$parameters);
+            $new = $this->get('arii_ats.twig_string')->render( $code, $config );
+            
+            // Nouveau nom 
+            $newfile = str_replace('.twig','.jil',$template);
+            while (($p = strpos(" $newfile",'{{'))>0) {
+                if (($e = strpos($newfile,'}}',$p))==0)
+                    $e = $p+2;
+
+                $param = substr($newfile,$p+1,$e-$p-1);
+                if (isset($config[$param])) {
+                    $param = $config[$param];
+                }
+                $newfile = substr($newfile,0,$p-1).$param.substr($newfile,$e+2);
+            }
+            
+            if (@file_put_contents("$dir/$newfile",$new)) 
+                print "$newfile<br/>";
+            else 
+                print "<p><font color='red'>JIL $newfile ?!</font></p>";
+        }
+        exit();
+    }
+
+    public function readAction()
+    {   
+        $request = Request::createFromGlobals();
+        $arg = $request->query->get( 'file' );
+
+        $path = $this->container->getParameter('workspace')."/Autosys/Templates";
+        $newfile = "$path/$arg";
+        if (!file_exists($newfile)) {
+            print "<p><font color='red'>$newfile ?!</font></p>";
+            exit();
+        }
+        print "<pre>";
+        print file_get_contents($newfile);
+        print "</pre>";
+        exit();
+    }
+
     public function diffAction()
     {   
         $request = Request::createFromGlobals();
-        $arg = $request->query->get( 'template' );
-
-        print "<strong>$arg</strong>";
-        
+        $arg = $request->query->get( 'file' );
         $path = $this->container->getParameter('workspace')."/Autosys/Templates";
 
-        $ref = str_replace('.yml','.ref',$arg);
+        $ref = str_replace('.jil','.dump',$arg);
         $reffile = "$path/$ref";
         if (!file_exists($reffile)) {
             print "<p><font color='red'>$ref ?!</font></p>";
             exit();
         }
 
-        list($content, $config) = $this->template($arg);
-        $new = $this->get('arii_tools.twig_string')->render( $content, $config );
-
-        $file = substr($arg,0,strlen($arg)-4);
-        file_put_contents("$path/$file.new",$new);
-
         //$gvz_cmd = $this->container->getParameter('graphviz_cmd');
         $cmd = $this->container->getParameter('perl').' '.dirname(__FILE__).str_replace('/',DIRECTORY_SEPARATOR,'/../Perl/jildiff.pl ');
-        $cmd .= ' jil="'.$reffile.'" del=y < "'."$path/$file.new".'"';
-        
+        $cmd .= ' jil="'.$reffile.'" del=y < "'."$path/$arg".'"';
+//        print $cmd;
         print "<pre>";
         print `$cmd`; 
         print "</pre>";
-//        print $cmd;
         exit();
     }
 

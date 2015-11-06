@@ -26,12 +26,12 @@
     </tr>
     {% for id, row in result.line %}
         {% if result.status is defined %}
-        <tr{% if result.status == 'SUCCESS' %} class="success"{% endif %}{%if result.status == 'FAILURE' %} class="failure"{% endif %}>
+        <tr{% if result.status == 'SUCCESS' %} class="success"{% endif %}{%if result.status == 'FAILURE' %} class="failure"{% endif %}{% if result.status == 'ON_ICE' %} class="info"{% endif %}>
         {% else %}
         <tr>
         {% endif %}
         <th>{{ id }}</th>
-        {% for cell in row %}
+        {% for cell in row %}  
             <td>{{ cell | raw }}</td>
         {% endfor %}
         </tr>

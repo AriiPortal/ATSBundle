@@ -168,9 +168,10 @@ class RequestsController extends Controller
             }
             $nb++;
             $value['line'][$nb] = $r;
+            $value['status'][$nb] = $value['status'];
         }
         $value['count'] = $nb;
-        return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value));
+        return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
     }
 
 }

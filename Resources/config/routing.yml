@@ -397,9 +397,21 @@ xml_ATS_templates_tree:
     pattern:  /templates/tree.xml
     defaults: { _controller: AriiATSBundle:Templates:tree }
 
+xml_ATS_templates_files:
+    pattern:  /templates/files.xml
+    defaults: { _controller: AriiATSBundle:Templates:files }
+
+html_ATS_template_recalc:
+    pattern:  /template/recalc.xml
+    defaults: { _controller: AriiATSBundle:Templates:recalc }
+
 arii_ATS_template:
     pattern:  /template
     defaults: { _controller: AriiATSBundle:Templates:template }
+
+arii_ATS_template_read:
+    pattern:  /template/read
+    defaults: { _controller: AriiATSBundle:Templates:read }
 
 arii_ATS_template_diff:
     pattern:  /template/diff
