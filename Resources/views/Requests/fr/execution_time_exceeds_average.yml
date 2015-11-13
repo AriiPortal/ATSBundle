@@ -1,0 +1,16 @@
+title:          Durées d'exécution trop longues
+description:    La durée d'exécution est largment supérieure à la durée moyenne.
+header:         JOB_NAME,LAST_START(timestamp),RUNTIME(duration),AVG_RUN_TIME(duration),DESCRIPTION
+icon:           job
+sql:
+    oracle: |
+        select JOB_TYPE,round((SYSDATE - TO_DATE('01-01-1970 00:00:00', 'DD-MM-YYYY HH24:MI:SS'))*(24 * 60 *60) - j.LAST_START) as RUNTIME,
+            j.JOB_NAME,j.LAST_START,j.DESCRIPTION,j.STATUS,
+            r.AVG_RUN_TIME
+        from UJO_JOBST j
+        left join UJO_AVG_JOB_RUNS r
+            on j.JOID=r.JOID
+        where j.STATUS=1
+        and JOB_TYPE<>98
+        and round((SYSDATE - TO_DATE('01-01-1970 00:00:00', 'DD-MM-YYYY HH24:MI:SS'))*(24 * 60 *60) - j.LAST_START)>r.AVG_RUN_TIME
+        order by j.LAST_START

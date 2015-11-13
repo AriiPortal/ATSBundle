@@ -1,7 +1,6 @@
 {# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
 {% extends "AriiATSBundle::layout.html.twig" %}
 {% block body %}
-<body>
 <script type="text/javascript">
 var max_history = 0; // pas d'historique
 var chained = 0; // que des standalone
@@ -396,7 +395,5 @@ function LogDetail(id) {
     myOutI5.cells("b").progressOn();
     myOutI5.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-d "+file+":"+num+"&job="+job);
 }
-
 </script>
-</body>
 {% endblock %}

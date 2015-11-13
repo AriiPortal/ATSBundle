@@ -227,7 +227,7 @@ class TemplatesController extends Controller
         
         //$gvz_cmd = $this->container->getParameter('graphviz_cmd');
         $cmd = $this->container->getParameter('perl').' '.dirname(__FILE__).str_replace('/',DIRECTORY_SEPARATOR,'/../Perl/jildiff.pl ');
-        $cmd .= ' jil="'."$path/$arg".'" del=y < "'.$reffile.'"';
+        $cmd .= ' jil="'.$reffile.'" del=y < "'."$path/$arg".'"';
 //        print $cmd;
         $res = `$cmd`;         
         $upd = str_replace('.dump','.update',$reffile);

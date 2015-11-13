@@ -17,8 +17,7 @@ class AriiExec {
         $this->log = $log;
     }
     
-    public function Exec($command) {
-        
+    public function Exec($command,$stdin='') {
         $database = $this->session->getDatabase();
         $name = $database['name'];
         
@@ -43,8 +42,24 @@ class AriiExec {
         if (!$ssh->login($user, $password)) {
             exit('Login Failed');
         }
+        
+        if ($stdin=='')
+            return $ssh->exec(". ~/.bash_profile;$command");
 
-        return $ssh->exec(". ~/.bash_profile;$command");
+        // Test STDIN
+        $ssh->enablePTY();
+        print "profile".$ssh->exec(". ~/.bash_profile");
+        print "sort".$exec = $ssh->exec('sort');
+        $ssh->write(<<<EOF
+echo "update_job: SE.ERIC.JOB.JobType_UNIX"
+echo "description: 'ok!!'
+EOF
+);
+        $ssh->reset(true);
+$ssh->setTimeout(2);
+print $ssh->read();
+return ;
+return  $ssh->read();  // outputs the echo above
     }
 }
 ?>

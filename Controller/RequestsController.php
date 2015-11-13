@@ -130,6 +130,7 @@ class RequestsController extends Controller
         while ($line = $data->sql->get_next($res))
         {
             $r = array();
+            $status = 'unknown';
             foreach ($value['columns'] as $h) {
                 if (isset($line[$h])) {
                     // format special
@@ -144,7 +145,7 @@ class RequestsController extends Controller
                                 break;
                             case 'status':
                                 $val = $ats->Status($line[$h]);
-                                $value['status'] = $val;
+                                $status = $val;
                                 break;
                             case 'event':
                                 $val = $ats->Event($line[$h]);
@@ -153,7 +154,7 @@ class RequestsController extends Controller
                                 $val = $ats->Alarm($line[$h]);
                                 break;
                             case 'br':
-                                $val = str_replace(array("\t","\n"),array("     ","<br/>"),utf8_encode($line[$h]));
+                                $val = str_replace(array("\t","\n"),array("     ","<br/>"),$line[$h]);
                                 break;
                             default:
                                 $val = $line[$h].'('.$Format[$h].')';
@@ -168,9 +169,9 @@ class RequestsController extends Controller
                 array_push($r,$val);
             }
             $nb++;
-            $value['line'][$nb] = $r;
-            $value['status'][$nb] = $value['status'];
-        }
+            $value['lines'][$nb]['cells'] = $r;
+            $value['lines'][$nb]['status'] = $status;
+         }
         $value['count'] = $nb;
         return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
     }

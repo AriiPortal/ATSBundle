@@ -1,6 +1,6 @@
 title:          Job non executé depuis plus de 800 jours
 description:    Sans commentaire
-header:         DAYS,LAST_END,JOB_NAME,STATUS,DESCRIPTION
+header:         DAYS,LAST_END,JOB_NAME,STATUS(status),DESCRIPTION
 icon:           job
 sql:
     oracle: |

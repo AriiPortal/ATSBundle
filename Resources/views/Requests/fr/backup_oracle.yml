@@ -1,12 +1,13 @@
 title:          Sauvegardes Oracle
 description:    Récapitulatif des sauvegardes Oracle par instance
-header:         INSTANCE,DESCRIPTION,LAST_START(timestamp),LAST_END(timestamp),DURATION(duration),STATUS(status),JOB_NAME
+header:         DESCRIPTION,STATUS(status),LAST_START(timestamp),LAST_END(timestamp),DURATION(duration),NEXT_START(timestamp),JOB_NAME
 icon:           database
 sql:
     oracle: |
         select 
             SUBSTR(JOB_NAME,6,4) as INSTANCE,
-            JOB_NAME,STATUS,DESCRIPTION,LAST_START,LAST_END,LAST_END - LAST_START as DURATION
+            JOB_NAME,STATUS,DESCRIPTION,LAST_START,LAST_END,LAST_END,NEXT_START,LAST_END - LAST_START as DURATION,EXIT_CODE
         from UJO_JOBST
-        where (JOB_NAME like 'ORA%.BOX.%') and  (BOX_JOID=0)
-        order by JOB_NAME
+        where   ((JOB_NAME like 'ORA%.BOX.%') and  (BOX_JOID=0))
+                or ((JOB_NAME like 'ORA%.%') and (STATUS=5))
+        order by NEXT_START

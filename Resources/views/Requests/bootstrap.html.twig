@@ -24,14 +24,10 @@
         <th>{{ cell | trans }}</th>
     {% endfor %}
     </tr>
-    {% for id, row in result.line %}
-        {% if result.status is defined %}
-        <tr{% if result.status == 'SUCCESS' %} class="success"{% endif %}{%if result.status == 'FAILURE' %} class="failure"{% endif %}{% if result.status == 'ON_ICE' %} class="info"{% endif %}>
-        {% else %}
-        <tr>
-        {% endif %}
+    {% for id,line in result.lines %}
+        <tr class="{% if line.status == 'SUCCESS' %}success{% endif %}{% if line.status == 'RUNNING' %}warning{% endif %}{% if line.status == 'FAILURE' %}danger{% endif %}{% if line.status == 'ON_ICE' %}info{% endif %}{% if line.status == 'ON_HOLD' %}info{% endif %}">
         <th>{{ id }}</th>
-        {% for cell in row %}  
+        {% for cell in line.cells %}  
             <td>{{ cell | raw }}</td>
         {% endfor %}
         </tr>

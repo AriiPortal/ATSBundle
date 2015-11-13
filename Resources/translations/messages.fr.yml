@@ -12,3 +12,10 @@ SUCCESSOR: Successeur
 PREDECESSOR: Prédécesseur
 COMMAND: Commande
 Title: Titre
+LAST_START: Départ
+NEXT_START: Prochain
+LAST_END: Fin
+DURATION: Durée
+EXIT_CODE: Exit
+INSTANCE: Instance
+STATUS: Statut

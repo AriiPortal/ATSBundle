@@ -1,0 +1,13 @@
+title:          Sauvegardes Oracle (Erreurs)
+description:    Liste des erreurs Oracle
+header:         JOB_NAME,DESCRIPTION,LAST_START(timestamp),LAST_END(timestamp),STATUS(status),EXIT_CODE
+icon:           database
+sql:
+    oracle: |
+        select 
+            SUBSTR(JOB_NAME,6,4) as INSTANCE,
+            JOB_NAME,STATUS,DESCRIPTION,LAST_START,LAST_END,LAST_END,NEXT_START,LAST_END - LAST_START as DURATION,
+            EXIT_CODE
+        from UJO_JOBST
+        where (JOB_NAME like 'ORA%.%') and (STATUS=5)
+        order by JOB_NAME
