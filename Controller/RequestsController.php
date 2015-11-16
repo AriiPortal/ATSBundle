@@ -91,6 +91,15 @@ class RequestsController extends Controller
         $request = Request::createFromGlobals();
         if ($request->query->get( 'request' ))
             $req=$request->query->get( 'request');
+
+        // cas de l'appel direct
+        if ($request->query->get( 'dbname' )) {
+            $instance=$request->query->get( 'dbname');
+
+            $session = $this->container->get('arii_core.session');
+            $engine = $session->setDatabaseByName($instance,'waae');            
+        }
+        
         if (!isset($req)) return $this->summaryAction();
         
         $page = '../src/Arii/ATSBundle/Resources/views/Requests/'.$lang.'/'.$req.'.yml';
