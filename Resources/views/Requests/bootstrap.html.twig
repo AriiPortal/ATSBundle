@@ -25,7 +25,11 @@
     {% endfor %}
     </tr>
     {% for id,line in result.lines %}
+        {% if line.status is defined %}
         <tr class="{% if line.status == 'SUCCESS' %}success{% endif %}{% if line.status == 'RUNNING' %}warning{% endif %}{% if line.status == 'FAILURE' %}danger{% endif %}{% if line.status == 'ON_ICE' %}info{% endif %}{% if line.status == 'ON_HOLD' %}info{% endif %}">
+        {% else %}
+        <tr>
+        {% endif %}        
         <th>{{ id }}</th>
         {% for cell in line.cells %}  
             <td>{{ cell | raw }}</td>

@@ -9,13 +9,17 @@ dhtmlxEvent(window,"load",function(){
     globalLayout.cells("a").setWidth(355); 
     globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").hideHeader(); 
-
-    {% if  app.request.query.get('id') is defined %}
-    last = "{{ app.request.query.get('id') }}";
-    globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request="+last );
+    {% if  app.request.query.get('request') is defined %}
+    last = "{{ app.request.query.get('request') }}";
     {% else %}
-    globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_summary') }}");
+    last = "";
     {% endif %}
+        
+    if (last == '') {
+        globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_summary') }}");
+    }
+    else
+        globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request="+last );
 
     globalMenu = globalLayout.cells("a").attachMenu();
     globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
@@ -33,6 +37,7 @@ dhtmlxEvent(window,"load",function(){
     myGrid.setColSorting("str");
     myGrid.init();
     myGrid.load( "{{ url('xml_ATS_requests_list') }}");
+
     myGrid.attachEvent("onRowDblClicked", function (id) {
         last = id;
         globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request="+id);

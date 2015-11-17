@@ -57,7 +57,6 @@ class RequestsController extends Controller
         return $response;        
     }
     
-    // Temps d'exécution trop long
     public function summaryAction()
     {
         $lang = $this->getRequest()->getLocale();
@@ -77,10 +76,11 @@ class RequestsController extends Controller
                     $content = file_get_contents("$basedir/$file");
                     $v = $yaml->parse($content);
                     $nb++;
-                    $value['line'][$nb] = array($v['title'],$v['description']);
-                }
+                    $value['lines'][$nb]['cells'] = array($v['title'],$v['description']);
+                }                
             }
         }
+        
         $value['count'] = $nb;
         return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value));
     }
@@ -91,7 +91,12 @@ class RequestsController extends Controller
         $request = Request::createFromGlobals();
         if ($request->query->get( 'request' ))
             $req=$request->query->get( 'request');
-
+        else {
+            print "Request ?!";
+            exit();
+        }
+            
+            
         // cas de l'appel direct
         if ($request->query->get( 'dbname' )) {
             $instance=$request->query->get( 'dbname');
