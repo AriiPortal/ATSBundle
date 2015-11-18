@@ -5,7 +5,10 @@
 <!-- Optional theme -->
 <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-theme.min.css') }}">
 <!-- Latest compiled and minified JavaScript -->
-<!-- <script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script> -->
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('bundles/ariiats/js/jquery.tablesorter.min.js') }}"></script>
+
 {% endblock %} 
 {% block body %}
 <body>
@@ -15,15 +18,18 @@
   <p>{{ result.description | trans }}</p>
   {% set current_db = app.session.get('database') %}[{{ current_db.name }}]
 </div>
-  
+
 <div class="table-responsive">
 {% if result.count > 0 %}
-  <table class="table">
+  <table id="myTable" class="table tablesorter">
+      <thead>
       <tr><td>#</td>
     {% for cell in result.columns %}
         <th>{{ cell | trans }}</th>
     {% endfor %}
     </tr>
+      </thead>
+      <tbody>
     {% for id,line in result.lines %}
         {% if line.status is defined %}
         <tr class="{% if line.status == 'SUCCESS' %}success{% endif %}{% if line.status == 'RUNNING' %}warning{% endif %}{% if line.status == 'FAILURE' %}danger{% endif %}{% if line.status == 'ON_ICE' %}info{% endif %}{% if line.status == 'ON_HOLD' %}info{% endif %}">
@@ -36,6 +42,7 @@
         {% endfor %}
         </tr>
     {% endfor %}
+      </tbody>
   </table>
 {% else %}
 <div class="alert alert-success" role="alert">
@@ -47,6 +54,13 @@
     <pre>{{ result.sql.oracle }} </pre>
 {% endif %}
 </div>
-</div>    
+</div>
+<script>
+$(document).ready(function(){
+$(function(){
+$("#myTable").tablesorter();
+});
+});
+</script>
 </body>
 {% endblock %}
