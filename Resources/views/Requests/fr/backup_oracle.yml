@@ -1,13 +1,17 @@
 title:          Sauvegardes Oracle
 description:    Récapitulatif des sauvegardes Oracle par instance
-header:         DESCRIPTION,STATUS(status),LAST_START(timestamp),LAST_END(timestamp),DURATION(duration),NEXT_START(timestamp),JOB_NAME
+header:         DESCRIPTION,STATUS(status),LAST_START(timestamp),LAST_END(timestamp),DURATION(duration),NEXT_START(timestamp),HOST,STANDBY,JOB_NAME
 icon:           database
 sql:
     oracle: |
         select 
-            SUBSTR(JOB_NAME,6,4) as INSTANCE,
-            JOB_NAME,STATUS,DESCRIPTION,LAST_START,LAST_END,LAST_END,NEXT_START,LAST_END - LAST_START as DURATION,EXIT_CODE
+            JOB_NAME,STATUS,DESCRIPTION,LAST_START,LAST_END,LAST_END,NEXT_START,LAST_END - LAST_START as DURATION,EXIT_CODE,
+            'ORA.'||SUBSTR(JOB_NAME,6,INSTR(JOB_NAME,'.',6,1)-6)||'.PRIMARY.HOST' as GLO_NAME,p.VALUE as HOST,s.VALUE as STANDBY
         from UJO_JOBST
+            left join UJO_GLOB p
+                on 'ORA.'||SUBSTR(JOB_NAME,6,INSTR(JOB_NAME,'.',6,1)-6)||'.PRIMARY.HOST'=p.GLO_NAME
+            left join UJO_GLOB s
+                on 'ORA.'||SUBSTR(JOB_NAME,6,INSTR(JOB_NAME,'.',6,1)-6)||'.STANDBY.HOST'=s.GLO_NAME
         where   ((JOB_NAME like 'ORA%.BOX.%') and  (BOX_JOID=0))
                 or ((JOB_NAME like 'ORA%.%') and (STATUS=5))
         order by NEXT_START
