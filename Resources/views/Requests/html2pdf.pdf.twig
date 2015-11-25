@@ -1,0 +1,39 @@
+<page>
+  <h1>{{ result.title }}</h1>
+  <p>{{ result.description }}</p>
+  {% set current_db = app.session.get('database') %}[{{ current_db.name }}]
+    <page_header> 
+ENTETE
+TEST
+ERIC
+<br/>
+    </page_header> 
+{% if result.count > 0 %}
+  <table id="myTable" class="table tablesorter">
+      <thead>
+      <tr><td>#</td>
+    {% for cell in result.columns %}
+        <th>{{ cell }}</th>
+    {% endfor %}
+    </tr>
+      </thead>
+      <tbody>
+    {% for id,line in result.lines %}
+        {% if line.status is defined %}
+        <tr class="{% if line.status == 'SUCCESS' %}success{% endif %}{% if line.status == 'RUNNING' %}warning{% endif %}{% if line.status == 'FAILURE' %}danger{% endif %}{% if line.status == 'ON_ICE' %}info{% endif %}{% if line.status == 'ON_HOLD' %}info{% endif %}">
+        {% else %}
+        <tr>
+        {% endif %}        
+        <th>{{ id }}</th>
+        {% for cell in line.cells %}  
+            <td>{{ cell | raw }}</td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+      </tbody>
+  </table>
+{% endif %}
+    <page_footer> 
+PIED
+    </page_footer> 
+</page>

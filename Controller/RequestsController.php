@@ -84,8 +84,8 @@ class RequestsController extends Controller
         $value['count'] = $nb;
         return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value));
     }
-    
-    public function resultAction()
+
+    public function resultAction($output='html')
     {
         $lang = $this->getRequest()->getLocale();
         $request = Request::createFromGlobals();
@@ -94,8 +94,9 @@ class RequestsController extends Controller
         else {
             print "Request ?!";
             exit();
-        }
-            
+        }            
+        if ($request->query->get( 'output' ))
+            $output=$request->query->get( 'output');
             
         // cas de l'appel direct
         if ($request->query->get( 'dbname' )) {
@@ -187,7 +188,28 @@ class RequestsController extends Controller
             $value['lines'][$nb]['status'] = $status;
          }
         $value['count'] = $nb;
-        return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
+
+        if ($output=='html')
+            return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
+        
+/*        
+        $twig = file_get_contents('../src/Arii/ATSBundle/Resources/views/Requests/html2pdf.pdf.twig');
+        $content = $this->get('arii_ats.twig_string')->render( $twig, array('result' => $value ) );      
+        require_once('../vendor/html2pdf/html2pdf.class.php');
+        header('Content-Type: application/pdf');
+        $html2pdf = new \HTML2PDF('L','A4','fr');
+        $html2pdf->WriteHTML($content);
+        $html2pdf->Output($request.'.pdf');
+*/
+        $twig = file_get_contents('../src/Arii/ATSBundle/Resources/views/Requests/dompdf.pdf.twig');
+        $content = $this->get('arii_ats.twig_string')->render( $twig, array('result' => $value ) );      
+        require_once('../vendor/dompdf/dompdf_config.inc.php');
+        header('Content-Type: application/pdf');
+        $dompdf = new \DOMPDF();
+        $dompdf->load_html($content);
+        $dompdf->render();
+        $dompdf->stream("sample.pdf");
+        exit();
     }
 
 }

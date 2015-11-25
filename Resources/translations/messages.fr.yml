@@ -14,8 +14,12 @@ COMMAND: Commande
 Title: Titre
 LAST_START: Départ
 NEXT_START: Prochain
+PLANNED_END: Fin planifiée
 LAST_END: Fin
 DURATION: Durée
 EXIT_CODE: Exit
 INSTANCE: Instance
 STATUS: Statut
+HOST: Hôte
+DELAY: Retard
+STANDBY: Standby
