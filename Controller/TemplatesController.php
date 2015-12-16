@@ -55,7 +55,7 @@ class TemplatesController extends Controller
         
         $temp = $config['template'];
         $content = file_get_contents("$path/$temp");
-        
+
         return array($content,$config);
     }
     

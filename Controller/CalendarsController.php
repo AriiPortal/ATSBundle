@@ -154,7 +154,25 @@ class CalendarsController extends Controller
         $data->event->attach("beforeRender",array($this,"jobs_render"));
         $data->render_sql($qry,'JOB_NAME','JOB_NAME,LAST_END,NEXT_START,DESCRIPTION');        
     }
-    
+
+    public function excludejobsAction() {
+        $request = Request::createFromGlobals();
+        $calendar = $request->query->get( 'calendar' );
+            
+        $sql = $this->container->get('arii_core.sql');                  
+        $qry = $sql->Select(array('JOB_NAME','LAST_END','NEXT_START','DESCRIPTION'))
+                .$sql->From(array('UJO_JOBST'));
+        if ($calendar != '') {
+            $qry .= $sql->Where(array('{job_name}' => 'JOB_NAME', 'EXCLUDE_CALENDAR' => $calendar));
+        }  
+        $qry .= $sql->OrderBy(array('JOB_NAME'));
+
+        $dhtmlx = $this->container->get('arii_core.dhtmlx');
+        $data = $dhtmlx->Connector('grid');
+        $data->event->attach("beforeRender",array($this,"jobs_render"));
+        $data->render_sql($qry,'JOB_NAME','JOB_NAME,LAST_END,NEXT_START,DESCRIPTION');        
+    }
+
     public function jobs_render($data) {
         $date = $this->container->get('arii_core.date');
         $data->set_value('LAST_END',$date->Time2Local($data->get_value('LAST_END'),'',true));

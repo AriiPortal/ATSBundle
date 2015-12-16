@@ -27,22 +27,39 @@ class AriiExec {
             print "?!";
             exit();
         }
-        
+
+        set_include_path('../vendor/phpseclib' . PATH_SEPARATOR . get_include_path());
+        include('Net/SSH2.php');
+        include('Crypt/RSA.php');
+
         $shell = $engine[0]['shell'];
         $host = $shell['host'];
         $user = $shell['user'];
-        $password = $shell['password'];
-        
-        $method = 'CURL';
 
-        set_include_path(get_include_path() . PATH_SEPARATOR . '../vendor/phpseclib');
-        include('Net/SSH2.php');
-        
         $ssh = new \Net_SSH2($host);
-        if (!$ssh->login($user, $password)) {
-            exit('Login Failed');
-        }
         
+        if (isset($shell['key'])) {
+            $key = new \Crypt_RSA();
+            $ret = $key->loadKey($shell['key']);
+            if (!$ret) {
+                echo "loadKey failed\n";
+                print "<pre>".$ssh->getLog().'</pre>';
+                exit;
+            }
+        }
+        elseif (isset($shell['password'])) {
+            $key = $shell['password'];
+        }
+        else {
+            $key = ''; // ?! possible ?
+        }
+               
+        if (!$ssh->login('autosys', $key)) {
+            print 'Login Failed';
+            print "<pre>".$ssh->getLog().'</pre>';
+            exit();
+        }
+
         if ($stdin=='')
             return $ssh->exec(". ~/.bash_profile;$command");
 

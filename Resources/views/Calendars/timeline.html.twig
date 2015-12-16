@@ -37,7 +37,8 @@ dhtmlxEvent(window,"load",function(){
     globalLayout.cells("b").hideHeader(); 
     globalLayout.cells("c").hideHeader();
     globalLayout.cells("c").setHeight(200); 
-   
+    globalLayout.cells("c").collapse();
+    
     globalMenu = globalLayout.cells("a").attachMenu();
     globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
     globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
@@ -62,7 +63,11 @@ dhtmlxEvent(window,"load",function(){
     myGrid.load( "{{ url('xml_ATS_calendars_list') }}");
     myGrid.attachEvent("onRowDblClicked", Detail );
     
-    myJobs = globalLayout.cells("c").attachGrid();
+    myTab = globalLayout.cells("c").attachTabbar();
+    myTab.addTab("b1","{{ "Jobs" | trans }}","100px", null, true);
+    myTab.addTab("b2","{{ "Exclude" | trans }}","100px");
+
+    myJobs = myTab.cells("b1").attachGrid();
     myJobs.selMultiRows = true;
     myJobs.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
     myJobs.setHeader("{{ "Job" | trans }},{{ "Last" | trans }},{{ "Next" | trans }},{{ "Description" | trans }}");
@@ -73,6 +78,18 @@ dhtmlxEvent(window,"load",function(){
     myJobs.setColSorting("str,date,date,str");
     myJobs.enableAlterCss("","");
     myJobs.init();    
+
+    myExclude = myTab.cells("b2").attachGrid();
+    myExclude.selMultiRows = true;
+    myExclude.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myExclude.setHeader("{{ "Job" | trans }},{{ "Last" | trans }},{{ "Next" | trans }},{{ "Description" | trans }}");
+    myExclude.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter");
+    myExclude.setInitWidths("200,140,140,*");
+    myExclude.setColAlign("left,right,right,left");
+    myExclude.setColTypes("ro,ro,ro,ro");
+    myExclude.setColSorting("str,date,date,str");
+    myExclude.enableAlterCss("","");
+    myExclude.init();    
 
     //scheduler.locale.labels.section_custom="Section";
     scheduler.config.details_on_create=false;
@@ -121,19 +138,26 @@ dhtmlxEvent(window,"load",function(){
 });
 
 function Detail(id) {
+    globalLayout.cells("c").expand();
+    myTab.cells("b1").progressOn();
+    myTab.cells("b2").progressOn();
     dhtmlxAjax.get( "{{ url('xml_ATS_calendar') }}?calendar="+id, function(loader1){
         scheduler.clearAll();
         scheduler.parse(loader1.xmlDoc.responseText);
         scheduler.update_view();
-        globalLayout.cells("c").progressOn();
         myJobs.clearAll();
-        myJobs.load( "{{ url('xml_ATS_calendar_jobs') }}?calendar="+id, function(loader1){
-            globalLayout.cells("c").progressOff();
+        myExclude.clearAll();
+        myJobs.load( "{{ url('xml_ATS_calendar_jobs') }}?calendar="+id, function(loader1){            
+            myTab.cells("b1").progressOff();
+            myExclude.load( "{{ url('xml_ATS_calendar_exclude') }}?calendar="+id, function(loader1){
+                myTab.cells("b2").progressOff();
+            });
         });
     });
 }
 
 function GlobalRefresh() {
+    myGrid.load( "{{ url('xml_ATS_calendars_list') }}");
 }
 
 

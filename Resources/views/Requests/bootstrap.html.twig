@@ -14,6 +14,7 @@
 <body>
 <div class="container-fluid">
 <div class="jumbotron">
+<img src="{{ asset('logo.png') }}"/>
   <h1>{{ result.title | trans }}</h1>
   <p>{{ result.description | trans }}</p>
   {% set current_db = app.session.get('database') %}[{{ current_db.name }}]

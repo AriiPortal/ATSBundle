@@ -71,7 +71,7 @@ dhtmlxEvent(window,"load",function(){
     myGrid.enableContextMenu(myGridMenu);
     myGrid.attachEvent("onBeforeContextMenu", onShowMenu );
     myGrid.init();
-    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}");
+    myGrid.load( "{{ url('xml_Hub_categories') }}");
     myGrid.attachEvent("onRowDblClicked",JobDetail );
 
     myDonut.attachEvent("onItemClick",function(id, value){

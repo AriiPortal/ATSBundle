@@ -336,7 +336,11 @@ xml_ATS_calendar:
 xml_ATS_calendar_jobs:
     pattern:  /calendars/jobs.xml
     defaults: { _controller: AriiATSBundle:Calendars:jobs }
-    
+
+xml_ATS_calendar_exclude:
+    pattern:  /calendars/exclude.xml
+    defaults: { _controller: AriiATSBundle:Calendars:excludejobs }
+
 # --------------------------------------------------------------------------
 # INSTRUCTIONS
 # --------------------------------------------------------------------------
@@ -366,6 +370,21 @@ xml_ATS_instructions_grid_toolbar:
 arii_ATS_generate:
     pattern:  /generate
     defaults: { _controller: AriiATSBundle:Graphviz:generate }
+
+# --------------------------------------------------------------------------
+# Logs
+# --------------------------------------------------------------------------
+arii_ATS_logs:
+    pattern:  /logs
+    defaults: { _controller: AriiATSBundle:Logs:index }
+
+xml_ATS_logs_toolbar:
+    pattern:  /logs/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Logs:toolbar }
+
+xml_ATS_event_demon:
+    pattern:  /logs/event_demon.xml
+    defaults: { _controller: AriiATSBundle:Logs:EventDemon }
 
 # --------------------------------------------------------------------------
 # REQUESTS
