@@ -13,7 +13,9 @@ class GraphvizController extends Controller
         's' => 'green', 
         'f' => 'red',
         'd' => 'blue',
-        'n' => 'orange'
+        'n' => 'orange',
+        't' => 'purple',
+        'e' => 'cyan'
     );
     
     public function generateAction()
@@ -30,8 +32,6 @@ class GraphvizController extends Controller
         $images_path = $this->get('kernel')->getRootDir().'/../web'.$images;
         $images_url = $this->container->get('templating.helper.assets')->getUrl($images);        
         
-        $this->config = $this->container->getParameter('osjs_config');
-        // $this->images = $this->container->getParameter('graphviz_images');
         $this->graphviz_dot = $this->container->getParameter('graphviz_dot');
 
         
@@ -119,7 +119,7 @@ bgcolor=transparent
         }
 
         // Conditions
-        $qry = $sql->Select(array('JOID','COND_JOB_NAME','TYPE','JOB_VER'))
+        $qry = $sql->Select(array('JOID','COND_JOB_NAME','TYPE','JOB_VER','VALUE'))
                 .$sql->From(array('UJO_JOB_COND'))
                 ." where JOID in (".implode(',',array_keys($Jobs)).")"
                 .$sql->OrderBy(array('JOID'));
@@ -130,12 +130,22 @@ bgcolor=transparent
             $joid = $line['JOID'];
             $name = $line['COND_JOB_NAME'];
             $ver = $line['JOB_VER'];
+            $value = $line['VALUE'];
             if (isset($Ver[$joid]) and ($Ver[$joid] != $ver)) continue;
             
             switch (strtolower($type)) {
                 case 'g':
                     break;
                 case 'b':
+                    break;
+                case 'e':
+                    $color=$this->Color[$type];
+                    if (isset($Joid[$name])) {
+                        $digraph .= $Joid[$name]." -> ".$joid." [color=$color;label=$value]\n";                        
+                    }
+                    else {
+                        $digraph .= "\"$name\" -> ".$joid." [color=$color;label=$value]\n";                        
+                    }
                     break;
                 default:
                     $color=$this->Color[$type];
@@ -211,40 +221,6 @@ bgcolor=transparent
             header('Content-type: image/'.$output);
             print trim($out);
             exit();
-        }
-        exit();
-    }
-
-    public function configAction()
-    {
-        $request = Request::createFromGlobals();
-        // system('C:/xampp/htdocs/Symfony/vendor/graphviz/config.cmd');
-        $return = 0;
-        $output = "svg";
-        if ($request->query->get( 'output' ))
-            $output = $request->query->get( 'output' );
-        
-        $gvz_cmd = $this->container->getParameter('graphviz_config_cmd');
-        $config = "c:/arii/enterprises/sos-paris/spoolers";
-        $cmd = $gvz_cmd.' "'.$config.'" "'.$output.'"';
-
-   //     print $cmd; exit();
-        $base =  $this->container->getParameter('graphviz_base'); 
-        if ($output == 'svg') {
-            exec($cmd,$out,$return);
-            header('Content-type: image/svg+xml');
-            foreach ($out as $o) {
-                $o = str_replace('xlink:href="../../web','xlink:href="'.$base.'',$o);
-                print $o;
-            }
-        }
-        elseif ($output == 'pdf') {
-            header('Content-type: application/pdf');
-            system($cmd);
-        }
-        else {
-            header('Content-type: image/'.$output);
-            system($cmd);
         }
         exit();
     }

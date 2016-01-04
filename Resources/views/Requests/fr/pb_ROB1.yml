@@ -1,0 +1,18 @@
+title:          Recherche du job qui a planté le transac avec ROB1
+description:    Le 21 a 18h30 et qui dure 50 minutes.
+header:         JOB_NAME,LAST_START(timestamp),RUNTIME(duration),AVG_RUN_TIME(duration),DESCRIPTION
+icon:           job
+sql:
+    oracle: |
+        select JOB_TYPE,round(j.LAST_START - j.LAST_END) as RUNTIME,
+            j.JOB_NAME,j.LAST_START,j.DESCRIPTION,j.STATUS,
+            r.AVG_RUN_TIME
+        from UJO_AVG_JOB_RUNS r
+        left join UJO_JOBST j
+            on r.JOID=j.JOID
+        where (j.LAST_START - j.LAST_END)>20*60  
+        and JOB_NAME like '%.JOB.%'
+        order by JOB_NAME
+    a voir: |        
+        and To_Char( To_Date( '01.01.1970 06:00:00','DD.MM.YYYY HH24:Mi:Ss')+ last_start / 86400,'YYYY-DD-MM')> '19.12.2015 18:00:00'
+        order by j.LAST_START

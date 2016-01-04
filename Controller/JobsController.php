@@ -38,38 +38,18 @@ class JobsController extends Controller
     public function statusAction($only_warning=0,$job_only=0)
     {
         $request = Request::createFromGlobals();
+        if ($request->query->get( 'box' ))
+            $box = $request->query->get( 'box' );      
+        else 
+            $box = '';
         if ($request->query->get( 'only_warning' ))
             $only_warning = $request->query->get( 'only_warning' );
-        if ($request->query->get( 'job_warning' ))
-            $only_warning = $request->query->get( 'job_warning' );
+        else
+            $only_warning = 0;
 
-        $sql = $this->container->get('arii_core.sql');                  
-        $qry = $sql->Select(array('j.JOID','j.BOX_JOID','j.JOB_NAME','j.JOB_TYPE','j.DESCRIPTION','j.AS_APPLIC','j.AS_GROUP',
-                                    's.STATUS','s.LAST_START','s.LAST_END','s.EXIT_CODE',
-                                    't.LINEAGE','t.DEPTH'))
-                .$sql->From(array('UJO_JOB j'))
-                .$sql->LeftJoin('UJO_JOB_STATUS s',array('j.JOID','s.JOID'))
-                .$sql->LeftJoin('UJO_JOB_TREE t',array('j.JOID','t.JOID'))
-                .$sql->Where(
-                        array(  'j.IS_ACTIVE' => 1, 
-                                '{job_name}' => 'j.JOB_NAME', 
-                                '{start_timestamp}'=> 's.LAST_START'))                
-                .$sql->OrderBy(array('s.STATUS_TIME desc'));
-        
-        $dhtmlx = $this->container->get('arii_core.dhtmlx');
-        $data = $dhtmlx->Connector('data');
-
-        $res = $data->sql->query($qry);
-        $autosys = $this->container->get('arii_ats.autosys');
-        $Job = array();
-        while ($line = $data->sql->get_next($res))
-        {            
-            if ($only_warning and ($line['STATUS']==4)) continue;
-            $status = $autosys->Status($line['STATUS']);            
-            $joid = $line['JOID'];
-            $Job[$joid] = $line;            
-        }
-
+        $state = $this->container->get('arii_ats.state');
+        $Job = $state->Jobs($box,$only_warning);
+                
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
         $list = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -85,41 +65,11 @@ class JobsController extends Controller
             $status = $autosys->Status($j['STATUS']);
             list($bgcolor,$color) = $autosys->ColorStatus($status);
             $list .= '<row id="'.$k.'" style="background-color: '.$bgcolor.'">';
-            $box = $j['BOX_JOID'];
-            
-            if ($box > 0) {
-                if (isset($j['LINEAGE'])) {                    
-                    $Folder = explode('/',$j['LINEAGE']);
-                    $folder = '';
-                    array_shift($Folder);
-                    array_pop($Folder);
-                    foreach ($Folder as $f) {
-                        if (isset($Job[$f]['JOB_NAME']))
-                            $folder .= '/'.$Job[$f]['JOB_NAME'];
-                        else 
-                            $folder .= '/['.$f.']';
-                    }
-                }
-                else
-                    $folder = "[$box]";
-            }
-            else
-                $folder = '';
-/*
-            while (isset($Job[$box]) and ($Job[$box]['BOX_JOID']>0)) {
-               $box = $Job[$box]['BOX_JOID'];
-               $folder = $Job[$box]['JOB_NAME'].'/'.$folder;
-            }
-*/            
-            if ($folder != '')
-                $list .= '<cell>'.$folder.'</cell>';
-            else 
-                $list .= '<cell/>';
-            
+            $list .= '<cell>'.$j['BOX_NAME'].'</cell>';               
             $list .= '<cell>'.$j['JOB_NAME'].'</cell>';               
             $list .= '<cell>'.$status.'</cell>';               
             $list .= '<cell>'.$autosys->JobType($j['JOB_TYPE']).'</cell>';               
-                
+
             $date = $this->container->get('arii_core.date');
             foreach (array('LAST_START','LAST_END') as $f ) {
                 $list .= '<cell>'.$date->Time2Local($j[$f],'VA1',true).'</cell>';               

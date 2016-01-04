@@ -23,27 +23,31 @@ class AriiState
 /*********************************************************************
  * Informations de connexions
  *********************************************************************/
-   public function Jobs() {   
+   public function Jobs($box='%',$only_warning=0) {   
         $date = $this->date;        
         $sql = $this->sql;
         $db = $this->db;
         $data = $db->Connector('data');
         
         // Jobs
-        $Fields = array( '{job_name}'   => 'JOB_NAME' );
-
-        $qry = $sql->Select(array('JOID','JOB_NAME','DESCRIPTION','STATUS','STATUS_TIME'))
-                .$sql->From(array('UJO_JOBST'))
+        $Fields = array( 
+            '{job_name}'   => 'JOB_NAME',
+            '{start_timestamp}'=> 'LAST_START');
+        
+        # Jointure car la vue est incomplete
+        $qry = $sql->Select(array('s.*','j.AS_APPLIC','j.AS_GROUP'))
+                .$sql->From(array('UJO_JOBST s'))
+                .$sql->LeftJoin('UJO_JOB j',array('j.JOID','s.JOID'))
                 .$sql->Where($Fields)
-                .$sql->OrderBy(array('JOB_NAME'));
+                .$sql->OrderBy(array('s.BOX_NAME','s.JOB_NAME'));
 
         $res = $data->sql->query($qry);
         $Jobs = array();
         while ($line = $data->sql->get_next($res))
-        {            
+        {   
+            if ($only_warning and ($line['STATUS']==4)) continue;
             $jn = $line['JOB_NAME'];
             $joid = $line['JOID'];
-
             $Jobs[$jn] =$line;
         }
         return $Jobs;

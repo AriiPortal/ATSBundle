@@ -156,6 +156,10 @@ function Detail(id) {
     });
 }
 
+function GridRefresh() {
+    GlobalRefresh();
+}
+
 function GlobalRefresh() {
     myGrid.load( "{{ url('xml_ATS_calendars_list') }}");
 }

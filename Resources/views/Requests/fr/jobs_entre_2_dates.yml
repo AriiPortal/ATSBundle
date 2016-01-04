@@ -1,0 +1,20 @@
+title:          Jobs entre 2 dates
+description:    2 dates.
+header:         JOB_NAME,STARTIME(timestamp),ENDTIME(timestamp),RUNTIME(duration),DESCRIPTION
+icon:           job
+sql:
+    oracle: |
+        select JOB_TYPE,round(r.ENDTIME - r.STARTIME) as RUNTIME,
+            j.JOB_NAME,r.STARTIME,r.ENDTIME,j.DESCRIPTION,j.STATUS,
+            To_Char( To_Date( '01.01.1970 00:00:00','DD.MM.YYYY HH24:Mi:Ss')+ r.STARTIME / 86400,'YYYY-MM-DD HH24:Mi:Ss') as TEST
+        from UJO_JOB_RUNS r
+        left join UJO_JOBST j
+            on r.JOID=j.JOID
+        where JOB_NAME like '%.JOB.%'
+        and To_Char( To_Date( '01.01.1970 00:00:00','DD.MM.YYYY HH24:Mi:Ss')+ r.STARTIME / 86400,'YYYY-MM-DD HH24:Mi')>= '2015-12-21 17:00'
+        and To_Char( To_Date( '01.01.1970 00:00:00','DD.MM.YYYY HH24:Mi:Ss')+ r.STARTIME / 86400,'YYYY-MM-DD HH24:Mi')<=  '2015-12-21 19:00'
+        order by r.STARTIME
+    a voir: |        
+        
+        and r.AVG_RUN_TIME>0
+        order by j.LAST_START

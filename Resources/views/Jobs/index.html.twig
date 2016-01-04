@@ -4,7 +4,7 @@
 <script type="text/javascript">
 var max_history = 0; // pas d'historique
 var chained = 0; // que des standalone
-var only_warning = 0; // que les problemes
+var only_warning = 1; // que les problemes
 var update=30;
 var autorefresh;
 var jobtype = "CMD"; // Type de job en cours
@@ -15,6 +15,7 @@ dhtmlxEvent(window,"load",function(){
     globalLayout.cells("a").setWidth(350); 
     globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").hideHeader(); 
+    globalLayout.cells("c").hideHeader(); 
 
     globalMenu = globalLayout.cells("a").attachMenu();
     globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
@@ -47,7 +48,7 @@ dhtmlxEvent(window,"load",function(){
                 align:"left"
             } 
     });
-    myDonut.load( "{{ url('xml_ATS_jobs_pie') }}" );
+    myDonut.load(  "{{ url('xml_ATS_jobs_pie') }}?chained="+chained+"&only_warning="+only_warning );
     
 /*    myTree = myTab.cells("b2").attachTree();
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
@@ -71,7 +72,7 @@ dhtmlxEvent(window,"load",function(){
     myGrid.enableContextMenu(myGridMenu);
     myGrid.attachEvent("onBeforeContextMenu", onShowMenu );
     myGrid.init();
-    myGrid.load( "{{ url('xml_Hub_categories') }}");
+    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?history="+max_history+"&chained="+chained+"&only_warning="+only_warning);
     myGrid.attachEvent("onRowDblClicked",JobDetail );
 
     myDonut.attachEvent("onItemClick",function(id, value){
@@ -99,6 +100,7 @@ dhtmlxEvent(window,"load",function(){
     myGridToolbar.attachEvent("onStateChange",function(itemid, state){
     });
 
+    globalLayout.cells("c").setHeight(300); 
     myTabbar = globalLayout.cells("c").attachTabbar();
     myTabbar.addTab("job","{{ "Job" | trans }}","100px", null, true);
     myTabbar.addTab("output","{{ "Output" | trans }}","100px");
@@ -262,6 +264,7 @@ function GridRefresh() {
 }
 
 function JobDetail(id) {
+    
     job = myGrid.cells(id, 1 ).getValue(); 
     status = myGrid.cells(id, 2 ).getValue(); 
     type = myGrid.cells(id, 3 ).getValue(); 
