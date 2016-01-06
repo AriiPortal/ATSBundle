@@ -120,6 +120,7 @@ class RequestsController extends Controller
             return $this->render('AriiATSBundle:Requests:ERROR.html.twig', array('error' => $error));
         }
 
+
         $sql = $this->container->get('arii_core.sql');
         
         $dhtmlx = $this->container->get('arii_core.dhtmlx');

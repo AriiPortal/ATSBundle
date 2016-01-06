@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 class JobsController extends Controller
 {
     protected $images;
+    protected $autosys; 
     
     public function __construct( )
     {
@@ -132,18 +133,30 @@ class JobsController extends Controller
     }
 
     public function treeAction() {
+        $request = Request::createFromGlobals();
+        if ($request->query->get( 'only_warning' ))
+            $only_warning = $request->query->get( 'only_warning' );
+        
         $sql = $this->container->get('arii_core.sql');                  
-        $qry = $sql->Select(array('JOID','BOX_JOID','JOB_NAME','DESCRIPTION'))
+        $qry = $sql->Select(array('JOID','BOX_JOID','JOB_NAME','DESCRIPTION','STATUS'))
                 .$sql->From(array('UJO_JOBST'))
                 .$sql->Where(array( 
-                    '{start_timestamp}' => 'LAST_START', 
-                    '{job_name}' => 'JOB_NAME' ))
-                .$sql->OrderBy(array('JOB_NAME'));
+                    'JOB_TYPE' => 98, 
+                    '{job_name}'   => 'JOB_NAME'));
+        if ($only_warning)
+                $qry .= " and STATUS<>4";
+        $qry .= $sql->OrderBy(array('JOB_NAME'));
 
         $dhtmlx = $this->container->get('arii_core.dhtmlx');
         $data = $dhtmlx->Connector('tree');
-//        $data->event->attach("beforeRender",array($this,"form_render"));
-        $data->render_sql($qry,'JOID','JOB_NAME','DESCRIPTION','BOX_JOID');
+        $this->autosys = $this->container->get('arii_ats.autosys');
+        $data->event->attach("beforeRender",array($this,"tree_render"));        
+        $data->render_sql($qry,'JOID','JOB_NAME','','BOX_JOID');
+    }
+
+    public function tree_render($data) {
+        list($bgcolor,$color) = $this->autosys->ColorStatus($this->autosys->Status($data->get_value("STATUS")));
+        $data->set_value("JOB_NAME","<font color='".$bgcolor."'>".$data->get_value("JOB_NAME")."</font>");
     }
     
     public function barchartAction($tag='application',$only_warning=0) {

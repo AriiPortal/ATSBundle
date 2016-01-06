@@ -27,9 +27,9 @@ dhtmlxEvent(window,"load",function(){
     myRibbon.attachEvent("onStateChange", StateRibbon );
     myRibbon.attachEvent("onClick", ClickRibbon );
 
-    var myTab = globalLayout.cells("a").attachTabbar();
+    myTab = globalLayout.cells("a").attachTabbar();
     myTab.addTab("b1","{{ "Status" | trans }}","100px", null, true);
-//    myTab.addTab("b2","{{ "Folders" | trans }}","100px");
+    myTab.addTab("b2","{{ "Folders" | trans }}","100px");
 
     myDonut =  myTab.cells("b1").attachChart({
             view:"donut",
@@ -50,10 +50,9 @@ dhtmlxEvent(window,"load",function(){
     });
     myDonut.load(  "{{ url('xml_ATS_jobs_pie') }}?chained="+chained+"&only_warning="+only_warning );
     
-/*    myTree = myTab.cells("b2").attachTree();
+    myTree = myTab.cells("b2").attachTree();
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
-    myTree.load( "{ { url('xml_ATS_jobs_tree') }}" );
-*/    
+    
     myGridMenu = new dhtmlXMenuObject(null);
     myGridMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/wa/') }}" );
     myGridMenu.renderAsContextMenu();
@@ -62,7 +61,7 @@ dhtmlxEvent(window,"load",function(){
     myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
-    myGrid.setHeader("{{ "Folder" | trans }},{{ "Job" | trans }},{{ "Type" | trans }},{{ "Status" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
+    myGrid.setHeader("{{ "Job" | trans }},{{ "Folder" | trans }},{{ "Status" | trans }},{{ "Type" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
     myGrid.attachHeader("#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
     myGrid.setInitWidths("*,320,120,90,160,160,140,80");
     myGrid.setColAlign("left,left,center,center,right,right,right,right");
@@ -207,6 +206,7 @@ dhtmlxEvent(window,"load",function(){
     });
     
     // Premier chargement avant le smart rendering
+    myTree.load( "{{ url('xml_ATS_jobs_tree') }}?only_warning="+only_warning );
     autorefresh = setInterval( "GridRefresh()",update*1000);
     
     function onShowMenu(rowId, celInd, grid) {
@@ -253,12 +253,11 @@ function GridRefresh() {
         globalLayout.cells("b").progressOff();
         myGrid.refreshFilters();
         myGrid.filterByAll();
-//        myGrid.filterBy(4, status);  
         myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?chained="+chained+"&only_warning="+only_warning, function () {
             myDonut.refresh();                
             globalLayout.progressOff();
             globalLayout.cells("a").progressOff();
-            // myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_tree') }}?chained="+chained+"&only_warning="+only_warning);                    
+            myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_tree') }}?only_warning="+only_warning);                    
         });
     });    
 }

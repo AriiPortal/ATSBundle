@@ -293,8 +293,8 @@ function GridRefresh() {
             myBarChartGroup.load( "{{ url('xml_ATS_jobs_barchart') }}?tag=GROUP&only_warning="+only_warning, function () {
                 myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?only_warning="+only_warning, function () {
                     myGrid.filterBy(2, status);
-                    myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_tree') }}");                    
-            });
+                    myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_grid') }}");                    
+                });
             });
         });
     });    
