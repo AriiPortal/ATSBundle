@@ -9,8 +9,9 @@ class GraphvizController extends Controller
 {
     private $graphviz_dot;
     private $config;
+    private $images_path;
     private $Color = array(
-        's' => 'green', 
+        's' => 'green',
         'f' => 'red',
         'd' => 'blue',
         'n' => 'orange',
@@ -28,9 +29,9 @@ class GraphvizController extends Controller
         $joid = $request->query->get( 'id' );
                 
         // Localisation des images 
-        $images = '/bundles/ariigraphviz/images/silk';
-        $images_path = $this->get('kernel')->getRootDir().'/../web'.$images;
-        $images_url = $this->container->get('templating.helper.assets')->getUrl($images);        
+        $images = '/bundles/ariicore/images/wa';
+        $this->images_path = str_replace('\\','/',$this->get('kernel')->getRootDir()).'/../web'.$images;
+        $images_url = $this->container->get('templating.helper.assets')->getUrl($images);
         
         $this->graphviz_dot = $this->container->getParameter('graphviz_dot');
 
@@ -50,53 +51,28 @@ class GraphvizController extends Controller
         
         $digraph = "digraph ATS {
 fontname=arial
-fontsize=8
+fontsize=10
 splines=$splines
 randkir=$rankdir
-node [shape=plaintext,fontname=arial,fontsize=8]
-edge [shape=plaintext,fontname=arial,fontsize=8,decorate=true,compound=true]
+node [shape=plaintext,fontname=arial,fontsize=10]
+edge [shape=plaintext,fontname=arial,fontsize=10,decorate=true,compound=true]
 bgcolor=transparent
 ";
+        $autosys = $this->container->get('arii_ats.autosys');
         
         // Jobs concernés
         $sql = $this->container->get('arii_core.sql');                  
-/*        
-        $qry = $sql->Select(array('j.JOID','j.BOX_JOID','j.JOB_NAME','j.JOB_TYPE','j.DESCRIPTION','j.AS_APPLIC','j.AS_GROUP',
-                                    's.STATUS','s.LAST_START','s.LAST_END','s.EXIT_CODE',
-                                    't.LINEAGE','t.DEPTH'))
-                .$sql->From(array('UJO_JOB j'))
-                .$sql->LeftJoin('UJO_JOB_STATUS s',array('j.JOID','s.JOID'))
-                .$sql->LeftJoin('UJO_JOB_TREE t',array('j.JOID','t.JOID'))
-                .$sql->Where(
-                        array(  'j.IS_ACTIVE' => 1, 
-                                '{job_name}' => 'j.JOB_NAME', 
-                                '{start_timestamp}'=> 's.LAST_START'))                
-                .$sql->OrderBy(array('s.STATUS_TIME desc'));
-*/        
         $dhtmlx = $this->container->get('arii_core.dhtmlx');
         $data = $dhtmlx->Connector('data');
-/*
-        $qry = $sql->Select(array('*'))
-                .$sql->From(array('UJO_JOB_TREE'))
-                ." where LINEAGE like '%/$joid/%'"
-                .$sql->OrderBy(array('JOID'));
-        
-        $res = $data->sql->query($qry);
-        while ($line = $data->sql->get_next($res))
-        {  
-            $j = $line['JOID'];
-            $Jobs{$j}=1;
-            $j = $line['PARENT_JOID'];
-            $Jobs{$j}=1;
-        }
-*/        
+            
         // Job direct
-        $qry = $sql->Select(array('JOID','BOX_JOID','JOB_NAME','DESCRIPTION','IS_ACTIVE','JOB_VER'))
-                .$sql->From(array('UJO_JOB'))
-                ." where (JOID=$joid or BOX_JOID=$joid) and IS_ACTIVE=1"
+        $qry = $sql->Select(array('*'))
+                .$sql->From(array('UJO_JOBST'))
+                ." where (JOID=$joid or BOX_JOID=$joid)"
                 .$sql->OrderBy(array('JOID'));
-        
+
         $res = $data->sql->query($qry);
+        $Infos = array();
         while ($line = $data->sql->get_next($res))
         {
             $joid = $line['JOID'];
@@ -113,7 +89,12 @@ bgcolor=transparent
             $name = $line['JOB_NAME'];
             $Joid[$name] = $joid;
             if (!isset($Done[$joid])) {
-                $digraph .= "$joid [label=\"$name\"]\n";
+                $status = $autosys->Status($line['STATUS']);
+                list($bgcolor,$color) = $autosys->ColorStatus($status);
+                $line['COLOR'] = $color;
+                $line['BGCOLOR'] = $bgcolor;
+                $Infos[$joid] = $line;
+                $digraph .= $this->Node($line);
                 $Done{$joid}=1;
             }
         }
@@ -141,10 +122,10 @@ bgcolor=transparent
                 case 'e':
                     $color=$this->Color[$type];
                     if (isset($Joid[$name])) {
-                        $digraph .= $Joid[$name]." -> ".$joid." [color=$color;label=$value]\n";                        
+                        $digraph .= $Joid[$name]." -> ".$joid." [style=dotted;color=$color;label=$value]\n";                        
                     }
                     else {
-                        $digraph .= "\"$name\" -> ".$joid." [color=$color;label=$value]\n";                        
+                        $digraph .= "\"$name\" -> ".$joid." [style=dotted;color=$color;label=$value]\n";                        
                     }
                     break;
                 default:
@@ -157,15 +138,21 @@ bgcolor=transparent
                     }
             }
         }
+
         // clusters
         foreach ($Boxes as $box=>$jobs) {
             $digraph .= "subgraph cluster$box {\n";
+            $digraph .= "style=filled;\n";
+            $digraph .= "color=\"".$Infos[$box]['BGCOLOR']."\";\n";
+            $digraph .= "fillcolor=lightgrey;\n";
+
+            # Le noeud de la boite est dans le cluster
+            $digraph .= "$box;\n";
             foreach (explode(',',$jobs) as $j) {
                 $digraph .= "$j\n";
             }
             $digraph .= "}\n";
         }
-        
         $digraph .= "}";
 
 //        print "<pre>$digraph</pre>";
@@ -211,7 +198,7 @@ bgcolor=transparent
 <script xlink:href="'.$this->container->get('templating.helper.assets')->getUrl("bundles/ariigraphviz/js/SVGPan.js").'"/>
 <g id="viewport"';
             $xml .= substr($out,$head+14);
-            print str_replace('xlink:href="'.$images_path,'xlink:href="'.$images_url,$xml);
+            print str_replace('xlink:href="'.$this->images_path,'xlink:href="'.$images_url,$xml);
         }
         elseif ($output == 'pdf') {
             header('Content-type: application/pdf');
@@ -225,6 +212,22 @@ bgcolor=transparent
         exit();
     }
 
+    private function Node($Infos) {
+        $joid = $Infos['JOID'];
+        $label  = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="grey" BGCOLOR="'.$Infos['BGCOLOR'].'">';
+        if ($Infos['JOB_TYPE']==98) {
+            $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/bricks.png"/></TD><TD>'.$Infos['JOB_NAME'].'</TD></TR>';
+            $label .= '<TR><TD></TD><TD ALIGN="LEFT">'.$Infos['DESCRIPTION'].'</TD></TR>';
+        }
+        else {
+            $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/job.png"/></TD><TD>'.$Infos['JOB_NAME'].'</TD></TR>';
+            $label .= '<TR><TD></TD><TD ALIGN="LEFT">'.$Infos['DESCRIPTION'].'</TD></TR>';
+            $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/shell.png"/></TD><TD><![CDATA['.$Infos['COMMAND'].']]></TD></TR>';
+        }
+        $label .= '</TABLE>';        
+        return $joid.' [label=<'.$label.'>]'."\n";        
+    }
+    
     function CleanPath($path) {
         
         // bidouille en attendant la fin de l'étude

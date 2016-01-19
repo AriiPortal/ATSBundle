@@ -65,7 +65,7 @@ class JobsController extends Controller
         foreach($Job as $k=>$j) {
             $status = $autosys->Status($j['STATUS']);
             list($bgcolor,$color) = $autosys->ColorStatus($status);
-            $list .= '<row id="'.$k.'" style="background-color: '.$bgcolor.'">';
+            $list .= '<row id="'.$j['JOID'].'" style="background-color: '.$bgcolor.'">';
             $list .= '<cell>'.$j['BOX_NAME'].'</cell>';               
             $list .= '<cell>'.$j['JOB_NAME'].'</cell>';               
             $list .= '<cell>'.$status.'</cell>';               

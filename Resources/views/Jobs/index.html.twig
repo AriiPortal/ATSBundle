@@ -61,7 +61,7 @@ dhtmlxEvent(window,"load",function(){
     myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
-    myGrid.setHeader("{{ "Job" | trans }},{{ "Folder" | trans }},{{ "Status" | trans }},{{ "Type" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
+    myGrid.setHeader("{{ "Folder" | trans }},{{ "Job" | trans }},{{ "Status" | trans }},{{ "Type" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
     myGrid.attachHeader("#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
     myGrid.setInitWidths("*,320,120,90,160,160,140,80");
     myGrid.setColAlign("left,left,center,center,right,right,right,right");
@@ -76,7 +76,8 @@ dhtmlxEvent(window,"load",function(){
 
     myDonut.attachEvent("onItemClick",function(id, value){
         status = id;
-        myGrid.filterBy(4, status);  
+        myGrid.filterBy(2, status);  
+        myGrid.getFilterElement(2).value = status;
     });
 
     myGridToolbar = globalLayout.cells("b").attachToolbar();
@@ -356,7 +357,7 @@ function JobDetail(id) {
         myForm2.loadStruct("{{ url('json_ATS_job_form') }}?type="+type);
         jobtype = type;
     }
-
+    
     myForm.load("{{ url('xml_ATS_job_form') }}?id="+id);
     myForm2.load("{{ url('xml_ATS_job_form') }}?id="+id+"&type="+type, function() {
         myTabbar.cells("job").progressOff();
