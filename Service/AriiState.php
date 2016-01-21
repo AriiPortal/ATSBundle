@@ -31,7 +31,7 @@ class AriiState
         
         // Jobs
         $Fields = array( 
-            '{job_name}'   => 'JOB_NAME',
+            '{job_name}'   => 's.JOB_NAME',
             '{start_timestamp}'=> 'LAST_START');
         
         # Jointure car la vue est incomplete

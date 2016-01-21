@@ -16,10 +16,11 @@ class GraphvizController extends Controller
         'd' => 'blue',
         'n' => 'orange',
         't' => 'purple',
-        'e' => 'cyan'
+        'e' => 'cyan',
+        'B' => 'black'
     );
     
-    public function generateAction()
+    public function generateAction($output = 'svg')
     {
         $request = Request::createFromGlobals();
         $return = 0;
@@ -27,7 +28,10 @@ class GraphvizController extends Controller
         set_time_limit(120);
         $request = Request::createFromGlobals();
         $joid = $request->query->get( 'id' );
-                
+
+        if ($request->query->get( 'output' ) !='') 
+            $output = $request->query->get( 'output' );
+        
         // Localisation des images 
         $images = '/bundles/ariicore/images/wa';
         $this->images_path = str_replace('\\','/',$this->get('kernel')->getRootDir()).'/../web'.$images;
@@ -41,8 +45,7 @@ class GraphvizController extends Controller
             1 => array("pipe", "w"),  // stdout est un pipe où le processus va écrire
             2 => array("pipe", "w") // stderr est un fichier
          );
-        $output = 'svg';
-        
+
         $gvz_cmd = '"'.$this->graphviz_dot.'" -T '.$output;       
         $process = proc_open($gvz_cmd, $descriptorspec, $pipes);
         
@@ -50,113 +53,150 @@ class GraphvizController extends Controller
         $rankdir = 'TB';
         
         $digraph = "digraph ATS {
-fontname=arial
+fontname=arial 
 fontsize=10
 splines=$splines
 randkir=$rankdir
 node [shape=plaintext,fontname=arial,fontsize=10]
 edge [shape=plaintext,fontname=arial,fontsize=10,decorate=true,compound=true]
-bgcolor=transparent
+bgcolor=white
 ";
         $autosys = $this->container->get('arii_ats.autosys');
+        $date = $this->container->get('arii_core.date');        
         
         // Jobs concernés
         $sql = $this->container->get('arii_core.sql');                  
         $dhtmlx = $this->container->get('arii_core.dhtmlx');
         $data = $dhtmlx->Connector('data');
-            
-        // Job direct
-        $qry = $sql->Select(array('*'))
-                .$sql->From(array('UJO_JOBST'))
-                ." where (JOID=$joid or BOX_JOID=$joid)"
-                .$sql->OrderBy(array('JOID'));
 
-        $res = $data->sql->query($qry);
-        $Infos = array();
-        while ($line = $data->sql->get_next($res))
-        {
-            $joid = $line['JOID'];
-            $Jobs[$joid] = 1;
-            $Ver[$joid] = $line['JOB_VER'];
-            $box  = $line['BOX_JOID'];
-            if ($box!=0) {
-                if (isset($Boxes[$box]))
-                    $Boxes[$box] .= ",$joid";
-                else 
-                    $Boxes[$box] = $joid;
-                $Jobs[$box] = 1;
-            }
-            $name = $line['JOB_NAME'];
-            $Joid[$name] = $joid;
-            if (!isset($Done[$joid])) {
-                $status = $autosys->Status($line['STATUS']);
-                list($bgcolor,$color) = $autosys->ColorStatus($status);
-                $line['COLOR'] = $color;
-                $line['BGCOLOR'] = $bgcolor;
-                $Infos[$joid] = $line;
-                $digraph .= $this->Node($line);
-                $Done{$joid}=1;
-            }
-        }
+        $level = 1;
+        $Ids = array($joid);
+        $Infos = $Boxes = $Jobs = array();
+        while ($level>0) {
+            // Job direct
+            $qry = $sql->Select(array('*'))
+                    .$sql->From(array('UJO_JOBST'))
+                    ." where (JOID in (".implode(',',$Ids).") or BOX_JOID in (".implode(',',$Ids)."))"
+                    .$sql->OrderBy(array('JOID'));
 
-        // Conditions
-        $qry = $sql->Select(array('JOID','COND_JOB_NAME','TYPE','JOB_VER','VALUE'))
-                .$sql->From(array('UJO_JOB_COND'))
-                ." where JOID in (".implode(',',array_keys($Jobs)).")"
-                .$sql->OrderBy(array('JOID'));
-        $res = $data->sql->query($qry);
-        while ($line = $data->sql->get_next($res))
-        {
-            $type = $line['TYPE'];
-            $joid = $line['JOID'];
-            $name = $line['COND_JOB_NAME'];
-            $ver = $line['JOB_VER'];
-            $value = $line['VALUE'];
-            if (isset($Ver[$joid]) and ($Ver[$joid] != $ver)) continue;
-            
-            switch (strtolower($type)) {
-                case 'g':
-                    break;
-                case 'b':
-                    break;
-                case 'e':
-                    $color=$this->Color[$type];
-                    if (isset($Joid[$name])) {
-                        $digraph .= $Joid[$name]." -> ".$joid." [style=dotted;color=$color;label=$value]\n";                        
+            $res = $data->sql->query($qry);
+            $Ids = array();
+            while ($line = $data->sql->get_next($res))
+            {
+                $joid = $line['JOID'];
+                $Jobs[$joid] = 1;
+                $Ver[$joid] = $line['JOB_VER'];
+                $box  = $line['BOX_JOID'];
+                // print "(($box -> $joid))";
+
+                if ($box!=0) {
+                    if (!isset($Boxes[$box][$joid]))
+                        $Boxes[$box][$joid]=$line['JOB_TYPE'];
+                    
+                    $Jobs[$box] = 1;
+                }
+                $name = $line['JOB_NAME'];
+                $Joid[$name] = $joid;
+                if (!isset($Done[$joid])) {
+                    $status = $autosys->Status($line['STATUS']);
+                    $line['STATUS_TEXT'] = $status;
+                    list($bgcolor,$color) = $autosys->ColorStatus($status);
+                    $line['COLOR'] = $color;
+                    $line['BGCOLOR'] = $bgcolor;
+                    
+                    // Heures 
+                    foreach (array('LAST_START','LAST_END','NEXT_START') as $t ) {
+                        $line[$t] = $date->Time2Local($line[$t]);
                     }
-                    else {
-                        $digraph .= "\"$name\" -> ".$joid." [style=dotted;color=$color;label=$value]\n";                        
-                    }
-                    break;
-                default:
-                    $color=$this->Color[$type];
-                    if (isset($Joid[$name])) {
-                        $digraph .= $Joid[$name]." -> ".$joid." [color=$color]\n";                        
-                    }
-                    else {
-                        $digraph .= "\"$name\" -> ".$joid." [color=$color]\n";                        
-                    }
+                    $Infos[$joid] = $line;
+                    $digraph .= $this->Node($line);
+                    $Done{$joid}=1;
+                    
+                    array_push($Ids,$joid);
+                }
             }
+            $level--;
         }
 
         // clusters
         foreach ($Boxes as $box=>$jobs) {
-            $digraph .= "subgraph cluster$box {\n";
-            $digraph .= "style=filled;\n";
-            $digraph .= "color=\"".$Infos[$box]['BGCOLOR']."\";\n";
-            $digraph .= "fillcolor=lightgrey;\n";
+            $digraph .= $this->Boxes($box,$Boxes,$Infos);
+        }
 
-            # Le noeud de la boite est dans le cluster
-            $digraph .= "$box;\n";
-            foreach (explode(',',$jobs) as $j) {
-                $digraph .= "$j\n";
+        if (!empty($Jobs)) {
+            // Conditions
+            $qry = $sql->Select(array('*'))
+                    .$sql->From(array('UJO_JOB_COND'))
+                    ." where JOID in (".implode(',',array_keys($Jobs)).")"
+                    .$sql->OrderBy(array('JOID'));
+            $res = $data->sql->query($qry);
+            while ($line = $data->sql->get_next($res))
+            {
+                $type  = $line['TYPE'];
+                $joid  = $line['JOID'];
+                $name  = $line['COND_JOB_NAME'];
+                $ver   = $line['JOB_VER'];
+                $value = $line['VALUE'];
+                $lookback = $line['LOOKBACK_SECS'];
+                
+                switch ($line['COND_MODE']) {
+                    case 1:
+                        $style = '';
+                        break;
+                    case 2:
+                        $style = 'style=dashed;';
+                        break;
+                    default:
+                        $style = 'style=dotted;';
+                        break;
+                }
+                $operator   = $line['OPERATOR'];
+                
+                if (isset($Ver[$joid]) and ($Ver[$joid] != $ver)) continue;
+
+                switch (strtolower($type)) {
+                    case 'g':
+                        $color=$this->Color[$type];
+                        if (isset($Joid[$name])) {
+                            $digraph .= $Joid[$name]." -> ".$joid." [$style"."label=$value]\n";                        
+                        }
+                        else {
+                            $digraph .= "\"$name\" -> ".$joid." [$style"."label=$value]\n";                        
+                        }
+                        break;
+                    case 'b':
+                        break;
+                    case 'e':
+                        $color=$this->Color[$type];
+                        if (isset($Joid[$name])) {
+                            $digraph .= $Joid[$name]." -> ".$joid." [$style"."color=$color;label=$value]\n";                        
+                        }
+                        else {
+                            $digraph .= "\"$name\" -> ".$joid." [$style"."color=$color;label=$value]\n";                        
+                        }
+                        break;
+                    default:
+                        $color=$this->Color[$type];
+                        if (isset($Joid[$name])) {
+                            $digraph .= $Joid[$name]." -> ".$joid." [$style"."color=$color]\n";                        
+                        }
+                        else {
+                            $digraph .= "\"$name\" -> ".$joid." [$style"."color=$color]\n";                        
+                        }
+                }
             }
-            $digraph .= "}\n";
         }
         $digraph .= "}";
 
 //        print "<pre>$digraph</pre>";
 //        exit();
+        
+        if ($output == 'dot') {
+            header('Content-type: text/plain');
+            print trim($digraph);
+            exit();
+        }
+        
         if (is_resource($process)) {
             fwrite($pipes[0], $digraph );
             fclose($pipes[0]);
@@ -212,18 +252,76 @@ bgcolor=transparent
         exit();
     }
 
+    private function Boxes($box,&$Boxes,$Infos) {
+        // deja fait ?
+        $cluster = '';
+        // boite mais sans information dedans
+        if (!isset($Boxes[$box])) {
+            $Boxes[$box] = 0;
+            return $cluster;
+        }
+        if ($Boxes[$box]==0) return $cluster;
+        
+        $cluster .= "subgraph cluster$box {\n";
+        $cluster .= "style=filled;\n";
+        $cluster .= "color=\"".$Infos[$box]['BGCOLOR']."\";\n";
+        $cluster .= "fillcolor=\"#EEEEEE\";\n";
+
+        # Le noeud de la boite est dans le cluster
+        $cluster .= "$box;\n";
+        foreach ($Boxes[$box] as $j=>$t) {
+            // c'est une boite ?
+            if ($t==98) {
+                $cluster .= $this->Boxes($j,$Boxes,$Infos);
+                // Boites traité
+                $Boxes[$j] = 0;
+            }
+            else
+                $cluster .= "$j\n";
+            // on relie la boite et le job (purement esthétique)
+            $cluster .= "$box -> $j [style=invisible,arrowhead=none]\n";
+        }
+
+        $cluster .= "}\n";           
+        return $cluster;
+    }
     private function Node($Infos) {
         $joid = $Infos['JOID'];
         $label  = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="grey" BGCOLOR="'.$Infos['BGCOLOR'].'">';
         if ($Infos['JOB_TYPE']==98) {
-            $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/bricks.png"/></TD><TD>'.$Infos['JOB_NAME'].'</TD></TR>';
-            $label .= '<TR><TD></TD><TD ALIGN="LEFT">'.$Infos['DESCRIPTION'].'</TD></TR>';
+            $image = 'box';
         }
         else {
-            $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/job.png"/></TD><TD>'.$Infos['JOB_NAME'].'</TD></TR>';
-            $label .= '<TR><TD></TD><TD ALIGN="LEFT">'.$Infos['DESCRIPTION'].'</TD></TR>';
-            $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/shell.png"/></TD><TD><![CDATA['.$Infos['COMMAND'].']]></TD></TR>';
+            $image = 'cmd';
         }
+        $label .= '<TR><TD ROWSPAN="3"><IMG SRC="'.$this->images_path.'/big/'.$image.'.png"/></TD><TD ALIGN="RIGHT">'.$Infos['STATUS_TEXT'].'</TD></TR>';
+        $label .= '<TR><TD><b>'.$Infos['JOB_NAME'].'</b></TD></TR>';
+        $label .= '<TR><TD ALIGN="LEFT">'.$Infos['DESCRIPTION'].'</TD></TR>';
+        $Def = array(            
+            'BOX_NAME'      => 'box',
+            'COMMAND'       => 'shell',
+            'STD_IN_FILE'   => 'file',
+            'STD_OUT_FILE'   => 'file',
+            'STD_ERR_FILE'   => 'file',
+            'DAYS_OF_WEEK'  => 'date',
+            'RUN_CALENDAR'  => 'calendar',
+            'EXCLUDE_CALENDAR'  => 'calendar_delete',
+            'START_TIMES'   => 'time',
+            'START_MINS'    => 'time',
+            'RUN_WINDOWS'   => 'run_window',
+            'LAST_START'    => 'start',
+            'LAST_END'      => 'end',
+            'OWNER'         => 'user',
+            'RUN_MACHINE'   => 'server',
+            'NEXT_START'    => 'next',
+            'PROFILE'       => 'profile',
+        );
+        // Complement
+        foreach ($Def as $k=>$v) {
+            if (isset($Infos[$k]) and (trim($Infos[$k])!=''))
+                $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/'.$v.'.png"/></TD><TD ALIGN="LEFT">'.$Infos[$k].'</TD></TR>';            
+        }
+        
         $label .= '</TABLE>';        
         return $joid.' [label=<'.$label.'>]'."\n";        
     }
