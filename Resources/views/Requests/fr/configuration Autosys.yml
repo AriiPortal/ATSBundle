@@ -1,8 +1,0 @@
-title:          Codes internes
-description:    Liste des codes utilisés par Autosys.
-header:         FOLDER,CODE,TEXT
-icon:           config
-sql:
-    oracle: |
-        select FLD as FOLDER,CODE,TEXT from UJO_INTCODES
-            

@@ -20,7 +20,7 @@ class GraphvizController extends Controller
         'B' => 'black'
     );
     
-    public function generateAction($output = 'svg')
+    public function generateAction($output = 'svg',$level=1)
     {
         $request = Request::createFromGlobals();
         $return = 0;
@@ -31,6 +31,8 @@ class GraphvizController extends Controller
 
         if ($request->query->get( 'output' ) !='') 
             $output = $request->query->get( 'output' );
+        if ($request->query->get( 'level' ) !='') 
+            $level = $request->query->get( 'level' );
         
         // Localisation des images 
         $images = '/bundles/ariicore/images/wa';
@@ -69,14 +71,13 @@ bgcolor=white
         $dhtmlx = $this->container->get('arii_core.dhtmlx');
         $data = $dhtmlx->Connector('data');
 
-        $level = 1;
         $Ids = array($joid);
         $Infos = $Boxes = $Jobs = array();
         while ($level>0) {
             // Job direct
             $qry = $sql->Select(array('*'))
                     .$sql->From(array('UJO_JOBST'))
-                    ." where (JOID in (".implode(',',$Ids).") or BOX_JOID in (".implode(',',$Ids)."))"
+                    ." where (JOID in (".implode(',',$Ids).") or BOX_JOID in (".implode(',',$Ids).")) "
                     .$sql->OrderBy(array('JOID'));
 
             $res = $data->sql->query($qry);
@@ -264,7 +265,8 @@ bgcolor=white
         
         $cluster .= "subgraph cluster$box {\n";
         $cluster .= "style=filled;\n";
-        $cluster .= "color=\"".$Infos[$box]['BGCOLOR']."\";\n";
+        if (isset($Infos[$box]['BGCOLOR']))
+            $cluster .= "color=\"".$Infos[$box]['BGCOLOR']."\";\n";
         $cluster .= "fillcolor=\"#EEEEEE\";\n";
 
         # Le noeud de la boite est dans le cluster

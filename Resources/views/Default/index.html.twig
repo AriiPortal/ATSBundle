@@ -151,8 +151,9 @@ function GridRefresh() {
         else
             mySidebar.cells(1).clearBubble();
     });
-    
     globalLayout.progressOff();
+    globalLayout.cells("a").progressOff();
+    globalLayout.cells("b").progressOff();
 }
 </script>
 {% endblock %}

@@ -1,8 +1,0 @@
-title:          Configuration Autosys
-description:    Contenu de la table Alamode
-header:         TYPE,INT_VAL,STR_VAL
-icon:           config
-sql:
-    oracle: |
-        select TYPE,INT_VAL,STR_VAL from UJO_ALAMODE
-            

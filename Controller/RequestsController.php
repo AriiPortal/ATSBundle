@@ -36,7 +36,8 @@ class RequestsController extends Controller
         
         $yaml = new Parser();
         $lang = $this->getRequest()->getLocale();
-        $basedir = '../src/Arii/ATSBundle/Resources/views/Requests/'.$lang;
+        
+        $basedir = $this->container->getParameter('workspace').'/Autosys/Requests/'.$lang;
         if ($dh = @opendir($basedir)) {
             while (($file = readdir($dh)) !== false) {
                 if (substr($file,-4) == '.yml') {
@@ -60,7 +61,7 @@ class RequestsController extends Controller
     public function summaryAction()
     {
         $lang = $this->getRequest()->getLocale();
-        $basedir = '../src/Arii/ATSBundle/Resources/views/Requests/'.$lang;
+        $basedir = $this->container->getParameter('workspace').'/Autosys/Requests/'.$lang;
 
         $yaml = new Parser();
         $value['title'] = $this->get('translator')->trans('Summary');
@@ -108,7 +109,7 @@ class RequestsController extends Controller
         
         if (!isset($req)) return $this->summaryAction();
         
-        $page = '../src/Arii/ATSBundle/Resources/views/Requests/'.$lang.'/'.$req.'.yml';
+        $page = $this->container->getParameter('workspace').'/Autosys/Requests/'.$lang.'/'.$req.'.yml';
         $content = file_get_contents($page);
         
         $yaml = new Parser();

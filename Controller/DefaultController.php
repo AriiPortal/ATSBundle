@@ -35,7 +35,9 @@ class DefaultController extends Controller
         // On recupère les requetes
         $yaml = new Parser();
         $lang = $this->getRequest()->getLocale();
-        $basedir = '../src/Arii/ATSBundle/Resources/views/Requests/'.$lang;
+        
+        $basedir = $this->container->getParameter('workspace').'/Autosys/Requests/'.$lang;
+
         $Requests = array();
         if ($dh = @opendir($basedir)) {
             while (($file = readdir($dh)) !== false) {

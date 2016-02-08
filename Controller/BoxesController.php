@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
-class JobsController extends Controller
+class BoxesController extends Controller
 {
     protected $images;
     protected $autosys; 
@@ -19,24 +19,24 @@ class JobsController extends Controller
 
     public function indexAction()
     {
-        return $this->render('AriiATSBundle:Jobs:index.html.twig');
+        return $this->render('AriiATSBundle:Boxes:index.html.twig');
     }
 
     public function grid_toolbarAction()
     {
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
-        return $this->render('AriiATSBundle:Jobs:grid_toolbar.xml.twig',array(), $response );
+        return $this->render('AriiATSBundle:Boxes:grid_toolbar.xml.twig',array(), $response );
     }
 
     public function grid_menuAction()
     {
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
-        return $this->render('AriiATSBundle:Jobs:grid_menu.xml.twig',array(), $response );
+        return $this->render('AriiATSBundle:Boxes:grid_menu.xml.twig',array(), $response );
     }
 
-    public function statusAction($only_warning=0,$box_only=1)
+    public function statusAction($only_warning=0,$job_only=0)
     {
         $request = Request::createFromGlobals();
         if ($request->query->get( 'box' ))
@@ -45,11 +45,11 @@ class JobsController extends Controller
             $box = '';
         if ($request->query->get( 'only_warning' ))
             $only_warning = $request->query->get( 'only_warning' );
-        if ($request->query->get( 'box_only' ))
-            $only_warning = $request->query->get( 'box_only' );
+        else
+            $only_warning = 0;
 
         $state = $this->container->get('arii_ats.state');
-        $Job = $state->Jobs($box,$only_warning,$box_only);
+        $Job = $state->Jobs($box,$only_warning);
                 
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
@@ -114,7 +114,7 @@ class JobsController extends Controller
         while ($line = $data->sql->get_next($res))
         {                        
             $status = $autosys->Status($line['STATUS']);
-            if (($only_warning==1) and (($line['STATUS']==4) or ($line['STATUS']==8)))
+            if (($only_warning==1) and ($line['STATUS']==4))
                 $Status[$status] = 0;
             else 
                 $Status[$status] = $line['NB'];

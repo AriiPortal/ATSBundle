@@ -23,7 +23,7 @@ class AriiState
 /*********************************************************************
  * Informations de connexions
  *********************************************************************/
-   public function Jobs($box='%',$only_warning=0) {   
+   public function Jobs($box='%',$only_warning=0,$box_only=1) {   
         $date = $this->date;        
         $sql = $this->sql;
         $db = $this->db;
@@ -33,6 +33,9 @@ class AriiState
         $Fields = array( 
             '{job_name}'   => 's.JOB_NAME',
             '{start_timestamp}'=> 'LAST_START');
+        
+        if ($box_only) 
+            $Fields['s.JOB_TYPE'] = 98;
         
         # Jointure car la vue est incomplete
         $qry = $sql->Select(array('s.*','j.AS_APPLIC','j.AS_GROUP'))
@@ -45,7 +48,7 @@ class AriiState
         $Jobs = array();
         while ($line = $data->sql->get_next($res))
         {   
-            if ($only_warning and ($line['STATUS']==4)) continue;
+            if ($only_warning and (($line['STATUS']==4) or ($line['STATUS']==8))) continue;
             $jn = $line['JOB_NAME'];
             $joid = $line['JOID'];
             $Jobs[$jn] =$line;

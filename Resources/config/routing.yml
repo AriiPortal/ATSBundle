@@ -105,6 +105,38 @@ xml_ATS_jobs_barchart:
     defaults: { _controller: AriiATSBundle:Jobs:barchart }
 
 # --------------------------------------------------------------------------
+# BOXES
+# --------------------------------------------------------------------------
+arii_ATS_boxes:
+    pattern:  /boxes
+    defaults: { _controller: AriiATSBundle:Boxes:index }
+
+xml_ATS_boxes_pie:
+    pattern:  /boxes/pie.xml
+    defaults: { _controller: AriiATSBundle:Boxes:pie }
+
+xml_ATS_boxes_tree:
+    pattern:  /boxes/tree.xml
+    defaults: { _controller: AriiATSBundle:Boxes:tree }
+
+xml_ATS_boxes_grid:
+    pattern:  /boxes/grid.xml
+    defaults: { _controller: AriiATSBundle:Boxes:status }
+
+xml_ATS_boxes_grid_toolbar:
+    pattern:  /boxes/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Boxes:grid_toolbar }
+
+xml_ATS_boxes_grid_menu:
+    pattern:  /boxes/menu.xml
+    defaults: { _controller: AriiATSBundle:Boxes:grid_menu }
+
+xml_ATS_boxes_barchart:
+    pattern:  /boxes/barchart.xml
+    defaults: { _controller: AriiATSBundle:Boxes:barchart }
+
+
+# --------------------------------------------------------------------------
 # RUNTIMES
 # --------------------------------------------------------------------------
 arii_ATS_runtimes:
