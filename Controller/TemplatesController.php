@@ -220,7 +220,7 @@ class TemplatesController extends Controller
         $job = basename($arg);
         $job = substr($job,0,strlen($job)-4);
         $current = $ats->Exec('autorep -J '.$job.' -q');
-        
+
         $ref = str_replace('.jil','.dump',$arg);
         $reffile = "$path/$ref";
         file_put_contents($reffile,$current);
@@ -228,7 +228,7 @@ class TemplatesController extends Controller
         //$gvz_cmd = $this->container->getParameter('graphviz_cmd');
         $cmd = $this->container->getParameter('perl').' '.dirname(__FILE__).str_replace('/',DIRECTORY_SEPARATOR,'/../Perl/jildiff.pl ');
         $cmd .= ' jil="'.$reffile.'" del=y < "'."$path/$arg".'"';
-//        print $cmd;
+
         $res = `$cmd`;         
         $upd = str_replace('.dump','.update',$reffile);
         print "<pre>";

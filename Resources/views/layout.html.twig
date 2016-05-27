@@ -102,9 +102,6 @@ function ClickRibbon (itemid,state) {
     case 'menu_templates':
         window.location = "{{ url('arii_ATS_templates') }}";
         break;
-    case 'menu_config':
-        window.location = "{{ url('arii_ATS_config') }}";
-        break;
     case 'filter_edit':
         window.location = "{{ url('arii_filters') }}";
         break;
@@ -144,7 +141,7 @@ function ClickRibbon (itemid,state) {
             } );
         }
         else {
-            alert(itemid);
+            window.location = "{{ url('arii_ATS_index') }}"+itemid;
         }
     }
 }

@@ -28,10 +28,6 @@ dhtmlxEvent(window,"load",function(){
     myRibbon.attachEvent("onStateChange", StateRibbon );
     myRibbon.attachEvent("onClick", ClickRibbon );
 
-    myGlobalTab = globalLayout.cells("b").attachTabbar();
-    myGlobalTab.addTab("applications","{{ "Applications" | trans }}","150px", null, true);
-    myGlobalTab.addTab("groups","{{ "Groups" | trans }}","150px");
-
     myBarChart =  myGlobalTab.cells("applications").attachChart({
             view:"stackedBarH",
             value:"#SUCCESS#",

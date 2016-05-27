@@ -1,0 +1,136 @@
+<?php
+
+namespace Arii\ATSBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Cron
+ *
+ * @ORM\Table(name="ATS_REQUESTS")
+ * @ORM\Entity(repositoryClass="Arii\ATSBundle\Entity\RequestsRepository")
+ */
+class Requests
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=64, nullable=true)
+     */        
+    private $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="app_name", type="string", length=64, nullable=true)
+     */        
+    private $app_name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="group_name", type="string", length=64, nullable=true)
+     */        
+    private $group_name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="description", type="string", length=64, nullable=true)
+     */        
+    private $description;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="command", type="string", length=64, nullable=true)
+     */        
+    private $command;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="owner", type="string", length=64, nullable=true)
+     */        
+    private $owner;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="machine", type="string", length=64, nullable=true)
+     */        
+    private $machine;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="triggers", type="string", length=64, nullable=true)
+     */        
+    private $triggers;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="date", type="string", length=64, nullable=true)
+     */        
+    private $date;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="days_of_week", type="string", length=64, nullable=true)
+     */        
+    private $days_of_week;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="calendar", type="string", length=64, nullable=true)
+     */        
+    private $calendar;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="start_times", type="string", length=64, nullable=true)
+     */        
+    private $start_times;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="dependencies", type="string", length=64, nullable=true)
+     */        
+    private $dependencies;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="not_running", type="string", length=64, nullable=true)
+     */        
+    private $not_running;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="resources", type="string", length=64, nullable=true)
+     */        
+    private $resources;    
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="resources_value", type="integer", nullable=true)
+     */        
+    private $resources_value;    
+    
+}

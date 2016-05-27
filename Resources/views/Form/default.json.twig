@@ -1,0 +1,198 @@
+[
+    {type:"settings",
+        position: "label-left", 
+        labelAlign:"right", 
+        labelWidth:"100",
+        inputWidth:"300" 
+    },
+    {   type: "block",
+        inputWidth: "auto",
+        id: "request",
+        list: [  
+            {
+                type: "fieldset",
+                width: "500",
+                label: "{{ "Organisation" | trans }}",
+                list: [
+                    {   type:"input",    
+                            name: "REQUESTER", 
+                            label:"{{ "Requester" | trans}}",
+                            note: { text: "Visa du demandeur" }
+
+                    },
+                    {   type:"input",    
+                            name: "AS_APPLICATION", 
+                            label:"{{ "Application" | trans}}",
+                            note: { text: "Code de l'application (AIA, HP, etc...)" }
+                    },
+                    {   type:"input",
+                            name: "AS_GROUP", 
+                            label:"{{ "Group" | trans}}",
+                            note: { text: "Domaine fonctionnel (Ex: Compta, Contrat, etc... " }
+                    }
+                ]
+            },
+            {
+                type: "fieldset",
+                width: "500",
+                label: "{{ "Traitement" | trans }}",
+                list: [
+                    {   type:"input",    
+                            name: "COMMAND", 
+                            label:"{{ "Command" | trans}}",
+                            rows: 3
+                    },
+                    {   type:"input",    
+                            name: "OWNER", 
+                            label:"{{ "User" | trans}}"
+                    },
+                    {   type:"input",    
+                            name: "MACHINE", 
+                            label:"{{ "Host" | trans}}"
+                    }
+                ]
+            }
+        ]
+    },
+    {   type: "block",
+        inputWidth: "auto",
+        id: "trigger",
+        list: [      
+            {
+                type: "fieldset",
+                width: "500",
+                label: "{{ "Trigger" | trans }}",
+                list: [
+                    {   
+                        type:"select",    
+                        name: "TRIGGER", 
+                        label:"{{ "Type" | trans}}",
+                        options: [
+                            {
+                                text: "{{ "Date/Time" | trans }}",
+                                value: "date_condition",
+                                list: [
+                                    {   
+                                        type:"select",    
+                                        name: "TRIGGER", 
+                                        label:"{{ "Days" | trans}}",
+                                        note: { text: "Jours de lancement" },
+                                        options: [
+                                            {   
+                                                value: "ALL_DAYS", 
+                                                text: "{{ "Everyday" | trans }}"                                        
+                                            },
+                                            {
+                                                value: "DAYS_OF_WEEKS", 
+                                                text: "{{ "Days of week" | trans }}",
+                                                list: [
+                                                    {
+                                                        type:"checkbox",    
+                                                        name: "MONDAY", 
+                                                        label:"{{ "Monday" | trans}}"
+                                                    },
+                                                    {
+                                                        type:"checkbox",    
+                                                        name: "TUESDAY", 
+                                                        label:"{{ "Tuesday" | trans}}"
+                                                    },
+                                                    {
+                                                        type:"checkbox",    
+                                                        name: "WEDNESDAY", 
+                                                        label:"{{ "Wednesday" | trans}}"
+                                                    },
+                                                    {
+                                                        type:"checkbox",    
+                                                        name: "THURSDAY", 
+                                                        label:"{{ "Thursday" | trans}}"
+                                                    },
+                                                    {
+                                                        type:"checkbox",    
+                                                        name: "FRIDAY", 
+                                                        label:"{{ "Friday" | trans}}"
+                                                    },
+                                                    {
+                                                        type:"checkbox",    
+                                                        name: "SATURDAY", 
+                                                        label:"{{ "Saturday" | trans}}"
+                                                    },
+                                                    {
+                                                        type:"checkbox",    
+                                                        name: "SUNDAY", 
+                                                        label:"{{ "Sunday" | trans}}"
+                                                    }
+                                                ]
+                                            },
+                                            {   
+                                                value: "CALENDAR", 
+                                                text: "{{ "Calendar" | trans }}",
+                                                list: [
+                                                    {   
+                                                        type:"input",    
+                                                        name: "RUN_CALENDAR", 
+                                                        label:"{{ "Name" | trans}}",
+                                                        note: { text: "Nom du calendrier." }
+                                                    }
+                                                ]
+                                            }
+
+                                        ]
+                                    },
+                                    {   
+                                        type:"input",    
+                                        name: "START_TIMES", 
+                                        label:"{{ "Start times" | trans}}",
+                                        note: { text: "Heures de départ séparées par des virgules." }
+                                    }
+                                ]                         
+                            },
+                            {text: "{{ "File watcher" | trans }}", value: "file_watcher"},
+                            {text: "{{ "Job status" | trans }}", value: "conditions"}
+                        ]                    
+                    }
+                ]
+            }
+        ]
+    },
+    {   type: "block",
+        inputWidth: "auto",
+        id: "constraints",
+        list: [      
+            {
+                type: "fieldset",
+                width: "500",
+                label: "{{ "Constraints" | trans }}",
+                list: [
+                    {   
+                        type:"input",    
+                        name: "CONDITIONS", 
+                        label:"{{ "Dependencies" | trans}}",
+                        note: { text: "Formule des statuts (Ex: 'success(JOB_PRECEDENT) or failure(JOB_EN_ERREUR)')" }
+                    },
+                    {   
+                        type:"input",    
+                        name: "NOT_RUNNING", 
+                        label:"{{ "Non simultanéité" | trans}}",
+                        note: { text: "Liste des jobs qui ne doivent pas s'exécuter en même temps." }
+                    },
+                    {   
+                        type:"input",    
+                        name: "RESSOURCES", 
+                        label:"{{ "Resource" | trans}}",
+                        note: { text: "Nom de la ressource à utiliser." },
+                        list: [
+                            {   
+                                type:"input",    
+                                name: "RESSOURCE_VALUE", 
+                                label:"{{ "Value" | trans}}",
+                                note: { text: "Nombre de jetons utilisé." }
+                            }
+                        ]
+                    }
+
+                ]
+            }
+        ]
+    },
+    {type:"hidden",    name: "ID" }
+]

@@ -1,0 +1,304 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<script type="text/javascript">
+dhtmlxEvent(window,"load",function(){     
+    globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
+    globalLayout.cells("a").setWidth(410); 
+    globalLayout.cells("a").hideHeader(); 
+    globalLayout.cells("b").hideHeader(); 
+    globalLayout.cells("c").hideHeader(); 
+    globalLayout.cells("c").setHeight(350);
+    
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('/bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    myGrid = globalLayout.cells("b").attachGrid();
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid.setHeader("{{ "Application" | trans }},{{ "Group" | trans }},{{ "Job" | trans }},{{ "Description" | trans }},");
+    myGrid.attachHeader("#select_filter,#select_filter,#text_filter,#text_filter");
+    myGrid.setInitWidths("100,100,100,*");
+    myGrid.setColSorting("str,str,str,str");
+    myGrid.init();
+    myGrid.load( "{{ url('xml_ATS_form_grid') }}");
+
+    myToolbar = globalLayout.cells("c").attachToolbar();
+    myToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myToolbar.loadStruct( "{{ url('xml_ATS_form_toolbar') }}" ,function() {
+    });
+
+    formData = [
+        {type:"settings",
+            position: "label-left", 
+            labelAlign:"right", 
+            labelWidth:"100",
+            inputWidth:"300" 
+        },
+        {   type: "block",
+            id: "request",
+            list: [  
+                {
+                    type: "fieldset",
+                    width: "900",
+                    label: "{{ "Organisation" | trans }}",
+                    list: [
+                        {type:"input",    name: "ID" },
+                        {   type:"input",    
+                                name: "REQUESTER", 
+                                label:"{{ "Requester" | trans}}",
+                                note: { text: "Visa du demandeur" }
+
+                        },
+                        {   type:"input",    
+                                name: "APP_NAME", 
+                                label:"{{ "Application" | trans}}",
+                                note: { text: "Code de l'application" }
+                        },
+                        {   type:"input",
+                                name: "GROUP_NAME", 
+                                label:"{{ "Group" | trans}}",
+                                note: { text: "Domaine fonctionnel (Ex: Compta, Contrat, etc...)" }
+                        },
+                        {   type: "newcolumn" },
+                        {   type: "input",    
+                                name: "NAME", 
+                                label:"{{ "Job name" | trans}}",
+                                 note: { text: "Nom du job ou de la commande à exécuter" },
+                                required: true
+                        },
+                        {   type:"input",    
+                                name: "DESCRIPTION", 
+                                label:"{{ "Description" | trans}}",
+                                rows: 4
+                        }
+                    ]
+                }
+            ]
+        },
+        {   type: "block",
+            id: "job",
+            list: [  
+                {
+                    type: "fieldset",
+                    width: "500",
+                    label: "{{ "Traitement" | trans }}",
+                    list: [
+                        {   type:"input",    
+                                name: "COMMAND", 
+                                label:"{{ "Command" | trans}}",
+                                rows: 3
+                        },
+                        {   type:"input",    
+                                name: "OWNER", 
+                                label:"{{ "User" | trans}}"
+                        },
+                        {   type:"input",    
+                                name: "MACHINE", 
+                                label:"{{ "Host" | trans}}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {   type: "block",
+            inputWidth: "auto",
+            id: "trigger",
+            list: [      
+                {
+                    type: "fieldset",
+                    width: "500",
+                    label: "{{ "Trigger" | trans }}",
+                    list: [
+                        {   
+                            type:"select",    
+                            name: "TRIGGER", 
+                            label:"{{ "Type" | trans}}",
+                            options: [
+                                {
+                                    text: "{{ "Date/Time" | trans }}",
+                                    value: "date_condition",
+                                    list: [
+                                        {   
+                                            type:"select",    
+                                            name: "DATE", 
+                                            label:"{{ "Days" | trans}}",
+                                            note: { text: "Jours de lancement" },
+                                            options: [
+                                                {   
+                                                    value: "ALL_DAYS", 
+                                                    text: "{{ "Everyday" | trans }}"                                        
+                                                },
+                                                {
+                                                    value: "DAYS_OF_WEEKS", 
+                                                    text: "{{ "Days of week" | trans }}",
+                                                    list: [
+                                                        {
+                                                            type:"checkbox",    
+                                                            name: "MONDAY", 
+                                                            label:"{{ "Monday" | trans}}"
+                                                        },
+                                                        {
+                                                            type:"checkbox",    
+                                                            name: "TUESDAY", 
+                                                            label:"{{ "Tuesday" | trans}}"
+                                                        },
+                                                        {
+                                                            type:"checkbox",    
+                                                            name: "WEDNESDAY", 
+                                                            label:"{{ "Wednesday" | trans}}"
+                                                        },
+                                                        {
+                                                            type:"checkbox",    
+                                                            name: "THURSDAY", 
+                                                            label:"{{ "Thursday" | trans}}"
+                                                        },
+                                                        {
+                                                            type:"checkbox",    
+                                                            name: "FRIDAY", 
+                                                            label:"{{ "Friday" | trans}}"
+                                                        },
+                                                        {
+                                                            type:"checkbox",    
+                                                            name: "SATURDAY", 
+                                                            label:"{{ "Saturday" | trans}}"
+                                                        },
+                                                        {
+                                                            type:"checkbox",    
+                                                            name: "SUNDAY", 
+                                                            label:"{{ "Sunday" | trans}}"
+                                                        }
+                                                    ]
+                                                },
+                                                {   
+                                                    value: "CALENDAR", 
+                                                    text: "{{ "Calendar" | trans }}",
+                                                    list: [
+                                                        {   
+                                                            type:"input",    
+                                                            name: "RUN_CALENDAR", 
+                                                            label:"{{ "Name" | trans}}",
+                                                            note: { text: "Nom du calendrier." }
+                                                        }
+                                                    ]
+                                                }
+
+                                            ]
+                                        },
+                                        {   
+                                            type:"input",    
+                                            name: "START_TIMES", 
+                                            label:"{{ "Start times" | trans}}",
+                                            note: { text: "Heures de départ séparées par des virgules." }
+                                        }
+                                    ]                         
+                                },
+                                {text: "{{ "File watcher" | trans }}", value: "file_watcher"},
+                                {text: "{{ "Job status" | trans }}", value: "conditions"}
+                            ]                    
+                        }
+                    ]
+                }
+            ]
+        },
+        {   type: "block",
+            inputWidth: "auto",
+            id: "constraints",
+            list: [      
+                {
+                    type: "fieldset",
+                    width: "500",
+                    label: "{{ "Constraints" | trans }}",
+                    list: [
+                        {   
+                            type:"input",    
+                            name: "DEPENDENCIES", 
+                            label:"{{ "Dependencies" | trans}}",
+                            note: { text: "Formule des statuts (Ex: 'success(JOB_PRECEDENT) or failure(JOB_EN_ERREUR)')" }
+                        },
+                        {   
+                            type:"input",    
+                            name: "NOT_RUNNING", 
+                            label:"{{ "Non simultanéité" | trans}}",
+                            note: { text: "Liste des jobs qui ne doivent pas s'exécuter en même temps." }
+                        },
+                        {   
+                            type:"input",    
+                            name: "RESSOURCES", 
+                            label:"{{ "Resource" | trans}}",
+                            note: { text: "Nom de la ressource à utiliser." },
+                            list: [
+                                {   
+                                    type:"input",    
+                                    name: "RESSOURCE_VALUE", 
+                                    label:"{{ "Value" | trans}}",
+                                    note: { text: "Nombre de jetons utilisé." }
+                                }
+                            ]
+                        }
+
+                    ]
+                }
+            ]
+        }
+    ];
+    
+    myTabbar = globalLayout.cells("c").attachTabbar();
+    
+    myTabbar.addTab("request", "{{ "Request" | trans }}", 120, null, true);
+    myForm = myTabbar.cells("request").attachForm(formData);
+
+    myTabbar.addTab("job", "{{ "Job" | trans }}", 120);
+    myTabbar.cells("job").attachObject("job");
+    
+    myTabbar.addTab("trigger", "{{ "Trigger" | trans }}", 120);
+    myTabbar.cells("trigger").attachObject("trigger");
+    
+    myTabbar.addTab("constraints", "{{ "Constraints" | trans }}", 120);
+    myTabbar.cells("constraints").attachObject("constraints");
+
+    myToolbar.attachEvent("onClick",function(id,value){
+        switch(id){
+            case "save":
+                globalLayout.cells("b").progressOn();
+                myForm.send("{{ url('arii_ATS_form_save') }}","POST",function(loader,response){
+                    if(response === 'success')
+                    {
+                        dhtmlx.message({
+                            title:"Save",
+                            type: "Notice",
+                            lifetime: "60000",
+                            text: "{{ "saved" | trans }}"
+                        });
+                    }
+                    else {
+                        globalLayout.cells("b").attachHTMLString( loader.xmlDoc.responseText );
+                    }
+                    myGrid.clearAll();
+                    myGrid.load( "{{ url('xml_ATS_form_grid') }}");
+                    globalLayout.cells("b").progressOff();
+                });
+            break;
+        }
+    });
+    
+    myGrid.attachEvent("onRowDblClicked", function (id) {
+        globalLayout.cells("c").progressOn();
+        myForm.load("{{ url('xml_ATS_form_data') }}?id="+id, function () {
+            globalLayout.cells("c").progressOff();            
+        });
+    });
+
+            
+});
+
+function GlobalRefresh() {
+}
+</script>
+{% endblock %}

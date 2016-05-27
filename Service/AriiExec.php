@@ -35,7 +35,6 @@ class AriiExec {
         $shell = $engine[0]['shell'];
         $host = $shell['host'];
         $user = $shell['user'];
-
         $ssh = new \Net_SSH2($host);
         
         if (isset($shell['key'])) {
