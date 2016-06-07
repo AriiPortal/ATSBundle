@@ -23,3 +23,19 @@ STATUS: Statut
 HOST: Hôte
 DELAY: Retard
 STANDBY: Standby
+Request: Demande
+Trigger: Déclencheur
+Constraints: Contraintes
+Start times: Heure de départ
+Days: Jours
+Everyday: Tous les jours
+Days of Week: Jours de la semaine
+Date/Time: Date/Heure
+File watcher: Attente de fichier
+Dependencies: Dépendances
+Resource: Ressource
+Database update: Mise à jour DB
+Post processing: Post traitement
+Success codes: Exit en Succès
+Successors: Successeurs
+File name: Nom de fichier

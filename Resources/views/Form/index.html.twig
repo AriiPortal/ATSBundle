@@ -44,39 +44,54 @@ dhtmlxEvent(window,"load",function(){
         {   type: "block",
             id: "request",
             list: [  
-                {
-                    type: "fieldset",
+                {   type: "fieldset",
                     width: "900",
                     label: "{{ "Organisation" | trans }}",
                     list: [
-                        {type:"input",    name: "ID" },
+                        {   type:"hidden",    name: "ID" },
                         {   type:"input",    
-                                name: "REQUESTER", 
-                                label:"{{ "Requester" | trans}}",
-                                note: { text: "Visa du demandeur" }
-
-                        },
-                        {   type:"input",    
-                                name: "APP_NAME", 
-                                label:"{{ "Application" | trans}}",
-                                note: { text: "Code de l'application" }
+                            name: "APP_NAME", 
+                            label:"{{ "Application" | trans}}",
+                            required: true,
+                            note: { text: "Code de l'application" }
                         },
                         {   type:"input",
-                                name: "GROUP_NAME", 
-                                label:"{{ "Group" | trans}}",
-                                note: { text: "Domaine fonctionnel (Ex: Compta, Contrat, etc...)" }
-                        },
-                        {   type: "newcolumn" },
-                        {   type: "input",    
-                                name: "NAME", 
-                                label:"{{ "Job name" | trans}}",
-                                 note: { text: "Nom du job ou de la commande à exécuter" },
-                                required: true
+                            name: "GROUP_NAME", 
+                            label:"{{ "Group" | trans}}",
+                            required: true,
+                            note: { text: "Domaine fonctionnel (Ex: Compta, Contrat, etc...)" }
                         },
                         {   type:"input",    
-                                name: "DESCRIPTION", 
-                                label:"{{ "Description" | trans}}",
-                                rows: 4
+                            name: "REQUESTER", 
+                            label:"{{ "Requester" | trans}}",
+                            note: { text: "Visa du demandeur" }
+                        },
+                        {   type: "newcolumn" },
+                        {   type: "input",
+                            name: "NAME", 
+                            label:"{{ "Job name" | trans}}",
+                             note: { text: "Nom du job ou de la commande à exécuter" },
+                            required: true
+                        },
+                        {   type:"select",    
+                            name: "CRITICITY", 
+                            label:"{{ "Criticity" | trans}}",                            
+                            options: [
+                                {   text: "{{ "Basse" | trans }}",
+                                    value: "0",
+                                },
+                                {   text: "{{ "Moyenne" | trans }}",
+                                    value: "1",
+                                },
+                                {   text: "{{ "Haute" | trans }}",
+                                    value: "2",
+                                }
+                            ]
+                        },
+                        {   type:"input",    
+                            name: "DESCRIPTION", 
+                            label:"{{ "Description" | trans}}",
+                            rows: 4
                         }
                     ]
                 }
@@ -85,24 +100,89 @@ dhtmlxEvent(window,"load",function(){
         {   type: "block",
             id: "job",
             list: [  
-                {
-                    type: "fieldset",
-                    width: "500",
+                {   type: "fieldset",
+                    width: "900",
                     label: "{{ "Traitement" | trans }}",
                     list: [
+                        {   type:"select",    
+                            name: "COMMAND_TYPE", 
+                            label:"{{ "Type" | trans}}",
+                            options: [
+                                {   text: "{{ "I5 commmand" | trans }}",
+                                    value: "I5",
+                                    list: [
+                                        {   type:"input",    
+                                            name: "COMMAND_I5", 
+                                            label:"{{ "CL" | trans}}"
+                                        },
+                                        {   type:"checkbox",    
+                                            name: "DB_UPDATE", 
+                                            label:"{{ "Database update" | trans}}"
+                                        },
+                                        {   type:"input",    
+                                            name: "USER_I5", 
+                                            label:"{{ "User" | trans}}",
+                                            value: 'VABATCH'
+                                        }
+                                    ]
+                                },
+                                {   text: "{{ "Unix commmand" | trans }}",
+                                    value: "UNIX",
+                                    list: [
+                                        {   type:"input",    
+                                            name: "COMMAND_UNIX",
+                                            label:"{{ "Command" | trans}}",
+                                            rows: 3
+                                        },
+                                        {   type:"input",    
+                                            name: "USER_UNIX", 
+                                            label:"{{ "User" | trans}}",
+                                            value: 'autosys'
+                                        }
+                                    ]
+                                },
+                                {   text: "{{ "Windows commmand" | trans }}",
+                                    value: "WINDOWS",
+                                    list: [
+                                        {   type:"input",    
+                                            name: "COMMAND_WINDOWS", 
+                                            label:"{{ "Command" | trans}}",
+                                            rows: 3
+                                        },
+                                        {   type:"input",    
+                                            name: "USER_WINDOWS", 
+                                            label:"{{ "User" | trans}}",
+                                            value: 'autobatch@vaudoise'
+                                        }
+                                    ]
+                                },
+                                {   text: "{{ "Other" | trans }}",
+                                    value: "OTHER",
+                                    list: [
+                                        {   type:"input",    
+                                            name: "COMMAND_OTHER", 
+                                            label:"{{ "Command" | trans}}",
+                                            rows: 3
+                                        },
+                                        {   type:"input",    
+                                            name: "USER_OTHER", 
+                                            label:"{{ "User" | trans}}",
+                                            value: ''
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {   type: "newcolumn"   },
                         {   type:"input",    
-                                name: "COMMAND", 
-                                label:"{{ "Command" | trans}}",
-                                rows: 3
+                            name: "MACHINE", 
+                            label:"{{ "Host" | trans}}"
                         },
                         {   type:"input",    
-                                name: "OWNER", 
-                                label:"{{ "User" | trans}}"
-                        },
-                        {   type:"input",    
-                                name: "MACHINE", 
-                                label:"{{ "Host" | trans}}"
-                        }
+                            name: "MAX_RUN_TIME", 
+                            label:"{{ "Max run time" | trans}}",
+                            note: { text: "Temps d'exécution maximum" }
+                        }                                
                     ]
                 }
             ]
@@ -111,97 +191,91 @@ dhtmlxEvent(window,"load",function(){
             inputWidth: "auto",
             id: "trigger",
             list: [      
-                {
-                    type: "fieldset",
-                    width: "500",
+                {   type: "fieldset",
+                    width: "900",
                     label: "{{ "Trigger" | trans }}",
                     list: [
-                        {   
-                            type:"select",    
-                            name: "TRIGGER", 
-                            label:"{{ "Type" | trans}}",
-                            options: [
-                                {
-                                    text: "{{ "Date/Time" | trans }}",
-                                    value: "date_condition",
-                                    list: [
-                                        {   
-                                            type:"select",    
-                                            name: "DATE", 
-                                            label:"{{ "Days" | trans}}",
-                                            note: { text: "Jours de lancement" },
-                                            options: [
-                                                {   
-                                                    value: "ALL_DAYS", 
-                                                    text: "{{ "Everyday" | trans }}"                                        
+                        {   type:"checkbox",    
+                            label: "{{ "Date/Time" | trans }}",
+                            name: "TRIGGER_DATE_TIME", 
+                            list: [
+                                {   type:"select",
+                                    name: "DATE", 
+                                    label:"{{ "Days" | trans}}",
+                                    note: { text: "Jours de lancement" },
+                                    options: [
+                                        {   value: "ALL_DAYS", 
+                                            text: "{{ "Everyday" | trans }}"                                        
+                                        },
+                                        {   value: "DAYS_OF_WEEKS", 
+                                            text: "{{ "Days of week" | trans }}",
+                                            list: [
+                                                {   type:"checkbox",    
+                                                    name: "MONDAY", 
+                                                    label:"{{ "Monday" | trans}}"
                                                 },
-                                                {
-                                                    value: "DAYS_OF_WEEKS", 
-                                                    text: "{{ "Days of week" | trans }}",
-                                                    list: [
-                                                        {
-                                                            type:"checkbox",    
-                                                            name: "MONDAY", 
-                                                            label:"{{ "Monday" | trans}}"
-                                                        },
-                                                        {
-                                                            type:"checkbox",    
-                                                            name: "TUESDAY", 
-                                                            label:"{{ "Tuesday" | trans}}"
-                                                        },
-                                                        {
-                                                            type:"checkbox",    
-                                                            name: "WEDNESDAY", 
-                                                            label:"{{ "Wednesday" | trans}}"
-                                                        },
-                                                        {
-                                                            type:"checkbox",    
-                                                            name: "THURSDAY", 
-                                                            label:"{{ "Thursday" | trans}}"
-                                                        },
-                                                        {
-                                                            type:"checkbox",    
-                                                            name: "FRIDAY", 
-                                                            label:"{{ "Friday" | trans}}"
-                                                        },
-                                                        {
-                                                            type:"checkbox",    
-                                                            name: "SATURDAY", 
-                                                            label:"{{ "Saturday" | trans}}"
-                                                        },
-                                                        {
-                                                            type:"checkbox",    
-                                                            name: "SUNDAY", 
-                                                            label:"{{ "Sunday" | trans}}"
-                                                        }
-                                                    ]
+                                                {   type:"checkbox",    
+                                                    name: "TUESDAY", 
+                                                    label:"{{ "Tuesday" | trans}}"
                                                 },
-                                                {   
-                                                    value: "CALENDAR", 
-                                                    text: "{{ "Calendar" | trans }}",
-                                                    list: [
-                                                        {   
-                                                            type:"input",    
-                                                            name: "RUN_CALENDAR", 
-                                                            label:"{{ "Name" | trans}}",
-                                                            note: { text: "Nom du calendrier." }
-                                                        }
-                                                    ]
+                                                {   type:"checkbox",    
+                                                    name: "WEDNESDAY", 
+                                                    label:"{{ "Wednesday" | trans}}"
+                                                },
+                                                {   type:"checkbox",    
+                                                    name: "THURSDAY", 
+                                                    label:"{{ "Thursday" | trans}}"
+                                                },
+                                                {   type:"checkbox",    
+                                                    name: "FRIDAY", 
+                                                    label:"{{ "Friday" | trans}}"
+                                                },
+                                                {   type:"checkbox",    
+                                                    name: "SATURDAY", 
+                                                    label:"{{ "Saturday" | trans}}"
+                                                },
+                                                {   type:"checkbox",    
+                                                    name: "SUNDAY", 
+                                                    label:"{{ "Sunday" | trans}}"
                                                 }
-
                                             ]
                                         },
-                                        {   
-                                            type:"input",    
-                                            name: "START_TIMES", 
-                                            label:"{{ "Start times" | trans}}",
-                                            note: { text: "Heures de départ séparées par des virgules." }
+                                        {   value: "CALENDAR", 
+                                            text: "{{ "Calendar" | trans }}",
+                                            list: [
+                                                {   type:"input",    
+                                                    name: "RUN_CALENDAR", 
+                                                    label:"{{ "Name" | trans}}",
+                                                    note: { text: "Nom du calendrier." }
+                                                }
+                                            ]
                                         }
-                                    ]                         
+                                    ]
                                 },
-                                {text: "{{ "File watcher" | trans }}", value: "file_watcher"},
-                                {text: "{{ "Job status" | trans }}", value: "conditions"}
-                            ]                    
+                                {   type:"input",    
+                                    name: "START_TIMES", 
+                                    label:"{{ "Start times" | trans}}",
+                                    note: { text: "Heures de départ séparées par des virgules." }
+                                },
+                                {   type:"input",    
+                                    name: "RUN_CALENDAR", 
+                                    label:"{{ "Exclude calendar" | trans}}",
+                                    note: { text: "Calendriers des jours à exclure" }
+                                }
+                            ]                         
+                        },
+                        { type: "newcolumn" },
+                        {   type:"checkbox",    
+                            label: "{{ "File watcher" | trans }}",
+                            name: "TRIGGER_FILE_WATCHER", 
+                            list: [
+                                {
+                                    type:"input",    
+                                    name: "FILE_WATCHER", 
+                                    label:"{{ "File name" | trans}}",
+                                    note: { text: "Nom du fichier attendu" }
+                                }
+                            ]
                         }
                     ]
                 }
@@ -213,36 +287,79 @@ dhtmlxEvent(window,"load",function(){
             list: [      
                 {
                     type: "fieldset",
-                    width: "500",
+                    width: "900",
                     label: "{{ "Constraints" | trans }}",
                     list: [
-                        {   
-                            type:"input",    
+                        {   type:"input",    
                             name: "DEPENDENCIES", 
                             label:"{{ "Dependencies" | trans}}",
                             note: { text: "Formule des statuts (Ex: 'success(JOB_PRECEDENT) or failure(JOB_EN_ERREUR)')" }
                         },
-                        {   
-                            type:"input",    
+                        {   type:"input",    
                             name: "NOT_RUNNING", 
                             label:"{{ "Non simultanéité" | trans}}",
                             note: { text: "Liste des jobs qui ne doivent pas s'exécuter en même temps." }
                         },
-                        {   
-                            type:"input",    
-                            name: "RESSOURCES", 
+                        {   type:"input",    
+                            name: "RESOURCES", 
                             label:"{{ "Resource" | trans}}",
                             note: { text: "Nom de la ressource à utiliser." },
                             list: [
-                                {   
-                                    type:"input",    
-                                    name: "RESSOURCE_VALUE", 
+                                {   type:"input",    
+                                    name: "RESOURCES_VALUE", 
                                     label:"{{ "Value" | trans}}",
                                     note: { text: "Nombre de jetons utilisé." }
                                 }
                             ]
                         }
 
+                    ]
+                }
+            ]
+        },
+        {   type: "block",
+            inputWidth: "auto",
+            id: "postprocessing",
+            list: [      
+                {
+                    type: "fieldset",
+                    width: "900",
+                    label: "{{ "Post processing" | trans }}",
+                    list: [
+                        {   type:"input",    
+                            name: "SUCCESS_CODES", 
+                            label:"{{ "Success codes" | trans}}",
+                            note: { text: "Indiquer les codes de sorties à considérer comme succès" }
+                        },
+                        {   type:"input",    
+                            name: "SUCCESSORS", 
+                            label:"{{ "Successors" | trans}}",
+                            note: { text: "Liste des jobs à exécuter séparés par des virgules" }
+                        }
+                    ]
+                }
+            ]
+        },
+        {   type: "block",
+            inputWidth: "auto",
+            id: "exploitation",
+            list: [      
+                {   type: "fieldset",
+                    width: "900",
+                    label: "{{ "Exploitation" | trans }}",
+                    list: [
+                        {   type:"input",    
+                            name: "INSTRUCTIONS", 
+                            label:"{{ "Instructions" | trans}}",
+                            rows: 10,
+                            note: { text: "Procedures de reprise par l'exploitation." }
+                        },
+                        {   type: "newcolumn" },
+                        {   type:"checkbox",    
+                            name: "RESTART", 
+                            label:"{{ "Restart" | trans}}",
+                            note: { text: "Indiquer si le traitement peut être relancé." }
+                        }
                     ]
                 }
             ]
@@ -262,6 +379,12 @@ dhtmlxEvent(window,"load",function(){
     
     myTabbar.addTab("constraints", "{{ "Constraints" | trans }}", 120);
     myTabbar.cells("constraints").attachObject("constraints");
+
+    myTabbar.addTab("postprocessing", "{{ "Post processing" | trans }}", 120);
+    myTabbar.cells("postprocessing").attachObject("postprocessing");
+
+    myTabbar.addTab("exploitation", "{{ "Exploitation" | trans }}", 120);
+    myTabbar.cells("exploitation").attachObject("exploitation");
 
     myToolbar.attachEvent("onClick",function(id,value){
         switch(id){
@@ -284,7 +407,12 @@ dhtmlxEvent(window,"load",function(){
                     myGrid.load( "{{ url('xml_ATS_form_grid') }}");
                     globalLayout.cells("b").progressOff();
                 });
-            break;
+                break;
+            case 'add':
+                myForm.clear();
+                break;
+            default:
+                alert(id);                
         }
     });
     

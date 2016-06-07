@@ -477,36 +477,36 @@ xml_ATS_templates_mep_toolbar:
     defaults: { _controller: AriiATSBundle:Templates:toolbar }
 
 # --------------------------------------------------------------------------
-# Formulaire
+# Formulaire utilisateur
 # --------------------------------------------------------------------------
 arii_ATS_form:
-    pattern:  /form
+    pattern:  /public/form
     defaults: { _controller: AriiATSBundle:Form:index }
 
 xml_ATS_form_toolbar:
-    pattern:  /form/toolbar.xml
+    pattern:  /public/form/toolbar.xml
     defaults: { _controller: AriiATSBundle:Form:toolbar }
 
 xml_ATS_forms_list:
-    pattern:  /form/list.xml
+    pattern:  /public/form/list.xml
     defaults: { _controller: AriiATSBundle:Form:list }
 
 xml_ATS_form_grid:
-    pattern:  /form/grid.xml
+    pattern:  /public/form/grid.xml
     defaults: { _controller: AriiATSBundle:Form:grid }
 
 json_ATS_form_default:
-    pattern:  /form/default.json
+    pattern:  /public/form/default.json
     defaults: { _controller: AriiATSBundle:Form:default }
     
 json_ATS_form_get:
-    pattern:  /form/get.json
+    pattern:  /public/form/get.json
     defaults: { _controller: AriiATSBundle:Form:get }
 
 xml_ATS_form_data:
-    pattern:  /form/form.xml
+    pattern:  /public/form/form.xml
     defaults: { _controller: AriiATSBundle:Form:form }
 
 arii_ATS_form_save:
-    pattern:  /form/save.html
+    pattern:  /public/form/save.html
     defaults: { _controller: AriiATSBundle:Form:save }

@@ -80,8 +80,10 @@ class FormController extends Controller
     {
         $db = $this->container->get('arii_core.db');
         $grid = $db->Connector('form');
-        $grid->render_table('ATS_REQUESTS',"ID","ID,NAME,DESCRIPTION,COMMAND,OWNER,MACHINE,TRIGGERS,DAYS_OF_WEEK,CALENDAR,START_TIMES,DEPENDENCIES,NOT_RUNNING,RESOURCES,RESOURCES_VALUE");
+        $grid->render_table('ATS_REQUESTS',"ID","ID,NAME,APP_NAME,GROUP_NAME,DESCRIPTION,COMMAND,OWNER,MACHINE,TRIGGER_DATE_TIME,TRIGGER_FILE_WATCHER,FILE_WATCHER,DAYS_OF_WEEK,RUN_CALENDAR,START_TIMES,DEPENDENCIES,NOT_RUNNING,RESOURCES,RESOURCES_VALUE,REQUESTER,INSTRUCTIONS,RESTART,SUCCESSORS,SUCCESS_CODES,MAX_RUN_TIME,CRITICITY");
     }
+    
+    
     
     public function saveAction()
     {
@@ -96,21 +98,58 @@ class FormController extends Controller
             $form = new \Arii\ATSBundle\Entity\Requests();
         
         $form->setName($request->get('NAME'));
+        $form->setRequester($request->get('REQUESTER'));
         $form->setDescription($request->get('DESCRIPTION'));
         $form->setAppName($request->get('APP_NAME'));
         $form->setGroupName($request->get('GROUP_NAME'));
-        $form->setCommand($request->get('COMMAND'));
-        $form->setOwner($request->get('OWNER'));
+        
+        $command_type = $request->get('COMMAND_TYPE');
+        $form->setCommandType($command_type);
+        $form->setDbUpdate(0);
+        if ($command_type=='I5') {
+            $form->setOwner($request->get('USER_I5'));
+            $form->setCommand($request->get('COMMAND_I5'));
+            $form->setDbUpdate($request->get('DB_UPDATE'));
+        }
+        elseif ($command_type=='UNIX') {
+            $form->setOwner($request->get('USER_UNIX'));
+            $form->setCommand($request->get('COMMAND_UNIX'));
+        }
+        elseif ($command_type=='WINDOWS') {
+            $form->setOwner($request->get('USER_WINDOWS'));
+            $form->setCommand($request->get('COMMAND_WINDOWS'));
+        }
+        else {
+            $form->setOwner($request->get('USER_OTHER'));
+            $form->setCommand($request->get('COMMAND_OTHER'));
+        }
+                
         $form->setMachine($request->get('MACHINE'));
-        $form->setTriggers($request->get('TRIGGERS'));
+
+        $form->setTriggerFileWatcher($request->get('TRIGGER_FILE_WATCHER'));
+        $form->setFileWatcher($request->get('FILE_WATCHER'));
+        
+        $form->setTriggerDateTime($request->get('TRIGGER_DATE_TIME'));        
         $form->setDaysOfWeek($request->get('DAYS_OF_WEEK'));
-        $form->setCalendar($request->get('CALENDAR'));
+        $form->setRunCalendar($request->get('RUN_CALENDAR'));
+        $form->setExcludeCalendar($request->get('EXCLUDE_CALENDAR'));
         $form->setStartTimes($request->get('START_TIMES'));
+        
         $form->setDependencies($request->get('DEPENDENCIES'));
         $form->setNotRunning($request->get('NOT_RUNNING'));
+        
+        $form->setSuccessCodes($request->get('SUCCESS_CODES'));
+        $form->setSuccessors($request->get('SUCCESSORS'));
+
         $form->setResources($request->get('RESOURCES'));
         $form->setResourcesValue($request->get('RESOURCES_VALUE'));
         
+        $form->setInstructions($request->get('INSTRUCTIONS'));
+        $form->setRestart($request->get('RESTART'));
+        
+        $form->setMaxRunTime($request->get('MAX_RUN_TIME'));
+        $form->setCriticity($request->get('CRITICITY'));
+
         $em->persist($form);
         $em->flush();
 
