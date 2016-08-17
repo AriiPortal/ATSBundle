@@ -11,11 +11,7 @@ class DefaultController extends Controller
 {
     public function indexAction()
     {
-        $Colors = $this->container->getParameter('color_status');
-        foreach ($Colors as $k=>$v) {
-            if (($p=strpos($v,"/"))>0) $Colors[$k] = substr($Colors[$k],0,$p);                    
-        }
-        return $this->render('AriiATSBundle:Default:index.html.twig', array("color" => $Colors));
+        return $this->render('AriiATSBundle:Default:index.html.twig');
     }
 
     public function readmeAction()
@@ -36,7 +32,8 @@ class DefaultController extends Controller
         $yaml = new Parser();
         $lang = $this->getRequest()->getLocale();
         
-        $basedir = $this->container->getParameter('workspace').'/Autosys/Requests/'.$lang;
+        $session = $this->container->get('arii_core.session');
+        $basedir = $session->get('workspace').'/Autosys/Requests/'.$lang;
 
         $Requests = array();
         if ($dh = @opendir($basedir)) {

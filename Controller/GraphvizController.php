@@ -39,8 +39,8 @@ class GraphvizController extends Controller
         $this->images_path = str_replace('\\','/',$this->get('kernel')->getRootDir()).'/../web'.$images;
         $images_url = $this->container->get('templating.helper.assets')->getUrl($images);
         
-        $this->graphviz_dot = $this->container->getParameter('graphviz_dot');
-
+        $session = $this->container->get('arii_core.session');
+        $this->graphviz_dot = $session->get('graphviz_dot');
         
         $descriptorspec = array(
             0 => array("pipe", "r"),  // // stdin est un pipe où le processus va lire

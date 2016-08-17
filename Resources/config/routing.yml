@@ -477,6 +477,17 @@ xml_ATS_templates_mep_toolbar:
     defaults: { _controller: AriiATSBundle:Templates:toolbar }
 
 # --------------------------------------------------------------------------
+# Dashboard
+# --------------------------------------------------------------------------
+arii_ATS_dashboard:
+    pattern:  /public/dashboard
+    defaults: { _controller: AriiATSBundle:Dashboard:index }
+
+html_ATS_dashboard:
+    pattern:  /public/page
+    defaults: { _controller: AriiATSBundle:Dashboard:page }
+    
+# --------------------------------------------------------------------------
 # Formulaire utilisateur
 # --------------------------------------------------------------------------
 arii_ATS_form:

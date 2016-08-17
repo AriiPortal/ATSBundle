@@ -29,8 +29,9 @@ class FormController extends Controller
         $list .= '<rows>';
         
         $lang = $this->getRequest()->getLocale();
-        
-        $basedir = $this->container->getParameter('workspace').'/Autosys/Forms/'.$lang;
+        $session = $this->container->get('arii_core.session');
+
+        $basedir = $session->get('workspace').'/Autosys/Forms/'.$lang;
         if ($dh = @opendir($basedir)) {
             while (($file = readdir($dh)) !== false) {
                 if (substr($file,-10) == '.json.twig') {
@@ -63,7 +64,7 @@ class FormController extends Controller
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         $lang = $this->getRequest()->getLocale();        
-        $basedir = $this->container->getParameter('workspace').'/Autosys/Forms/'.$lang;
+        $basedir = $this->getBaseDir();
         $response->setContent( file_get_contents("$basedir/$form") );
         return $response;        
     }
@@ -154,6 +155,12 @@ class FormController extends Controller
         $em->flush();
 
         return new Response("success");
+    }
+
+    private function getBaseDir() {
+        $lang = $this->getRequest()->getLocale();
+        $session = $this->container->get('arii_core.session');
+        return $session->get('workspace').'/Autosys/Forms/'.$lang;        
     }
     
 }

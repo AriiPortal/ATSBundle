@@ -35,7 +35,7 @@ class TemplatesController extends Controller
         $category = dirname($arg);
         
         # Quel est le workspace ?
-        $path = $this->container->getParameter('workspace')."/Autosys/Templates/$category"; 
+        $path = $this->getBaseDir().'/'.$category; 
         $content = file_get_contents("$path/$template");
         
         # On parse le fichier 
@@ -69,7 +69,7 @@ class TemplatesController extends Controller
         # On parse le fichier 
         $yaml = new Parser();
         
-        $basedir = $this->container->getParameter('workspace')."/Autosys/Templates"; 
+        $basedir = $this->getBaseDir(); 
         if ($dh = @opendir($basedir)) {
             while (($file = readdir($dh)) !== false) {
                 if (is_dir("$basedir/$file") and (substr($file,0,1)!='.')) {
@@ -107,7 +107,7 @@ class TemplatesController extends Controller
         # On parse le fichier 
         $yaml = new Parser();
         
-        $basedir = $this->container->getParameter('workspace')."/Autosys/Templates"; 
+        $basedir = $this->getBaseDir(); 
         if ($dh = @opendir($basedir)) {
             while (($file = readdir($dh)) !== false) {
                 if (is_dir("$basedir/$file") and (substr($file,0,1)!='.')) {
@@ -134,7 +134,7 @@ class TemplatesController extends Controller
     {   
         $request = Request::createFromGlobals();
         $arg = $request->query->get( 'config' );
-        $path = $this->container->getParameter('workspace')."/Autosys/Templates";
+        $path = $this->getBaseDir();
        
         $config = @file_get_contents("$path/$arg");
         if (!$config) {
@@ -197,7 +197,7 @@ class TemplatesController extends Controller
         $request = Request::createFromGlobals();
         $arg = $request->query->get( 'file' );
 
-        $path = $this->container->getParameter('workspace')."/Autosys/Templates";
+        $path = $this->getBaseDir();
         $newfile = "$path/$arg";
         if (!file_exists($newfile)) {
             print "<p><font color='red'>$newfile ?!</font></p>";
@@ -213,7 +213,7 @@ class TemplatesController extends Controller
     {   
         $request = Request::createFromGlobals();
         $arg = $request->query->get( 'file' );
-        $path = $this->container->getParameter('workspace')."/Autosys/Templates";
+        $path = $this->getBaseDir();
 
         // On crée le dump
         $ats = $this->container->get('arii_ats.exec');
@@ -225,8 +225,8 @@ class TemplatesController extends Controller
         $reffile = "$path/$ref";
         file_put_contents($reffile,$current);
         
-        //$gvz_cmd = $this->container->getParameter('graphviz_cmd');
-        $cmd = $this->container->getParameter('perl').' '.dirname(__FILE__).str_replace('/',DIRECTORY_SEPARATOR,'/../Perl/jildiff.pl ');
+        $session = $this->container->get('arii_core.session');
+        $cmd = '"'.$session->get('perl').'" '.dirname(__FILE__).str_replace('/',DIRECTORY_SEPARATOR,'/../Perl/jildiff.pl ');
         $cmd .= ' jil="'.$reffile.'" del=y < "'."$path/$arg".'"';
 
         $res = `$cmd`;         
@@ -243,7 +243,7 @@ class TemplatesController extends Controller
     {   
         $request = Request::createFromGlobals();
         $arg = $request->query->get( 'file' );
-        $path = $this->container->getParameter('workspace')."/Autosys/Templates";
+        $path = $this->getBaseDir();
 
         // On crée le dump
         $ats = $this->container->get('arii_ats.exec');
@@ -255,8 +255,8 @@ class TemplatesController extends Controller
         $reffile = "$path/$ref";
         file_put_contents($reffile,$current);
         
-        //$gvz_cmd = $this->container->getParameter('graphviz_cmd');
-        $cmd = $this->container->getParameter('perl').' '.dirname(__FILE__).str_replace('/',DIRECTORY_SEPARATOR,'/../Perl/jildiff.pl ');
+        $session = $this->container->get('arii_core.session');
+        $cmd = '"'.$session->get('perl').'" '.dirname(__FILE__).str_replace('/',DIRECTORY_SEPARATOR,'/../Perl/jildiff.pl ');
         $cmd .= ' jil="'.$reffile.'" del=y < "'."$path/$arg".'"';
 //        print $cmd;
         $res = `$cmd`;         
@@ -268,4 +268,11 @@ class TemplatesController extends Controller
         file_put_contents($upd,$res);
         exit();
     }     
+
+    private function getBaseDir() {
+        $lang = $this->getRequest()->getLocale();
+        $session = $this->container->get('arii_core.session');
+        return $session->get('workspace').'/Autosys/Templates';        
+    }
+
 }

@@ -35,9 +35,8 @@ class RequestsController extends Controller
         $list .= '<rows>';
         
         $yaml = new Parser();
-        $lang = $this->getRequest()->getLocale();
+        $basedir = $this->getBaseDir();
         
-        $basedir = $this->container->getParameter('workspace').'/Autosys/Requests/'.$lang;
         if ($dh = @opendir($basedir)) {
             while (($file = readdir($dh)) !== false) {
                 if (substr($file,-4) == '.yml') {
@@ -60,8 +59,7 @@ class RequestsController extends Controller
     
     public function summaryAction()
     {
-        $lang = $this->getRequest()->getLocale();
-        $basedir = $this->container->getParameter('workspace').'/Autosys/Requests/'.$lang;
+        $basedir = $this->getBaseDir();
 
         $yaml = new Parser();
         $value['title'] = $this->get('translator')->trans('Summary');
@@ -109,7 +107,7 @@ class RequestsController extends Controller
         
         if (!isset($req)) return $this->summaryAction();
         
-        $page = $this->container->getParameter('workspace').'/Autosys/Requests/'.$lang.'/'.$req.'.yml';
+        $page = $this->getBaseDir().'/'.$req.'.yml';
         $content = file_get_contents($page);
         
         $yaml = new Parser();
@@ -214,4 +212,10 @@ class RequestsController extends Controller
         exit();
     }
 
+    /* Donne le répertoire de travail en fonction de la langue et de l'utilisiation */
+    private function getBaseDir() {
+        $lang = $this->getRequest()->getLocale();
+        $session = $this->container->get('arii_core.session');
+        return $session->get('workspace').'/Autosys/Requests/'.$lang;        
+    }
 }
