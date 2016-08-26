@@ -9,8 +9,8 @@ class AriiAutosys
 {
     protected $ColorStatus;
     
-    public function __construct ($color_status) {
-        $this->ColorStatus = $color_status;
+    public function __construct (\Arii\CoreBundle\Service\AriiSession $session) {
+        $this->ColorStatus = $session->getColors();
     }
     
     public function Alarm($alarm) {   

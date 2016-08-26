@@ -65,7 +65,7 @@ class JobsController extends Controller
         foreach($Job as $k=>$j) {
             $status = $autosys->Status($j['STATUS']);
             list($bgcolor,$color) = $autosys->ColorStatus($status);
-            $list .= '<row id="'.$j['JOID'].'" style="background-color: '.$bgcolor.'">';
+            $list .= '<row id="'.$j['JOID'].'" style="background-color: '.$bgcolor.'; color: '.$color.'">';
             $list .= '<cell>'.$j['JOB_NAME'].'</cell>';               
             $list .= '<cell>'.$j['BOX_NAME'].'</cell>';               
             $list .= '<cell>'.$j['DESCRIPTION'].'</cell>';               
@@ -121,7 +121,7 @@ class JobsController extends Controller
             }
         }
         $pie = '<data>';
-        foreach (array('SUCCESS','FAILURE','TERMINATED','RUNNING','INACTIVE','ACTIVATED','WAIT_REPLY','JOB_ON_ICE','JOB_ON_HOLD','JOB_ON_NOEXEC') as $s) {
+        foreach (array('SUCCESS','FAILURE','TERMINATED','RUNNING','INACTIVE','ACTIVATED','WAIT_REPLY','ON_ICE','ON_HOLD','ON_NOEXEC') as $s) {
             list($bgcolor,$color) = $autosys->ColorStatus($s);
             if (isset($Status[$s]))
                 $pie .= '<item id="'.$s.'"><STATUS>'.$s.'</STATUS><JOBS>'.$Status[$s].'</JOBS><COLOR>'.$bgcolor.'</COLOR></item>';
