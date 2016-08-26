@@ -3,7 +3,7 @@
 {% block body %}
 <script type="text/javascript">
 var max_history = 0; // pas d'historique
-var box_only = 0; // que des standalone
+var box_more = 0; // pas de boite en plus 
 var only_warning = 1; // que les problemes
 var update=30;
 var autorefresh;
@@ -15,7 +15,7 @@ dhtmlxEvent(window,"load",function(){
     globalLayout.cells("a").setWidth(350); 
     globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").hideHeader(); 
-    globalLayout.cells("c").hideHeader(); 
+    globalLayout.cells("c").setText("{{ "Detail" | trans }}"); 
 
     globalMenu = globalLayout.cells("a").attachMenu();
     globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
@@ -48,7 +48,7 @@ dhtmlxEvent(window,"load",function(){
                 align:"left"
             } 
     });
-    myDonut.load(  "{{ url('xml_ATS_jobs_pie') }}?box_only="+box_only+"&only_warning="+only_warning );
+    myDonut.load(  "{{ url('xml_ATS_jobs_pie') }}?box_more="+box_more+"&only_warning="+only_warning );
     
     myTree = myTab.cells("b2").attachTree();
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
@@ -63,7 +63,7 @@ dhtmlxEvent(window,"load",function(){
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
     myGrid.setHeader("{{ "Job" | trans }},{{ "Folder" | trans }},{{ "Description" | trans }},{{ "Status" | trans }},{{ "Type" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
     myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
-    myGrid.setInitWidths("300,*,*,120,90,160,160,140,80");
+    myGrid.setInitWidths("*,*,*,120,90,160,160,140,80");
     myGrid.setColAlign("left,left,,leftcenter,center,right,right,right,right");
     myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro");
     myGrid.setColSorting("str,str,str,str,str,date,date,str,int");
@@ -71,8 +71,10 @@ dhtmlxEvent(window,"load",function(){
     myGrid.enableContextMenu(myGridMenu);
     myGrid.attachEvent("onBeforeContextMenu", onShowMenu );
     myGrid.init();
-    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?history="+max_history+"&box_only="+box_only+"&only_warning="+only_warning);
+    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?history="+max_history+"&box_more="+box_more+"&only_warning="+only_warning);
     myGrid.attachEvent("onRowDblClicked",JobDetail );
+    myGrid.setColumnHidden(1,true);
+    myGrid.setColumnHidden(2,true);
 
     myDonut.attachEvent("onItemClick",function(id, value){
         status = id;
@@ -98,6 +100,17 @@ dhtmlxEvent(window,"load",function(){
         }
     });
     myGridToolbar.attachEvent("onStateChange",function(itemid, state){
+         switch (itemid) {
+            case 'boxes':
+                myGrid.setColumnHidden(1,!state);  
+                break;
+            case "desc":
+                myGrid.setColumnHidden(2,!state);  
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
     });
 
     globalLayout.cells("c").setHeight(300); 
@@ -234,6 +247,8 @@ dhtmlxEvent(window,"load",function(){
         return true;
     });
 
+    globalLayout.cells("c").collapse();
+
 });
 
 function GlobalRefresh() {
@@ -254,11 +269,11 @@ function GridRefresh() {
     seconds = "0" + seconds;
     }
     myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
-    myGrid.load("{{ url('xml_ATS_jobs_grid') }}?time="+seconds+"&history="+max_history+"&box_only="+box_only+"&only_warning="+only_warning, function(){    
+    myGrid.load("{{ url('xml_ATS_jobs_grid') }}?time="+seconds+"&history="+max_history+"&box_more="+box_more+"&only_warning="+only_warning, function(){    
         globalLayout.cells("b").progressOff();
         myGrid.refreshFilters();
         myGrid.filterByAll();
-        myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?box_only="+box_only+"&only_warning="+only_warning, function () {
+        myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?box_more="+box_more+"&only_warning="+only_warning, function () {
             myDonut.refresh();                
             globalLayout.progressOff();
             globalLayout.cells("a").progressOff();
@@ -268,6 +283,7 @@ function GridRefresh() {
 }
 
 function JobDetail(id) {
+    globalLayout.cells("c").expand();
     
     job = myGrid.cells(id, 0 ).getValue(); 
     status = myGrid.cells(id, 2 ).getValue(); 

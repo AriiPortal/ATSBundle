@@ -17,7 +17,7 @@
                  img:   "view.png", 
                  items:
                  [ 
-                    { id:"menu_boxes", text: "{{ "Boxes" | trans }}", img: "box.png" },
+//                    { id:"menu_boxes", text: "{{ "Boxes" | trans }}", img: "box.png" },
                     { id:"menu_jobs", text: "{{ "Jobs" | trans }}", img: "job.png" },
                     { id:"menu_alarms", text: "{{ "Alarms" | trans }}", img: "alarm.png" },                    
                     { id:"menu_audit", text: "{{ "Audit" | trans }}", img: "shield.png" },                    
@@ -126,7 +126,7 @@
                   list : 
                   [   
                         {id:"only_warning","type":"buttonTwoState",text:"","img":"warning.png", state: true },
-                        {id:"box_only","type":"buttonTwoState",text:"","img":"box.png", state: true }
+                        {id:"box_only","type":"buttonTwoState",text:"","img":"box.png", state: false }
                   ]
               },
 {% set current_db = app.session.get('database') %} 

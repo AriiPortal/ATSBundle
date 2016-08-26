@@ -36,20 +36,20 @@ class JobsController extends Controller
         return $this->render('AriiATSBundle:Jobs:grid_menu.xml.twig',array(), $response );
     }
 
-    public function statusAction($only_warning=0,$box_only=1)
+    public function statusAction($only_warning=0,$box_more=0)
     {
         $request = Request::createFromGlobals();
         if ($request->query->get( 'box' ))
             $box = $request->query->get( 'box' );      
         else 
             $box = '';
-        if ($request->query->get( 'only_warning' ))
+        if ($request->query->get( 'only_warning' )!='')
             $only_warning = $request->query->get( 'only_warning' );
-        if ($request->query->get( 'box_only' ))
-            $box_only = $request->query->get( 'box_only' );
+        if ($request->query->get( 'box_more' )!='')
+            $box_more = $request->query->get( 'box_more' );
 
         $state = $this->container->get('arii_ats.state');
-        $Job = $state->Jobs($box,$only_warning,$box_only);
+        $Job = $state->Jobs($box,$only_warning,$box_more);
                 
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
@@ -94,20 +94,20 @@ class JobsController extends Controller
         return $response;        
     }
 
-    public function pieAction($only_warning=0,$box_only=1) {
+    public function pieAction($only_warning=0,$box_more=0) {
         $request = Request::createFromGlobals();
         if ($request->query->get( 'box' ))
             $box = $request->query->get( 'box' );      
         else 
             $box = '';
-        if ($request->query->get( 'only_warning' ))
+        if ($request->query->get( 'only_warning' )!='')
             $only_warning = $request->query->get( 'only_warning' );
-        if ($request->query->get( 'box_only' ))
-            $box_only = $request->query->get( 'box_only' );
+        if ($request->query->get( 'box_more' )!='')
+            $box_more = $request->query->get( 'box_more' );
 
         $state = $this->container->get('arii_ats.state');
-        $Job = $state->Jobs($box,$only_warning,$box_only);
-        
+        $Job = $state->Jobs($box,$only_warning,$box_more);
+
         $autosys = $this->container->get('arii_ats.autosys');
         foreach ($Job as $k=>$j) {
             $status = $autosys->Status($j['STATUS']);
@@ -123,8 +123,9 @@ class JobsController extends Controller
         $pie = '<data>';
         foreach (array('SUCCESS','FAILURE','TERMINATED','RUNNING','INACTIVE','ACTIVATED','WAIT_REPLY','ON_ICE','ON_HOLD','ON_NOEXEC') as $s) {
             list($bgcolor,$color) = $autosys->ColorStatus($s);
-            if (isset($Status[$s]))
-                $pie .= '<item id="'.$s.'"><STATUS>'.$s.'</STATUS><JOBS>'.$Status[$s].'</JOBS><COLOR>'.$bgcolor.'</COLOR></item>';
+            if (!isset($Status[$s])) 
+                $Status[$s]=0;
+            $pie .= '<item id="'.$s.'"><STATUS>'.$s.'</STATUS><JOBS>'.$Status[$s].'</JOBS><COLOR>'.$bgcolor.'</COLOR></item>';
         }
         $pie .= '</data>';
         $response = new Response();

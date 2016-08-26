@@ -11,8 +11,8 @@
 <script>
 function StateRibbon (itemid,state) {
     switch(itemid) {
-         case 'chained':
-            chained = (state?1:0);
+         case 'box_only':
+            box_only = (state?1:0);
             globalLayout.progressOn();
             break;
          case 'only_warning':
@@ -67,7 +67,7 @@ function ClickRibbon (itemid,state) {
         window.location = "{{ url('arii_ATS_index') }}";
         break;
     case 'menu_boxes':
-        window.location = "{{ url('arii_ATS_jobs') }}";
+        window.location = "{{ url('arii_ATS_boxes') }}";
         break;
     case 'menu_jobs':
         window.location = "{{ url('arii_ATS_jobs') }}";

@@ -23,7 +23,7 @@ class AriiState
 /*********************************************************************
  * Informations de connexions
  *********************************************************************/
-   public function Jobs($box='%',$only_warning=0,$box_only=1) {   
+   public function Jobs($box='%',$only_warning=0,$box=0) {   
         $date = $this->date;        
         $sql = $this->sql;
         $db = $this->db;
@@ -34,15 +34,15 @@ class AriiState
             '{job_name}'   => 's.JOB_NAME',
             '{start_timestamp}'=> 'LAST_START');
         
-        if ($box_only) 
-            $Fields['s.JOB_TYPE'] = 98;
-        
         # Jointure car la vue est incomplete
         $qry = $sql->Select(array('s.*','j.AS_APPLIC','j.AS_GROUP'))
                 .$sql->From(array('UJO_JOBST s'))
                 .$sql->LeftJoin('UJO_JOB j',array('j.JOID','s.JOID'))
-                .$sql->Where($Fields)
-                .$sql->OrderBy(array('s.BOX_NAME','s.JOB_NAME'));
+                .$sql->Where($Fields);
+        if ($box==0) 
+            $qry .= 'and  s.JOB_TYPE <> 98';
+                        
+        $qry .= $sql->OrderBy(array('s.BOX_NAME','s.JOB_NAME'));
 
         $res = $data->sql->query($qry);
         $Jobs = array();
