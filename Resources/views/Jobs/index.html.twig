@@ -3,7 +3,7 @@
 {% block body %}
 <script type="text/javascript">
 var max_history = 0; // pas d'historique
-var box_more = 0; // pas de boite en plus 
+var box = 0; // pas de boite en plus 
 var only_warning = 1; // que les problemes
 var update=30;
 var autorefresh;
@@ -48,7 +48,7 @@ dhtmlxEvent(window,"load",function(){
                 align:"left"
             } 
     });
-    myDonut.load(  "{{ url('xml_ATS_jobs_pie') }}?box_more="+box_more+"&only_warning="+only_warning );
+    myDonut.load(  "{{ url('xml_ATS_jobs_pie') }}?box_more="+box+"&only_warning="+only_warning );
     
     myTree = myTab.cells("b2").attachTree();
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
@@ -71,7 +71,7 @@ dhtmlxEvent(window,"load",function(){
     myGrid.enableContextMenu(myGridMenu);
     myGrid.attachEvent("onBeforeContextMenu", onShowMenu );
     myGrid.init();
-    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?history="+max_history+"&box_more="+box_more+"&only_warning="+only_warning);
+    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?history="+max_history+"&box_more="+box+"&only_warning="+only_warning);
     myGrid.attachEvent("onRowDblClicked",JobDetail );
     myGrid.setColumnHidden(1,true);
     myGrid.setColumnHidden(2,true);
@@ -269,11 +269,11 @@ function GridRefresh() {
     seconds = "0" + seconds;
     }
     myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
-    myGrid.load("{{ url('xml_ATS_jobs_grid') }}?time="+seconds+"&history="+max_history+"&box_more="+box_more+"&only_warning="+only_warning, function(){    
+    myGrid.load("{{ url('xml_ATS_jobs_grid') }}?time="+seconds+"&history="+max_history+"&box_more="+box+"&only_warning="+only_warning, function(){    
         globalLayout.cells("b").progressOff();
         myGrid.refreshFilters();
         myGrid.filterByAll();
-        myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?box_more="+box_more+"&only_warning="+only_warning, function () {
+        myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?box_more="+box+"&only_warning="+only_warning, function () {
             myDonut.refresh();                
             globalLayout.progressOff();
             globalLayout.cells("a").progressOff();

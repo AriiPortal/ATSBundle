@@ -11,8 +11,8 @@
 <script>
 function StateRibbon (itemid,state) {
     switch(itemid) {
-         case 'box_only':
-            box_only = (state?1:0);
+         case 'box':
+            box = (state?1:0);
             globalLayout.progressOn();
             break;
          case 'only_warning':

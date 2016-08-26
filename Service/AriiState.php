@@ -40,8 +40,7 @@ class AriiState
                 .$sql->LeftJoin('UJO_JOB j',array('j.JOID','s.JOID'))
                 .$sql->Where($Fields);
         if ($box==0) 
-            $qry .= 'and  s.JOB_TYPE <> 98';
-                        
+            $qry .= ' and  s.JOB_TYPE <> 98';                        
         $qry .= $sql->OrderBy(array('s.BOX_NAME','s.JOB_NAME'));
 
         $res = $data->sql->query($qry);
