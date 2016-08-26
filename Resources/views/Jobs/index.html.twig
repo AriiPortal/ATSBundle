@@ -61,12 +61,12 @@ dhtmlxEvent(window,"load",function(){
     myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
-    myGrid.setHeader("{{ "Folder" | trans }},{{ "Job" | trans }},{{ "Status" | trans }},{{ "Type" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
-    myGrid.attachHeader("#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
-    myGrid.setInitWidths("*,320,120,90,160,160,140,80");
-    myGrid.setColAlign("left,left,center,center,right,right,right,right");
-    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
-    myGrid.setColSorting("str,str,str,str,date,date,str,int");
+    myGrid.setHeader("{{ "Job" | trans }},{{ "Folder" | trans }},{{ "Description" | trans }},{{ "Status" | trans }},{{ "Type" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
+    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
+    myGrid.setInitWidths("300,*,*,120,90,160,160,140,80");
+    myGrid.setColAlign("left,left,,leftcenter,center,right,right,right,right");
+    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro");
+    myGrid.setColSorting("str,str,str,str,str,date,date,str,int");
     myGrid.enableAlterCss("","");
     myGrid.enableContextMenu(myGridMenu);
     myGrid.attachEvent("onBeforeContextMenu", onShowMenu );
@@ -110,6 +110,7 @@ dhtmlxEvent(window,"load",function(){
     myTabbar.addTab("jil","{{ "JIL" | trans }}","100px");
     myTabbar.addTab("events","{{ "Events" | trans }}","100px");
     myTabbar.addTab("agent","{{ "Agent" | trans }}","100px");
+    myTabbar.addTab("note","{{ "Note" | trans }}","100px");
     
     myTabbar.tabs("output_I5").hide();
     
@@ -211,7 +212,7 @@ dhtmlxEvent(window,"load",function(){
     autorefresh = setInterval( "GridRefresh()",update*1000);
     
     function onShowMenu(rowId, celInd, grid) {
-        var job = grid.cells(rowId, 1 ).getValue();
+        var job = grid.cells(rowId, 0 ).getValue();
      return true;
     }
 
@@ -219,12 +220,15 @@ dhtmlxEvent(window,"load",function(){
         var data = myGrid.contextID.split("_");
         var rId = data[0];
         var cInd = data[1];
-        job = myGrid.cells(rId,1).getValue();
+        job = myGrid.cells(rId,0).getValue();
         switch (menuitemId) {
            case "job_history":
                 document.location.href = "{{ url('arii_ATS_job_history') }}?joid="+rId;
             break;
-            default:
+           case "job_note":
+               EditNote(job,myGrid.cells(rId,2).getValue());
+            break;
+             default:
                 alert("inconnu ! "+menuitemId);    
         }
         return true;
@@ -265,7 +269,7 @@ function GridRefresh() {
 
 function JobDetail(id) {
     
-    job = myGrid.cells(id, 1 ).getValue(); 
+    job = myGrid.cells(id, 0 ).getValue(); 
     status = myGrid.cells(id, 2 ).getValue(); 
     type = myGrid.cells(id, 3 ).getValue(); 
     
@@ -385,7 +389,8 @@ function JobDetail(id) {
             myTabbar.cells("events").attachURL("{{ url('arii_ATS_autorep') }}?options=-d -l0&job="+job);            
             var url = "{{ url('arii_ATS_generate') }}";
             url += "?id="+id;
-            myTabbar.cells("schema").attachURL(url);            
+            myTabbar.cells("schema").attachURL(url);
+            myTabbar.cells("note").attachURL("{{ url('arii_ATS_note') }}?job="+job);
             globalLayout.cells("c").progressOff();
         });
     });
@@ -397,6 +402,115 @@ function LogDetail(id) {
     status = this.cells(id, 2 ).getValue(); 
     myOutI5.cells("b").progressOn();
     myOutI5.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-d "+file+":"+num+"&job="+job);
+}
+
+function EditNote(jobname,description) {
+    var dhxWins = new dhtmlXWindows();
+    var largeur = 800;
+    var myWin = dhxWins.createWindow( "note" ,  (document.body.offsetWidth-largeur)/2, 50, largeur, 700 );
+    myWin.setText("{{ "Note" | trans }} "+jobname);
+   
+    var formData = [
+        {   type: 'settings', 
+            labelWidth: 100, 
+            inputWidth: largeur - 200, 
+            labelAlign: "right", 
+            position: "label-left" },
+        { type: "input", name: "ID"},
+        { type: "input",
+          name: "JOB_NAME",
+          label: "{{ "Name"| trans }}",
+          value: jobname,
+          required: true
+        },
+        { type: "input",
+          name: "JOB_DESC",
+          label: "{{ "Description"| trans }}",
+          value: description,
+          required: true
+        },
+        { type: "hidden",
+          name: "JOB_TYPE",
+          value: 'JOB'
+        },
+        {
+          type: "select",
+          name: "NOTE_TYPE",
+          label: "{{ "Note type" | trans}}",
+          options:[
+                {
+                    text: "{{ "New note" | trans }}", 
+                    value: "note",
+                    list: [ 
+                        {   type: 'checkbox', 
+                            name: 'IS_TEMPLATE',
+                            label: "{{ "Is a template"| trans }}", 
+                            position: "label-left",
+                            labelAlign: "right"
+                        },
+                        {   type: 'editor', 
+                            name: 'JOB_NOTE',
+                            label: "{{ "Note"| trans }}", 
+                            inputHeight:400
+                        }
+                    ]
+                },
+                {   
+                    text: "{{ "Use template" | trans }}", 
+                    value: "template",
+                    list: [ 
+                        {   type: 'select', 
+                            name: 'TEMPLATE_ID',
+                            label: "{{ "Template"| trans }}",
+                            connector: "{{ url('xml_ATS_note_templates') }}?job="+job
+                        }                
+                    ]                        
+                }
+            ]
+        }
+    ];
+
+    myFormToolbar = myWin.attachToolbar();
+    myFormToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myFormToolbar.loadStruct("{{ url('xml_ATS_note_toolbar') }}", function () {
+    });
+    
+    myFormWin = myWin.attachForm(formData);
+    alert("{{ url('xml_ATS_note_form') }}?job="+jobname);
+    myFormWin.load("{{ url('xml_ATS_note_form') }}?job="+jobname);
+    myFormToolbar.attachEvent("onClick",function (itemid) {
+         switch (itemid) {
+            case 'save':
+                myWin.progressOn();
+                myFormWin.send("{{ url('xml_ATS_note_save') }}","POST",function(loader,response){
+                    if(response === 'success')
+                    {
+                        myWin.close();
+                    }
+                    else {
+                        myWin.attachHTMLString( loader.xmlDoc.responseText );
+                    }
+                });
+                break;
+            case 'clear':
+                dhtmlx.confirm({
+                title: "{{ "Delete" | trans }}",
+                type: "confirm-error",
+                text: "{{ "Are you sure ?" | trans }}",
+                callback: function(answer) { 
+                    if (answer) {  
+                        workspace.clear();
+                    }
+                },
+                cancel: "{{ "No" | trans }}",
+                ok: "{{ "Yes" | trans }}" });
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+    
 }
 </script>
 {% endblock %}

@@ -46,7 +46,7 @@ class JobsController extends Controller
         if ($request->query->get( 'only_warning' ))
             $only_warning = $request->query->get( 'only_warning' );
         if ($request->query->get( 'box_only' ))
-            $only_warning = $request->query->get( 'box_only' );
+            $box_only = $request->query->get( 'box_only' );
 
         $state = $this->container->get('arii_ats.state');
         $Job = $state->Jobs($box,$only_warning,$box_only);
@@ -66,8 +66,9 @@ class JobsController extends Controller
             $status = $autosys->Status($j['STATUS']);
             list($bgcolor,$color) = $autosys->ColorStatus($status);
             $list .= '<row id="'.$j['JOID'].'" style="background-color: '.$bgcolor.'">';
-            $list .= '<cell>'.$j['BOX_NAME'].'</cell>';               
             $list .= '<cell>'.$j['JOB_NAME'].'</cell>';               
+            $list .= '<cell>'.$j['BOX_NAME'].'</cell>';               
+            $list .= '<cell>'.$j['DESCRIPTION'].'</cell>';               
             $list .= '<cell>'.$status.'</cell>';               
             $list .= '<cell>'.$autosys->JobType($j['JOB_TYPE']).'</cell>';               
 
@@ -93,31 +94,31 @@ class JobsController extends Controller
         return $response;        
     }
 
-    public function pieAction($only_warning=0) {
+    public function pieAction($only_warning=0,$box_only=1) {
         $request = Request::createFromGlobals();
+        if ($request->query->get( 'box' ))
+            $box = $request->query->get( 'box' );      
+        else 
+            $box = '';
         if ($request->query->get( 'only_warning' ))
             $only_warning = $request->query->get( 'only_warning' );
-        
-        $dhtmlx = $this->container->get('arii_core.dhtmlx');
-        $data = $dhtmlx->Connector('data');
-        // Jobs
-        $Fields = array( '{job_name}'   => 'JOB_NAME' );
-        
-        $sql = $this->container->get('arii_core.sql');
-        $qry = $sql->Select(array('STATUS','count(JOID) as NB'))
-                .$sql->From(array('UJO_JOBST'))
-                .$sql->Where(array('{job_name}' => 'JOB_NAME', '{start_timestamp}'=> 'LAST_START'))                
-                .$sql->GroupBy(array('STATUS'));
+        if ($request->query->get( 'box_only' ))
+            $box_only = $request->query->get( 'box_only' );
 
-        $res = $data->sql->query($qry);
+        $state = $this->container->get('arii_ats.state');
+        $Job = $state->Jobs($box,$only_warning,$box_only);
+        
         $autosys = $this->container->get('arii_ats.autosys');
-        while ($line = $data->sql->get_next($res))
-        {                        
-            $status = $autosys->Status($line['STATUS']);
-            if (($only_warning==1) and (($line['STATUS']==4) or ($line['STATUS']==8)))
-                $Status[$status] = 0;
-            else 
-                $Status[$status] = $line['NB'];
+        foreach ($Job as $k=>$j) {
+            $status = $autosys->Status($j['STATUS']);
+            if (($only_warning==1) and (($j['STATUS']==4) or ($j['STATUS']==8))) {
+            }
+            else {
+                if (isset($Status[$status])) 
+                    $Status[$status]++;
+                else 
+                    $Status[$status] = 1;
+            }
         }
         $pie = '<data>';
         foreach (array('SUCCESS','FAILURE','TERMINATED','RUNNING','INACTIVE','ACTIVATED','WAIT_REPLY','JOB_ON_ICE','JOB_ON_HOLD','JOB_ON_NOEXEC') as $s) {

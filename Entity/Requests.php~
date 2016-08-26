@@ -870,4 +870,50 @@ class Requests
     {
         return $this->trigger_file_watcher;
     }
+
+    /**
+     * Set criticity
+     *
+     * @param integer $criticity
+     * @return Requests
+     */
+    public function setCriticity($criticity)
+    {
+        $this->criticity = $criticity;
+
+        return $this;
+    }
+
+    /**
+     * Get criticity
+     *
+     * @return integer 
+     */
+    public function getCriticity()
+    {
+        return $this->criticity;
+    }
+
+    /**
+     * Set max_run_time
+     *
+     * @param integer $maxRunTime
+     * @return Requests
+     */
+    public function setMaxRunTime($maxRunTime)
+    {
+        $this->max_run_time = $maxRunTime;
+
+        return $this;
+    }
+
+    /**
+     * Get max_run_time
+     *
+     * @return integer 
+     */
+    public function getMaxRunTime()
+    {
+        return $this->max_run_time;
+    }
 }

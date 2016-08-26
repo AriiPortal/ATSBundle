@@ -521,3 +521,34 @@ xml_ATS_form_data:
 arii_ATS_form_save:
     pattern:  /public/form/save.html
     defaults: { _controller: AriiATSBundle:Form:save }
+
+# --------------------------------------------------------------------------
+# Note
+# --------------------------------------------------------------------------
+arii_ATS_note:
+    pattern:  /note/show.html
+    defaults: { _controller: AriiATSBundle:Note:show }
+
+xml_ATS_note_toolbar:
+    pattern:  /note/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Note:toolbar }
+
+xml_ATS_note_save:
+    pattern:  /note/save.xml
+    defaults: { _controller: AriiATSBundle:Note:save }
+
+xml_ATS_note_form:
+    pattern:  /note/form.xml
+    defaults: { _controller: AriiATSBundle:Note:form }
+
+xml_ATS_note_load:
+    pattern:  /note/load.xml
+    defaults: { _controller: AriiATSBundle:Note:load }
+
+xml_ATS_note_delete:
+    pattern:  /note/delete.xml
+    defaults: { _controller: AriiATSBundle:Note:delete }
+    
+xml_ATS_note_templates:
+    pattern:  /note/templates.xml
+    defaults: { _controller: AriiATSBundle:Note:templates }
