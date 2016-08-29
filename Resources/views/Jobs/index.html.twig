@@ -12,7 +12,7 @@ var status;
 
 dhtmlxEvent(window,"load",function(){     
     globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
-    globalLayout.cells("a").setWidth(350); 
+    globalLayout.cells("a").setWidth(400); 
     globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").hideHeader(); 
     globalLayout.cells("c").setText("{{ "Detail" | trans }}"); 
@@ -26,12 +26,31 @@ dhtmlxEvent(window,"load",function(){
     myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
     myRibbon.attachEvent("onStateChange", StateRibbon );
     myRibbon.attachEvent("onClick", ClickRibbon );
-
+/*
     myTab = globalLayout.cells("a").attachTabbar();
     myTab.addTab("b1","{{ "Status" | trans }}","100px", null, true);
     myTab.addTab("b2","{{ "Folders" | trans }}","100px");
-
-    myDonut =  myTab.cells("b1").attachChart({
+*/
+    myJobLayout = globalLayout.cells("a").attachLayout("2E");
+    myJobLayout.cells("a").hideHeader();
+    myAlarms = myJobLayout.cells("a").attachGrid();
+    myAlarms.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myAlarms.setHeader("{{ "Time" | trans }},{{ "Type" | trans }},{{ "Status" | trans }},{{ "Job" | trans }}");
+    myAlarms.attachHeader("#text_filter,#select_filter,#text_filter,#text_filter");
+    myAlarms.setInitWidths("140,0,0,*");
+    myAlarms.setColAlign("right,center,left,left");
+    myAlarms.setColTypes("ro,ro,ro,ro");
+    myAlarms.setColSorting("str,str,str,str");
+    myAlarms.enableAlterCss("","");
+    myAlarms.init();
+    myJobLayout.cells("a").progressOn();
+    myAlarms.load( "{{ url('xml_ATS_alarms_grid') }}?only_open=1", function () {
+        myJobLayout.cells("a").progressOff();
+    });
+    
+    myJobLayout.cells("b").hideHeader();
+    myJobLayout.cells("b").setHeight(350);
+    myDonut =  myJobLayout.cells("b").attachChart({
             view:"donut",
             container:"pie_chart_container",
             value:"#JOBS#",
@@ -48,30 +67,38 @@ dhtmlxEvent(window,"load",function(){
                 align:"left"
             } 
     });
-    myDonut.load(  "{{ url('xml_ATS_jobs_pie') }}?box_more="+box+"&only_warning="+only_warning );
+    myJobLayout.cells("b").progressOn();
+    myDonut.load(  "{{ url('xml_ATS_jobs_pie') }}?box_more="+box+"&only_warning="+only_warning, function () {
+        myJobLayout.cells("b").progressOff();
+    } );
     
+/*
     myTree = myTab.cells("b2").attachTree();
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
-    
+*/    
     myGridMenu = new dhtmlXMenuObject(null);
     myGridMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/wa/') }}" );
     myGridMenu.renderAsContextMenu();
     myGridMenu.loadStruct("{{ url('xml_ATS_jobs_grid_menu') }}");
           
+    globalLayout.cells("b").hideHeader();
     myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
     myGrid.setHeader("{{ "Job" | trans }},{{ "Folder" | trans }},{{ "Description" | trans }},{{ "Status" | trans }},{{ "Type" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
     myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
     myGrid.setInitWidths("*,*,*,120,90,160,160,140,80");
-    myGrid.setColAlign("left,left,,leftcenter,center,right,right,right,right");
+    myGrid.setColAlign("left,left,left,center,center,right,right,right,right");
     myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro,ro");
     myGrid.setColSorting("str,str,str,str,str,date,date,str,int");
     myGrid.enableAlterCss("","");
     myGrid.enableContextMenu(myGridMenu);
     myGrid.attachEvent("onBeforeContextMenu", onShowMenu );
     myGrid.init();
-    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?history="+max_history+"&box_more="+box+"&only_warning="+only_warning);
+    globalLayout.cells("b").progressOn();
+    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?history="+max_history+"&box_more="+box+"&only_warning="+only_warning, function() {
+        globalLayout.cells("b").progressOff();
+    });
     myGrid.attachEvent("onRowDblClicked",JobDetail );
     myGrid.setColumnHidden(1,true);
     myGrid.setColumnHidden(2,true);
@@ -221,9 +248,8 @@ dhtmlxEvent(window,"load",function(){
     });
     
     // Premier chargement avant le smart rendering
-    myTree.load( "{{ url('xml_ATS_jobs_tree') }}?only_warning="+only_warning );
-    autorefresh = setInterval( "GridRefresh()",update*1000);
-    
+//    myTree.load( "{{ url('xml_ATS_jobs_tree') }}?only_warning="+only_warning );
+
     function onShowMenu(rowId, celInd, grid) {
         var job = grid.cells(rowId, 0 ).getValue();
      return true;
@@ -248,6 +274,8 @@ dhtmlxEvent(window,"load",function(){
     });
 
     globalLayout.cells("c").collapse();
+    autorefresh = setInterval( "GridRefresh()",update*1000);
+    
 
 });
 
@@ -274,10 +302,13 @@ function GridRefresh() {
         myGrid.refreshFilters();
         myGrid.filterByAll();
         myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?box_more="+box+"&only_warning="+only_warning, function () {
-            myDonut.refresh();                
+          myDonut.refresh();                
             globalLayout.progressOff();
             globalLayout.cells("a").progressOff();
-            myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_tree') }}?only_warning="+only_warning);                    
+//            myTree.smartRefreshBranch(0,"{{ url('xml_ATS_jobs_tree') }}?only_warning="+only_warning);                    
+            myAlarms.load( "{{ url('xml_ATS_alarms_grid') }}?only_open=1" , function () {
+                myJobLayout.cells("a").progressOff();
+            });
         });
     });    
 }

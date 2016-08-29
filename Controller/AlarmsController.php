@@ -35,11 +35,11 @@ class AlarmsController extends Controller
         return $this->render('AriiATSBundle:Alarms:grid_menu.xml.twig',array(), $response );
     }
 
-    public function gridAction($only_warning=0)
+    public function gridAction($only_open=0)
     {
         $request = Request::createFromGlobals();
-        if ($request->query->get( 'only_warning' ))
-            $only_warning=$request->query->get( 'only_warning');
+        if ($request->query->get( 'only_open' )!='')
+            $only_open=$request->query->get( 'only_open');
 
         $sql = $this->container->get('arii_core.sql');
         
@@ -69,7 +69,7 @@ class AlarmsController extends Controller
         $date = $this->container->get('arii_core.date');
         while ($line = $data->sql->get_next($res))
         {
-            if ($only_warning and ($line['STATE']==45)) continue;
+            if ($only_open and ($line['STATE']==45)) continue;
             
             $list .= '<row id="'.$line['EOID'].'"';            
             if ($line['STATE']==43) {

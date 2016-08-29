@@ -321,7 +321,7 @@ bgcolor=white
         // Complement
         foreach ($Def as $k=>$v) {
             if (isset($Infos[$k]) and (trim($Infos[$k])!=''))
-                $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/'.$v.'.png"/></TD><TD ALIGN="LEFT">'.$Infos[$k].'</TD></TR>';            
+                $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/'.$v.'.png"/></TD><TD ALIGN="LEFT">'. htmlentities($Infos[$k]).'</TD></TR>';            
         }
         
         $label .= '</TABLE>';        
