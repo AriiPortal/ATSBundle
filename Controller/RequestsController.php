@@ -84,28 +84,27 @@ class RequestsController extends Controller
         return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value));
     }
 
-    public function resultAction($output='html')
+    public function resultAction($output='html',$dbname='',$req='')
     {
         $lang = $this->getRequest()->getLocale();
         $request = Request::createFromGlobals();
-        if ($request->query->get( 'request' ))
+        if ($request->query->get( 'request' )!='')
             $req=$request->query->get( 'request');
-        else {
-            print "Request ?!";
-            exit();
-        }            
+
         if ($request->query->get( 'output' ))
             $output=$request->query->get( 'output');
-            
-        // cas de l'appel direct
-        if ($request->query->get( 'dbname' )) {
-            $instance=$request->query->get( 'dbname');
 
+        // cas de l'appel direct
+        if ($request->query->get( 'dbname' )!='')
+            $dbname=$request->query->get( 'dbname');
+
+        if ($dbname!='') {
             $session = $this->container->get('arii_core.session');
-            $engine = $session->setDatabaseByName($instance,'waae');            
+            $engine = $session->setDatabaseByName($dbname,'waae');    
         }
+       
         
-        if (!isset($req)) return $this->summaryAction();
+        if (isset($req)=='') return $this->summaryAction();
         
         $page = $this->getBaseDir().'/'.$req.'.yml';
         $content = file_get_contents($page);
@@ -142,9 +141,9 @@ class RequestsController extends Controller
         // bibliothèques
         $ats  = $this->container->get('arii_ats.autosys'); 
         $date = $this->container->get('arii_core.date');   
+        $r = array();
         while ($line = $data->sql->get_next($res))
         {
-            $r = array();
             $status = 'unknown';
             foreach ($value['columns'] as $h) {
                 if (isset($line[$h])) {
@@ -188,9 +187,15 @@ class RequestsController extends Controller
             $value['lines'][$nb]['status'] = $status;
          }
         $value['count'] = $nb;
-
+        
         if ($output=='html')
             return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
+        elseif ($output=='nagios') {
+            $response = new Response();
+            $response->setStatusCode( '403' );
+            $response->setContent( implode("\n",$r));
+            return $response;                        
+        }
         
 /*        
         $twig = file_get_contents('../src/Arii/ATSBundle/Resources/views/Requests/html2pdf.pdf.twig');
