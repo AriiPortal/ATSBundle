@@ -1,0 +1,81 @@
+{% extends "AriiCoreBundle::base.html.twig" %}
+{% block head %}
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+<!-- Optional theme -->
+<link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-theme.min.css') }}">
+<!-- Latest compiled and minified JavaScript -->
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('bundles/ariiats/js/jquery.tablesorter.min.js') }}"></script>
+<title>{{ Box.job_name }}</title>
+{% endblock %} 
+{% block body %}
+<body>
+<div class="container-fluid">
+<div class="jumbotron">
+<img style="float: right;" src="{{ asset('logo.png') }}"/>
+  <h1>{{ Box.job_name }}</h1>
+  <p>{{ Box.description }}</p>
+{% if Box.as_applic != '' %}
+  <button type="button" class="btn btn-primary">{{ Box.as_applic }}</button>
+{% endif %}
+{% if Box.as_group != '' %}
+  <button type="button" class="btn btn-info">{{ Box.as_group }}</button>
+{% endif %}
+</div>
+
+{% if Box.date_conditions==1 %}
+<h2>{{ "Schedule" | trans }}</h2>
+
+<table class="table table-striped table-bordered table-condensed">
+{% if Box.run_calendar != '' %}    
+    <tr><th class="col-md-2">{{ "Run calendar" | trans }}</th><td class="col-md-8">{{ Box.run_calendar }}</td></tr>
+{%endif %}
+{% if Box.days_of_week != '' %}    
+    <tr><th class="col-md-2">{{ "Days of week" | trans }}</th><td class="col-md-8">{{ Box.days_of_week }}</td></tr>
+{%endif %}
+{% if Box.start_times != '' %}    
+    <tr><th class="col-md-2">{{ "Start times" | trans }}</th><td class="col-md-8">{{ Box.start_times }}</td></tr>
+{%endif %}
+{% if Box.start_mins != '' %}    
+    <tr><th class="col-md-2">{{ "Start minutes" | trans }}</th><td class="col-md-8">{{ Box.start_mins }}</td></tr>
+{%endif %}
+</table>
+{% else %}
+<h2><strike>{{ "Schedule" | trans }}</strike></h2>
+{% endif %}
+
+{% if Box.has_condition==1 %}
+<h2>{{ "Conditions" | trans }}</h2>
+{% else %}
+<h2><strike>{{ "Conditions" | trans }}</strike></h2>
+{% endif %}
+    
+<h2>{{ "Diagram" | trans }}</h2>
+<img src="{{ url('arii_ATS_generate') }}?id={{ Box.joid }}&output=png&fields=MACHINE,PROFILE" alt="{{ Box.job_name }}" class="img-responsive">
+
+<h2>{{ "Jobs" | trans }}</h2>
+
+{% for Step,Job in Jobs %}
+<h3>{{ Job.job_name }}</h3>
+{% if Job.description is not empty %}
+<blockquote>
+<p>{{ Job.description }}</p>
+</blockquote>
+{% endif %}
+{% if Job.NOTE is not empty %}
+<div class="alert alert-success" role="alert">{{ Job.NOTE | raw }}</div>
+{% endif %}
+{% if Job.TEMPLATE is not empty %}
+<div class="alert alert-info" role="alert">{{ Job.TEMPLATE | raw }}</div>
+{% endif %}
+<table class="table table-striped table-bordered table-condensed">
+<tr><th class="col-md-2">{{ "Run machine" | trans }}</th><td class="col-md-8">{{ Job.run_machine }}</td></tr>
+<tr><th class="col-md-2">{{ "Owner" | trans }}</th><td class="col-md-8">{{ Job.owner }}</td></tr>
+<tr><th class="col-md-2">{{ "Command" | trans }}</th><td class="col-md-8">{{ Job.command }}</td></tr>
+</table>
+{% endfor %}
+</script>
+</body>
+{% endblock %}

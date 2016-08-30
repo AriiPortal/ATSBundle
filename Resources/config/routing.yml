@@ -135,6 +135,12 @@ xml_ATS_boxes_barchart:
     pattern:  /boxes/barchart.xml
     defaults: { _controller: AriiATSBundle:Boxes:barchart }
 
+# --------------------------------------------------------------------------
+# BOX
+# --------------------------------------------------------------------------
+html_ATS_box_doc:
+    pattern:  /box/doc.html
+    defaults: { _controller: AriiATSBundle:Box:doc }
 
 # --------------------------------------------------------------------------
 # RUNTIMES

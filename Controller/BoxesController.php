@@ -36,20 +36,18 @@ class BoxesController extends Controller
         return $this->render('AriiATSBundle:Boxes:grid_menu.xml.twig',array(), $response );
     }
 
-    public function statusAction($only_warning=0,$job_only=0)
+    public function statusAction($box='',$only_warning=0,$job=0)
     {
         $request = Request::createFromGlobals();
-        if ($request->query->get( 'box' ))
+        if ($request->query->get( 'box' )!='')
             $box = $request->query->get( 'box' );      
-        else 
-            $box = '';
         if ($request->query->get( 'only_warning' ))
             $only_warning = $request->query->get( 'only_warning' );
         else
             $only_warning = 0;
 
         $state = $this->container->get('arii_ats.state');
-        $Job = $state->Jobs($box,$only_warning);
+        $Job = $state->Boxes($box,$only_warning,true);
                 
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
@@ -62,28 +60,33 @@ class BoxesController extends Controller
         </head>';
         
         $autosys = $this->container->get('arii_ats.autosys');
+        $date = $this->container->get('arii_core.date');
         foreach($Job as $k=>$j) {
             $status = $autosys->Status($j['STATUS']);
             list($bgcolor,$color) = $autosys->ColorStatus($status);
-            $list .= '<row id="'.$j['JOID'].'" style="background-color: '.$bgcolor.'">';
-            $list .= '<cell>'.$j['BOX_NAME'].'</cell>';               
-            $list .= '<cell>'.$j['JOB_NAME'].'</cell>';               
+            $list .= '<row id="'.$j['JOID'].'" bgColor="'.$bgcolor.'" style="color: '.$color.'">';
+            $list .= '<cell>'.$j['BOX_NAME'].'</cell>';             
             $list .= '<cell>'.$status.'</cell>';               
-            $list .= '<cell>'.$autosys->JobType($j['JOB_TYPE']).'</cell>';               
+            $list .= '<cell>'.$date->Time2Local($j['LAST_START'],'VA1',true).'</cell>';               
+            $list .= '<cell>'.$date->Time2Local($j['LAST_END'],'VA1',true).'</cell>';               
 
-            $date = $this->container->get('arii_core.date');
-            foreach (array('LAST_START','LAST_END') as $f ) {
-                $list .= '<cell>'.$date->Time2Local($j[$f],'VA1',true).'</cell>';               
-            }
             if ($j['LAST_END']>0)
                 $list .= '<cell>'.($j['LAST_END']-$j['LAST_START']).'</cell>';               
             else
                 $list .= '<cell/>';  
             
-            if ($j['EXIT_CODE']!='-656')
-                $list .= '<cell>'.$j['EXIT_CODE'].'</cell>';               
-            else 
-                $list .= '<cell/>';  
+            // job
+            if ($j['JOB_NAME']!='') {
+                $jobstatus = $autosys->Status($j['JOB_STATUS']);
+                list($bgcolor,$color) = $autosys->ColorStatus($jobstatus);
+                $list .= '<cell bgColor="'.$bgcolor.'" style="color:'.$color.'">'.$j['JOB_NAME'].'</cell>';      
+                $list .= '<cell bgColor="'.$bgcolor.'" style="color:'.$color.'">'.$jobstatus.'</cell>';               
+                $list .= '<cell bgColor="'.$bgcolor.'" style="color:'.$color.'">'.$date->Time2Local($j['JOB_START'],'VA1',true).'</cell>';               
+            }
+            else {
+                $list .= '<cell/><cell/><cell/>';
+            }
+            
             $list .= '<cell>'.$j['AS_APPLIC'].'</cell>';               
             $list .= '<cell>'.$j['AS_GROUP'].'</cell>';               
             $list .= '</row>';
@@ -95,35 +98,30 @@ class BoxesController extends Controller
 
     public function pieAction($only_warning=0) {
         $request = Request::createFromGlobals();
-        if ($request->query->get( 'only_warning' ))
+        if ($request->query->get( 'box' ))
+            $box = $request->query->get( 'box' );      
+        else 
+            $box = '';
+        if ($request->query->get( 'only_warning' )!='')
             $only_warning = $request->query->get( 'only_warning' );
-        
-        $dhtmlx = $this->container->get('arii_core.dhtmlx');
-        $data = $dhtmlx->Connector('data');
-        // Jobs
-        $Fields = array( '{job_name}'   => 'JOB_NAME' );
-        
-        $sql = $this->container->get('arii_core.sql');
-        $qry = $sql->Select(array('STATUS','count(JOID) as NB'))
-                .$sql->From(array('UJO_JOBST'))
-                .$sql->Where(array('{job_name}' => 'JOB_NAME', '{start_timestamp}'=> 'LAST_START'))                
-                .$sql->GroupBy(array('STATUS'));
 
-        $res = $data->sql->query($qry);
+        $state = $this->container->get('arii_ats.state');
+        $Job = $state->Boxes($box,$only_warning);
+
         $autosys = $this->container->get('arii_ats.autosys');
-        while ($line = $data->sql->get_next($res))
-        {                        
-            $status = $autosys->Status($line['STATUS']);
-            if (($only_warning==1) and ($line['STATUS']==4))
-                $Status[$status] = 0;
+        foreach ($Job as $k=>$j) {
+            $status = $autosys->Status($j['STATUS']);
+            if (isset($Status[$status])) 
+                $Status[$status]++;
             else 
-                $Status[$status] = $line['NB'];
+                $Status[$status] = 1;
         }
         $pie = '<data>';
-        foreach (array('SUCCESS','FAILURE','TERMINATED','RUNNING','INACTIVE','ACTIVATED','WAIT_REPLY','JOB_ON_ICE','JOB_ON_HOLD','JOB_ON_NOEXEC') as $s) {
+        foreach (array('SUCCESS','FAILURE','TERMINATED','RUNNING','INACTIVE','ACTIVATED','WAIT_REPLY','ON_ICE','ON_HOLD','ON_NOEXEC') as $s) {
             list($bgcolor,$color) = $autosys->ColorStatus($s);
-            if (isset($Status[$s]))
-                $pie .= '<item id="'.$s.'"><STATUS>'.$s.'</STATUS><JOBS>'.$Status[$s].'</JOBS><COLOR>'.$bgcolor.'</COLOR></item>';
+            if (!isset($Status[$s])) 
+                $Status[$s]=0;
+            $pie .= '<item id="'.$s.'"><STATUS>'.$s.'</STATUS><JOBS>'.$Status[$s].'</JOBS><COLOR>'.$bgcolor.'</COLOR></item>';
         }
         $pie .= '</data>';
         $response = new Response();
@@ -223,5 +221,5 @@ class BoxesController extends Controller
         $response->setContent( $bar );
         return $response;
     }
-
+    
 }

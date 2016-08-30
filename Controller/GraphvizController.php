@@ -4,12 +4,12 @@ namespace Arii\ATSBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class GraphvizController extends Controller
 {
-    private $graphviz_dot;
-    private $config;
     private $images_path;
+    private $images = '/bundles/ariicore/images/wa';
     private $Color = array(
         's' => 'green',
         'f' => 'red',
@@ -20,12 +20,31 @@ class GraphvizController extends Controller
         'B' => 'black'
     );
     
-    public function generateAction($output = 'svg',$level=1)
+    public function generateAction($output = 'svg',$level=1, 
+            $Show = array(            
+            'BOX_NAME',
+            'COMMAND',
+            'STD_IN_FILE',
+            'STD_OUT_FILE',
+            'STD_ERR_FILE',
+            'DAYS_OF_WEEK',
+            'RUN_CALENDAR',
+            'EXCLUDE_CALENDAR',
+            'START_TIMES',
+            'START_MINS',
+            'RUN_WINDOWS',
+            'LAST_START',
+            'LAST_END',
+            'OWNER',
+            'RUN_MACHINE',
+            'NEXT_START',
+            'PROFILE'
+        ) 
+    )
     {
         $request = Request::createFromGlobals();
         $return = 0;
 
-        set_time_limit(120);
         $request = Request::createFromGlobals();
         $joid = $request->query->get( 'id' );
 
@@ -33,44 +52,21 @@ class GraphvizController extends Controller
             $output = $request->query->get( 'output' );
         if ($request->query->get( 'level' ) !='') 
             $level = $request->query->get( 'level' );
+        if ($request->query->get( 'fields' ) !='') 
+            $Show = explode(',',$request->query->get( 'fields' ));
         
-        // Localisation des images 
-        $images = '/bundles/ariicore/images/wa';
-        $this->images_path = str_replace('\\','/',$this->get('kernel')->getRootDir()).'/../web'.$images;
-        $images_url = $this->container->get('templating.helper.assets')->getUrl($images);
-        
-        $session = $this->container->get('arii_core.session');
-        $this->graphviz_dot = $session->get('graphviz_dot');
-        
-        $descriptorspec = array(
-            0 => array("pipe", "r"),  // // stdin est un pipe où le processus va lire
-            1 => array("pipe", "w"),  // stdout est un pipe où le processus va écrire
-            2 => array("pipe", "w") // stderr est un fichier
-         );
-
-        $gvz_cmd = '"'.$this->graphviz_dot.'" -T '.$output;       
-        $process = proc_open($gvz_cmd, $descriptorspec, $pipes);
-        
-        $splines = 'polyline';
-        $rankdir = 'TB';
-        
-        $digraph = "digraph ATS {
-fontname=arial 
-fontsize=10
-splines=$splines
-randkir=$rankdir
-node [shape=plaintext,fontname=arial,fontsize=10]
-edge [shape=plaintext,fontname=arial,fontsize=10,decorate=true,compound=true]
-bgcolor=white
-";
         $autosys = $this->container->get('arii_ats.autosys');
         $date = $this->container->get('arii_core.date');        
         
+        // Images
+        $this->images_path = str_replace('\\','/',$this->container->get('kernel')->getRootDir()).'/../web'.$this->images;
+
         // Jobs concernés
         $sql = $this->container->get('arii_core.sql');                  
         $dhtmlx = $this->container->get('arii_core.dhtmlx');
         $data = $dhtmlx->Connector('data');
 
+        $digraph = '';
         $Ids = array($joid);
         $Infos = $Boxes = $Jobs = array();
         while ($level>0) {
@@ -110,7 +106,7 @@ bgcolor=white
                         $line[$t] = $date->Time2Local($line[$t]);
                     }
                     $Infos[$joid] = $line;
-                    $digraph .= $this->Node($line);
+                    $digraph .= $this->Node($line,$Show);
                     $Done{$joid}=1;
                     
                     array_push($Ids,$joid);
@@ -187,70 +183,27 @@ bgcolor=white
                 }
             }
         }
-        $digraph .= "}";
-
-//        print "<pre>$digraph</pre>";
-//        exit();
-        
-        if ($output == 'dot') {
-            header('Content-type: text/plain');
-            print trim($digraph);
-            exit();
+                
+        $graphviz = $this->container->get('arii_core.graphviz');
+        $out = $graphviz->dot($digraph,$output,$this->images);
+                
+        // reponse du controleur
+        $response = new Response();
+        switch ($output) {
+            case 'svg':
+                $response->headers->set('Content-Type', 'image/svg+xml');
+                break;
+            case 'pdf':
+                $response->headers->set('Content-Type', 'application/pdf');
+                break;
+            case 'dot':
+                $response->headers->set('Content-Type', 'text/plain');
+                break;
+            default:
+                $response->headers->set('Content-Type', 'image/'.$output);
         }
-        
-        if (is_resource($process)) {
-            fwrite($pipes[0], $digraph );
-            fclose($pipes[0]);
-
-            $out = stream_get_contents($pipes[1]);
-            fclose($pipes[1]);
-
-            $err = stream_get_contents($pipes[2]);
-            fclose($pipes[2]);
-
-            $return_value = proc_close($process);
-            if ($return_value != 0) {
-                print "[exit $return_value]<br/>";
-                print "$out<br/>";
-                print "<font color='red'>$err</font>";
-                print "<hr/>";
-                print "<pre>$digraph</pre>";
-                exit();
-            }
-        }  
-        else {
-            print "Ressource !";
-            exit();
-        }
-
-        if ($output == 'svg') {
-            
-            header('Content-type: image/svg+xml');
-            // integration du script svgpan
-            $head = strpos($out,'<g id="graph');
-            if (!$head) {                
-                print $check;
-                print $this->graphviz_dot;
-                exit();
-            }
-            $xml = '<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg style="width: 100%;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
-<script xlink:href="'.$this->container->get('templating.helper.assets')->getUrl("bundles/ariigraphviz/js/SVGPan.js").'"/>
-<g id="viewport"';
-            $xml .= substr($out,$head+14);
-            print str_replace('xlink:href="'.$this->images_path,'xlink:href="'.$images_url,$xml);
-        }
-        elseif ($output == 'pdf') {
-            header('Content-type: application/pdf');
-            print trim($out);
-        }
-        else {
-            header('Content-type: image/'.$output);
-            print trim($out);
-            exit();
-        }
-        exit();
+        $response->setContent($out);
+        return $response;        
     }
 
     private function Boxes($box,&$Boxes,$Infos) {
@@ -287,19 +240,8 @@ bgcolor=white
         $cluster .= "}\n";           
         return $cluster;
     }
-    private function Node($Infos) {
-        $joid = $Infos['JOID'];
-        $label  = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="grey" BGCOLOR="'.$Infos['BGCOLOR'].'">';
-        if ($Infos['JOB_TYPE']==98) {
-            $image = 'box';
-        }
-        else {
-            $image = 'cmd';
-        }
-        $label .= '<TR><TD ROWSPAN="3"><IMG SRC="'.$this->images_path.'/big/'.$image.'.png"/></TD><TD ALIGN="RIGHT">'.$Infos['STATUS_TEXT'].'</TD></TR>';
-        $label .= '<TR><TD><b>'.$Infos['JOB_NAME'].'</b></TD></TR>';
-        $label .= '<TR><TD ALIGN="LEFT">'.$Infos['DESCRIPTION'].'</TD></TR>';
-        $Def = array(            
+    private function Node($Infos,$Fields=array(),$realtime=false) {
+        $Icons = array(            
             'BOX_NAME'      => 'box',
             'COMMAND'       => 'shell',
             'STD_IN_FILE'   => 'file',
@@ -318,10 +260,39 @@ bgcolor=white
             'NEXT_START'    => 'next',
             'PROFILE'       => 'profile',
         );
+        
+        $joid = $Infos['JOID'];
+        if ($realtime) {
+            $label  = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="grey" BGCOLOR="'.$Infos['BGCOLOR'].'">';
+        }
+        else {
+            if ($Infos['JOB_TYPE']==98)
+                $label  = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="grey" BGCOLOR="#AAAAAA">';
+            else
+                $label  = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="grey" BGCOLOR="#DDDDDD">';
+        }
+        if ($Infos['JOB_TYPE']==98) {
+            $image = 'box';
+        }
+        else {
+            $image = 'cmd';
+        }
+        if ($realtime) {
+            $label .= '<TR><TD ROWSPAN="3"><IMG SRC="'.$this->images_path.'/big/'.$image.'.png"/></TD><TD ALIGN="RIGHT">'.$Infos['STATUS_TEXT'].'</TD></TR>';
+        }
+        else {
+            $label .= '<TR><TD ROWSPAN="3"><IMG SRC="'.$this->images_path.'/big/'.$image.'.png"/></TD><TD ALIGN="RIGHT"></TD></TR>';
+        }
+        $label .= '<TR><TD><b>'.$Infos['JOB_NAME'].'</b></TD></TR>';
+        $label .= '<TR><TD ALIGN="LEFT">'.$Infos['DESCRIPTION'].'</TD></TR>';
         // Complement
-        foreach ($Def as $k=>$v) {
-            if (isset($Infos[$k]) and (trim($Infos[$k])!=''))
-                $label .= '<TR><TD><IMG SRC="'.$this->images_path.'/'.$v.'.png"/></TD><TD ALIGN="LEFT">'. htmlentities($Infos[$k]).'</TD></TR>';            
+        foreach ($Fields as $k) {
+            if (isset($Infos[$k]) and (trim($Infos[$k])!='')) {
+                $label .= '<TR><TD>';
+                if (isset($Icons[$k])) {
+                    $label .= '<IMG SRC="'.$this->images_path.'/'.$Icons[$k].'.png"/>';            
+                }
+                $label .= '</TD><TD ALIGN="LEFT">'. htmlentities($Infos[$k]).'</TD></TR>';            }
         }
         
         $label .= '</TABLE>';        

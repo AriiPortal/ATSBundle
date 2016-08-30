@@ -48,7 +48,7 @@ dhtmlxEvent(window,"load",function(){
                 align:"left"
             } 
     });
-    myDonut.load(  "{{ url('xml_ATS_jobs_pie') }}?chained="+chained+"&only_warning="+only_warning );
+    myDonut.load(  "{{ url('xml_ATS_boxes_pie') }}?chained="+chained+"&only_warning="+only_warning );
     
     myTree = myTab.cells("b2").attachTree();
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
@@ -61,23 +61,23 @@ dhtmlxEvent(window,"load",function(){
     myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
-    myGrid.setHeader("{{ "Folder" | trans }},{{ "Job" | trans }},{{ "Status" | trans }},{{ "Type" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Exit" | trans }}");
-    myGrid.attachHeader("#text_filter,#text_filter,#select_filter,#select_filter,#text_filter,#text_filter,#text_filter,#numeric_filter");
-    myGrid.setInitWidths("*,320,120,90,160,160,140,80");
-    myGrid.setColAlign("left,left,center,center,right,right,right,right");
+    myGrid.setHeader("{{ "Box" | trans }},{{ "Status" | trans }},{{ "Start time" | trans }},{{ "End time" | trans }},{{ "Duration" | trans }},{{ "Job" | trans }},{{ "Status" | trans }},{{ "Start time" | trans }}");
+    myGrid.attachHeader("#text_filter,#select_filter,#text_filter,#text_filter,#select_filter,#text_filter,#text_filter,#numeric_filter");
+    myGrid.setInitWidths("*,120,150,150,80,*,120,150");
+    myGrid.setColAlign("left,left,right,right,right,left,left,right");
     myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
-    myGrid.setColSorting("str,str,str,str,date,date,str,int");
+    myGrid.setColSorting("str,str,date,date,int,str,str,date");
     myGrid.enableAlterCss("","");
     myGrid.enableContextMenu(myGridMenu);
     myGrid.attachEvent("onBeforeContextMenu", onShowMenu );
     myGrid.init();
-    myGrid.load( "{{ url('xml_ATS_jobs_grid') }}?history="+max_history+"&chained="+chained+"&only_warning="+only_warning);
+    myGrid.load( "{{ url('xml_ATS_boxes_grid') }}?history="+max_history+"&chained="+chained+"&only_warning="+only_warning);
     myGrid.attachEvent("onRowDblClicked",JobDetail );
 
     myDonut.attachEvent("onItemClick",function(id, value){
         status = id;
-        myGrid.filterBy(2, status);  
-        myGrid.getFilterElement(2).value = status;
+        myGrid.filterBy(1, status);  
+        myGrid.getFilterElement(1).value = status;
     });
 
     myGridToolbar = globalLayout.cells("b").attachToolbar();
@@ -103,16 +103,12 @@ dhtmlxEvent(window,"load",function(){
     globalLayout.cells("c").setHeight(300); 
     myTabbar = globalLayout.cells("c").attachTabbar();
     myTabbar.addTab("job","{{ "Job" | trans }}","100px", null, true);
-    myTabbar.addTab("output","{{ "Output" | trans }}","100px");
-    myTabbar.addTab("output_I5","{{ "Output" | trans }}","100px");
     myTabbar.addTab("history","{{ "History" | trans }}","100px");
     myTabbar.addTab("schema","{{ "Schema" | trans }}","100px");
     myTabbar.addTab("jil","{{ "JIL" | trans }}","100px");
     myTabbar.addTab("events","{{ "Events" | trans }}","100px");
-    myTabbar.addTab("agent","{{ "Agent" | trans }}","100px");
-    
-    myTabbar.tabs("output_I5").hide();
-    
+    myTabbar.addTab("instructions","{{ "Instructions" | trans }}","100px");
+
     myTabbar.attachEvent("onContentLoaded", function(id){
         myTabbar.cells(id).progressOff();
     });
@@ -168,44 +164,6 @@ dhtmlxEvent(window,"load",function(){
     myHistory.enableAlterCss("","");
     myHistory.init();
 
-    myOut = myTabbar.cells("output").attachLayout("2E");
-    myOut.cells("a").setText("{{ "Standard output" | trans }}");
-    myOut.cells("b").setText("{{ "Error output" | trans }}");
-
-    myOutI5 = myTabbar.cells("output_I5").attachLayout("2U");
-    myOutI5.cells("a").setText("{{ "Files" | trans }}");
-    myOutI5.cells("a").setWidth(640);
-    myOutI5.cells("b").setText("{{ "Content" | trans }}");
-    
-    myGridOut = myOutI5.cells("a").attachGrid();
-    myGridOut.selMultiRows = true;
-    myGridOut.setHeader("{{ "File" | trans }},{{ "Num" | trans }},{{ "Status" | trans }},{{ "Size" | trans }},{{ "Date" | trans }},{{ "Time" | trans }},{{ "User data" | trans }},{{ "Queue name" | trans }}");
-    myGridOut.attachHeader("#text_filter,#numeric_filter,#select_filter,#numeric_filter,#numeric_filter,#numeric_filter,#text_filter,#text_filter");
-    myGridOut.setInitWidths("140,60,120,120,90,90,140,140");
-    myGridOut.setColAlign("left,right,left,right,right,right,left,left");
-    myGridOut.setColTypes("ro,ro,ro,ro,ro,ro,ro,ro");
-    myGridOut.setColSorting("str,int,str,int,int,int,str,str");
-    myGridOut.enableAlterCss("","");
-    myGridOut.init();
-    myGridOut.attachEvent("onRowDblClicked",LogDetail );
-    
-    myAgent = myTabbar.cells("agent").attachLayout("2E");
-    myAgent.cells("a").hideHeader();
-    myAgent.cells("b").setText("{{ "Spool" | trans }}");
-    
-    myTabbar.attachEvent("onContentLoaded", function(id){
-        myTabbar.cells(id).progressOff();
-    });
-    myOut.attachEvent("onContentLoaded", function(id){
-        myOut.cells(id).progressOff();
-    });
-    myOutI5.attachEvent("onContentLoaded", function(id){
-        myOutI5.cells(id).progressOff();
-    });
-    myAgent.attachEvent("onContentLoaded", function(id){
-        myAgent.cells(id).progressOff();
-    });
-    
     // Premier chargement avant le smart rendering
     myTree.load( "{{ url('xml_ATS_jobs_tree') }}?only_warning="+only_warning );
     autorefresh = setInterval( "GridRefresh()",update*1000);
@@ -250,11 +208,11 @@ function GridRefresh() {
     seconds = "0" + seconds;
     }
     myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
-    myGrid.load("{{ url('xml_ATS_jobs_grid') }}?time="+seconds+"&history="+max_history+"&chained="+chained+"&only_warning="+only_warning, function(){    
+    myGrid.load("{{ url('xml_ATS_boxes_grid') }}?time="+seconds+"&history="+max_history+"&chained="+chained+"&only_warning="+only_warning, function(){    
         globalLayout.cells("b").progressOff();
         myGrid.refreshFilters();
         myGrid.filterByAll();
-        myDonut.load( "{{ url('xml_ATS_jobs_pie') }}?chained="+chained+"&only_warning="+only_warning, function () {
+        myDonut.load( "{{ url('xml_ATS_boxes_pie') }}?chained="+chained+"&only_warning="+only_warning, function () {
             myDonut.refresh();                
             globalLayout.progressOff();
             globalLayout.cells("a").progressOff();
@@ -326,26 +284,6 @@ function JobDetail(id) {
    
     // Infos
     myTabbar.cells("job").progressOn();
-    myTabbar.tabs("agent").hide();               
-    myTabbar.tabs("output").hide();
-    myTabbar.tabs("output_I5").hide();
-    if (type == 'I5') {
-        myTabbar.tabs("output_I5").show();
-        myTabbar.tabs("output_I5").progressOn();
-    }
-    else if (type == 'BOX'){
-        // rien
-    }
-    else {
-        myTabbar.tabs("output").show();
-        myOut.cells("a").progressOn();
-        myOut.cells("b").progressOn();
-        if (status != 'SUCCESS') {
-            myTabbar.tabs("agent").show();
-            myAgent.cells("a").progressOn();
-            myAgent.cells("b").progressOn();
-        }
-    }
     
     myTabbar.cells("schema").progressOn();
     myTabbar.cells("jil").progressOn();
@@ -364,28 +302,10 @@ function JobDetail(id) {
         globalLayout.cells("c").progressOff();
         myHistory.clearAndLoad( "{{ url('xml_ATS_job_history') }}?id="+id, function () {            
             myTabbar.cells("history").progressOff();
-            if (type == 'I5') {
-                myGridOut.load("{{ url('xml_ATS_autosyslog') }}?options=-z&job="+job, function() {
-                    myTabbar.tabs("output_I5").progressOff();
-                });
-            }
-            else if (type == 'BOX'){
-                // rien
-            }
-            else {
-                myOut.cells("a").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tO&job="+job);            
-                myOut.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tE&job="+job);
-                
-                if (status != 'SUCCESS') {
-                    myAgent.cells("a").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tA&job="+job);                            
-                    myAgent.cells("b").attachURL("{{ url('arii_ATS_autosyslog') }}?options=-tS&job="+job);                            
-                }            
-            }
             myTabbar.cells("jil").attachURL("{{ url('arii_ATS_autorep') }}?options=-q -l0&job="+job);
             myTabbar.cells("events").attachURL("{{ url('arii_ATS_autorep') }}?options=-d -l0&job="+job);            
-            var url = "{{ url('arii_ATS_generate') }}";
-            url += "?id="+id;
-            myTabbar.cells("schema").attachURL(url);            
+            myTabbar.cells("schema").attachURL("{{ url('arii_ATS_generate') }}?id="+id);
+            myTabbar.cells("instructions").attachURL("{{ url('html_ATS_box_doc') }}?id="+id);
             globalLayout.cells("c").progressOff();
         });
     });

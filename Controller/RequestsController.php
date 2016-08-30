@@ -192,7 +192,7 @@ class RequestsController extends Controller
             return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
         elseif ($output=='nagios') {
             $response = new Response();
-            $response->setStatusCode( '403' );
+            $response->setStatusCode( '401' );
             $response->setContent( implode("\n",$r));
             return $response;                        
         }
