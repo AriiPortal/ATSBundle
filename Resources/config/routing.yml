@@ -184,6 +184,10 @@ xml_ATS_job_history_chart:
     pattern:  /job/history_chart.xml
     defaults: { _controller: AriiATSBundle:Job:history_chart  }
 
+txt_ATS_job_jil:
+    pattern:  /job/jil.txt
+    defaults: { _controller: AriiATSBundle:Job:jil }
+
 # --------------------------------------------------------------------------
 # EVENTS
 # --------------------------------------------------------------------------

@@ -45,6 +45,35 @@ class JobController extends Controller
         return $this->render('AriiATSBundle:Job:history.html.twig',array('id' => $id, 'type' => $type, 'job' => $job));
     }
 
+    public function jilAction()
+    {
+        $request = Request::createFromGlobals();
+        $id = $request->query->get('id');
+        
+        $sql = $this->container->get('arii_core.sql');                  
+        $qry = $sql->Select(array('*'))
+                .$sql->From(array('UJO_JOB'))
+                .$sql->Where(
+                        array(  'IS_ACTIVE' => 1, 
+                                'JOID' => $id ));
+        
+        $dhtmlx = $this->container->get('arii_core.dhtmlx');
+        $data = $dhtmlx->Connector('data');
+
+        $res = $data->sql->query($qry);
+        $job = $data->sql->get_next($res);
+        
+        $jil = "/* job $id */\n";
+        foreach ($job as $k=>$v) {
+            $jil .= "$k: \"$v\"\n";
+        }
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/plain');
+        $response->setContent($jil);
+        return $response;
+        
+    }
+    
     public function formAction()
     {
         $request = Request::createFromGlobals();

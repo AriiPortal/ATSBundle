@@ -49,19 +49,21 @@ class Notes
      */        
     private $job_note;
     
+    // Forcer un template en cas de conflit ?
     /**
     * @ORM\ManyToOne(targetEntity="Arii\ATSBundle\Entity\Notes")
     * @ORM\JoinColumn(nullable=true)
     */
     private $template;
 
+    // Preciser un template qui ne contient pas de % ?
     /**
      * @var string
      *
      * @ORM\Column(name="is_template", type="boolean" )
      */        
     private $is_template=false;
-    
+   
     /**
      * Get id
      *

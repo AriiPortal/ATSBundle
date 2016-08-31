@@ -56,7 +56,7 @@ class EventsController extends Controller
     [GLOBAL_VALUE] => 
     [WF_JOID] => 1
  */
-    public function gridAction($sens='future')
+    public function gridAction($sens='future',$job='')
     {
         $sql = $this->container->get('arii_core.sql');                  
         $qry = $sql->Select(array('*'))

@@ -483,6 +483,14 @@ function EditNote(jobname,description) {
           name: "JOB_TYPE",
           value: 'JOB'
         },
+        {   type: 'editor', 
+            toolbar: true,
+            iconsPath: "{{ asset('dhtmlx/skins/terrace/imgs/') }}",
+            name: 'JOB_NOTE',
+            label: "{{ "Note"| trans }}", 
+            inputHeight:400
+        }
+/*
         {
           type: "select",
           name: "NOTE_TYPE",
@@ -514,12 +522,13 @@ function EditNote(jobname,description) {
                         {   type: 'select', 
                             name: 'TEMPLATE_ID',
                             label: "{{ "Template"| trans }}",
-                            connector: "{{ url('xml_ATS_note_templates') }}?job="+job
+                            connector: "{ { url('xml_ATS_note_templates') }}?job="+job
                         }                
                     ]                        
                 }
             ]
         }
+*/
     ];
 
     myFormToolbar = myWin.attachToolbar();

@@ -12,4 +12,13 @@ use Doctrine\ORM\EntityRepository;
  */
 class NotesRepository extends EntityRepository
 {
+    public function findByJobName($job) {        
+        // On recherche la doc la plus proche
+        return  $this->createQueryBuilder('o')
+                ->Where(':template LIKE o.job_name') 
+                ->setParameter('template', $job)                  
+               ->getQuery()
+               ->getResult();
+    }
+    
 }

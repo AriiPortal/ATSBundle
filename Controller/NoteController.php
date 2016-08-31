@@ -80,8 +80,8 @@ class NoteController extends Controller
         $job = $request->get('job');
         
         $note = $this->getDoctrine()->getRepository("AriiATSBundle:Notes")->findOneBy(array('job_name'=>$job)); 
-        
-        print $note->getJobNote();
+        if ($note)
+            print $note->getJobNote();
         exit();
     }
 

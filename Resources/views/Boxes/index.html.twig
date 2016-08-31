@@ -15,8 +15,8 @@ dhtmlxEvent(window,"load",function(){
     globalLayout.cells("a").setWidth(350); 
     globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").hideHeader(); 
-    globalLayout.cells("c").hideHeader(); 
-
+    globalLayout.cells("c").setText("{{ "Details" | trans }}"); 
+    
     globalMenu = globalLayout.cells("a").attachMenu();
     globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
     globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
@@ -48,7 +48,10 @@ dhtmlxEvent(window,"load",function(){
                 align:"left"
             } 
     });
-    myDonut.load(  "{{ url('xml_ATS_boxes_pie') }}?chained="+chained+"&only_warning="+only_warning );
+    myTab.cells("b1").progressOn();
+    myDonut.load(  "{{ url('xml_ATS_boxes_pie') }}?chained="+chained+"&only_warning="+only_warning, function() {
+        myTab.cells("b1").progressOff();
+    } );
     
     myTree = myTab.cells("b2").attachTree();
     myTree.setImagesPath("{{ asset('bundles/ariicore/images/tree/') }}");
@@ -71,7 +74,10 @@ dhtmlxEvent(window,"load",function(){
     myGrid.enableContextMenu(myGridMenu);
     myGrid.attachEvent("onBeforeContextMenu", onShowMenu );
     myGrid.init();
-    myGrid.load( "{{ url('xml_ATS_boxes_grid') }}?history="+max_history+"&chained="+chained+"&only_warning="+only_warning);
+    globalLayout.cells("b").progressOn();
+    myGrid.load( "{{ url('xml_ATS_boxes_grid') }}?history="+max_history+"&chained="+chained+"&only_warning="+only_warning, function(){
+        globalLayout.cells("b").progressOff();
+    });
     myGrid.attachEvent("onRowDblClicked",JobDetail );
 
     myDonut.attachEvent("onItemClick",function(id, value){
@@ -105,8 +111,8 @@ dhtmlxEvent(window,"load",function(){
     myTabbar.addTab("job","{{ "Job" | trans }}","100px", null, true);
     myTabbar.addTab("history","{{ "History" | trans }}","100px");
     myTabbar.addTab("schema","{{ "Schema" | trans }}","100px");
-    myTabbar.addTab("jil","{{ "JIL" | trans }}","100px");
-    myTabbar.addTab("events","{{ "Events" | trans }}","100px");
+//    myTabbar.addTab("jil","{{ "JIL" | trans }}","100px");
+//    myTabbar.addTab("events","{{ "Events" | trans }}","100px");
     myTabbar.addTab("instructions","{{ "Instructions" | trans }}","100px");
 
     myTabbar.attachEvent("onContentLoaded", function(id){
@@ -187,7 +193,8 @@ dhtmlxEvent(window,"load",function(){
         }
         return true;
     });
-
+    
+    globalLayout.cells("c").collapse(); 
 });
 
 function GlobalRefresh() {
@@ -222,6 +229,7 @@ function GridRefresh() {
 }
 
 function JobDetail(id) {
+    globalLayout.cells("c").expand();
     
     job = myGrid.cells(id, 1 ).getValue(); 
     status = myGrid.cells(id, 2 ).getValue(); 
@@ -286,8 +294,8 @@ function JobDetail(id) {
     myTabbar.cells("job").progressOn();
     
     myTabbar.cells("schema").progressOn();
-    myTabbar.cells("jil").progressOn();
-    myTabbar.cells("events").progressOn(); 
+//    myTabbar.cells("jil").progressOn();
+//    myTabbar.cells("events").progressOn(); 
         
     if (type != jobtype) {
         myForm2.unload();
@@ -302,8 +310,8 @@ function JobDetail(id) {
         globalLayout.cells("c").progressOff();
         myHistory.clearAndLoad( "{{ url('xml_ATS_job_history') }}?id="+id, function () {            
             myTabbar.cells("history").progressOff();
-            myTabbar.cells("jil").attachURL("{{ url('arii_ATS_autorep') }}?options=-q -l0&job="+job);
-            myTabbar.cells("events").attachURL("{{ url('arii_ATS_autorep') }}?options=-d -l0&job="+job);            
+//            myTabbar.cells("jil").attachURL("{{ url('txt_ATS_job_jil') }}?id="+id);
+//            myTabbar.cells("events").attachURL("{ { url('xml_ATS_autorep') }}?options=-d -l0&job="+job);            
             myTabbar.cells("schema").attachURL("{{ url('arii_ATS_generate') }}?id="+id);
             myTabbar.cells("instructions").attachURL("{{ url('html_ATS_box_doc') }}?id="+id);
             globalLayout.cells("c").progressOff();
