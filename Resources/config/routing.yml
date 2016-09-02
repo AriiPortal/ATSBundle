@@ -572,3 +572,27 @@ xml_ATS_note_delete:
 xml_ATS_note_templates:
     pattern:  /note/templates.xml
     defaults: { _controller: AriiATSBundle:Note:templates }
+
+# --------------------------------------------------------------------------
+# Instructions
+# --------------------------------------------------------------------------
+arii_ATS_docs:
+    pattern:  /docs
+    defaults: { _controller: AriiATSBundle:Docs:index }
+
+xml_ATS_docs_all:
+    pattern:  /docs/all.xml
+    defaults: { _controller: AriiATSBundle:Docs:all }
+
+xml_ATS_docs_grid:
+    pattern:  /docs/grid.xml
+    defaults: { _controller: AriiATSBundle:Docs:grid }
+
+xml_ATS_docs_alarms:
+    pattern:  /docs/alarms.xml
+    defaults: { _controller: AriiATSBundle:Docs:alarms }
+    
+xml_ATS_docs_alarms_all:
+    pattern:  /docs/alarms_all.xml
+    defaults: { _controller: AriiATSBundle:Docs:allalarms }
+    

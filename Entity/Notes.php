@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Cron
  *
  * @ORM\Table(name="ATS_NOTES")
- * @ORM\Entity(repositoryClass="Arii\ATSBundle\Entity\RequestsRepository")
+ * @ORM\Entity(repositoryClass="Arii\ATSBundle\Entity\NotesRepository")
  */
 class Notes
 {
@@ -21,6 +21,7 @@ class Notes
      */
     private $id;
 
+    // Utile ?
     /**
      * @var string
      *

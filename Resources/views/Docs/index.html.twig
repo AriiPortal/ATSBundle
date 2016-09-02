@@ -1,0 +1,127 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<script type="text/javascript">
+var max_history = 0; // pas d'historique
+var box = 0; // pas de boite en plus 
+var only_warning = 1; // que les problemes
+var update=30;
+var autorefresh;
+var jobtype = "CMD"; // Type de job en cours
+var status;
+
+dhtmlxEvent(window,"load",function(){     
+    globalLayout = new dhtmlXLayoutObject(document.body,"3L");  
+    globalLayout.cells("a").setWidth(400); 
+    globalLayout.cells("a").hideHeader(); 
+    globalLayout.cells("b").hideHeader(); 
+    globalLayout.cells("c").setText("{{ "Detail" | trans }}"); 
+
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('/bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    globalLayout.cells("a").hideHeader();
+    myJobs = globalLayout.cells("a").attachGrid();
+    myJobs.selMultiRows = true;
+    myJobs.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myJobs.setHeader("{{ "Job" | trans }},{{ "Note" | trans }}");
+    myJobs.attachHeader("#text_filter,#text_filter");
+    myJobs.setInitWidths("*,*");
+    myJobs.setColAlign("left,left");
+    myJobs.setColTypes("ro,ro");
+    myJobs.setColSorting("str,str");
+    myJobs.enableAlterCss("","");
+    myJobs.init();
+    globalLayout.cells("a").progressOn();
+    myJobs.load( "{{ url('xml_ATS_docs_all') }}", function() {
+        globalLayout.cells("a").progressOff();
+    });
+
+    globalLayout.cells("c").hideHeader();
+    myGrid = globalLayout.cells("c").attachGrid();
+    myGrid.selMultiRows = true;
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid.setHeader("{{ "Note" | trans }},{{ "Description" | trans }},{{ "Status" | trans }},{{ "Errors" | trans }},{{ "Message" | trans }}");
+    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+    myGrid.setInitWidths("*,*,100,*,*");
+    myGrid.setColAlign("left,left,left,left,left");
+    myGrid.setColTypes("ro,ro,ro,ro,ro");
+    myGrid.setColSorting("str,str,str,str,str");
+    myGrid.enableAlterCss("","");
+    myGrid.init();
+    globalLayout.cells("c").progressOn();
+    myGrid.load( "{{ url('xml_ATS_docs_alarms') }}", function() {
+        globalLayout.cells("c").progressOff();
+    });
+    myGrid.attachEvent("onRowDblClicked",JobDetail );
+    myGrid.setColumnHidden(1,true);
+    myGrid.setColumnHidden(2,true);
+
+    myGridToolbar = globalLayout.cells("b").attachToolbar();
+    myGridToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
+    myGridToolbar.loadStruct( "{{ url('xml_ATS_jobs_grid_toolbar') }}");
+    myGridToolbar.attachEvent("onClick",function(itemid){
+         switch (itemid) {
+            case 'refresh':
+                globalLayout.cells("b").progressOn();
+                GlobalRefresh();
+                break;
+            case "print":
+                myGrid.printView();
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+    myGridToolbar.attachEvent("onStateChange",function(itemid, state){
+         switch (itemid) {
+            case 'boxes':
+                myGrid.setColumnHidden(1,!state);  
+                break;
+            case "desc":
+                myGrid.setColumnHidden(2,!state);  
+                break;
+            default:
+                alert(itemid);
+                break;
+        }
+    });
+
+
+    globalLayout.cells("c").collapse();
+    autorefresh = setInterval( "GridRefresh()",update*1000);
+
+});
+
+function GlobalRefresh() {
+    GridRefresh();
+}
+
+function GridRefresh() {
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
+    var seconds = currentTime.getSeconds();
+    if (minutes < 10){
+    minutes = "0" + minutes;
+    }
+    if (seconds < 10){
+    seconds = "0" + seconds;
+    }
+    myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
+    myGrid.load("{{ url('xml_ATS_jobs_grid') }}?time="+seconds+"&history="+max_history+"&box_more="+box+"&only_warning="+only_warning, function(){    
+        globalLayout.cells("c").progressOff();
+        myGrid.refreshFilters();
+        myGrid.filterByAll();
+    });    
+}
+</script>
+{% endblock %}
