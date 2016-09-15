@@ -102,8 +102,7 @@ class RequestsController extends Controller
             $session = $this->container->get('arii_core.session');
             $engine = $session->setDatabaseByName($dbname,'waae');    
         }
-       
-        
+               
         if (isset($req)=='') return $this->summaryAction();
         
         $page = $this->getBaseDir().'/'.$req.'.yml';
@@ -190,6 +189,16 @@ class RequestsController extends Controller
         
         if ($output=='html')
             return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
+        elseif ($output=='check') {
+            $response = new Response(); 
+            if ($nb==0) {
+                $response->setStatusCode( '500' );
+            }
+            else {
+                $response->setContent( implode("\n",$r) );
+            }
+            return $response;                        
+        }
         elseif ($output=='nagios') {
             $response = new Response();
             $response->setStatusCode( '401' );

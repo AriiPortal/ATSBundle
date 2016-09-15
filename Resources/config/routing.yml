@@ -450,12 +450,11 @@ arii_ATS_requests_summary:
 # --------------------------------------------------------------------------
 # Monitoring
 # --------------------------------------------------------------------------
-nagios_ATS_requests_result:
+check_ATS_requests_result:
     pattern:  /{output}/{dbname}/{req}
     defaults: { _controller: AriiATSBundle:Requests:result }
     requirements:
-        output: nagios
-    
+        output: check
 
 #--------------------------------------------------------------------
 # Templates

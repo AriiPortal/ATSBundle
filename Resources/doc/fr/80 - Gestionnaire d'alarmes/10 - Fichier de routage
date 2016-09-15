@@ -1,0 +1,22 @@
+Fichier de routage
+=====
+
+| pattern     | Masque de recherche
+| description | Résumé du routage
+| time_slot   | Plage horaire 
+| status      | Statut du traitement
+| exit_codes  | Codes de sortie
+| send        | Outil utilisé de notification
+| to          | Destinataire(s)
+| cc          | Destinaires secondaires
+| message     | Message de l'alerte
+| help        | Aide ajoutée aux informations
+
+Pattern
+-------
+Expression régulière pour identifier le job
+En cas de conflit, le pattern le plus long est privilégié.
+
+
+
+

@@ -81,7 +81,7 @@ class Alarms
      *
      * @ORM\Column(name="active", type="boolean" )
      */        
-    private $active=true;
+    private $active=1;
    
 
     /**
