@@ -31,9 +31,9 @@ class DefaultController extends Controller
         // On recupère les requetes
         $yaml = new Parser();
         $lang = $this->getRequest()->getLocale();
-        
+
         $session = $this->container->get('arii_core.session');
-        $basedir = $session->get('workspace').'/Autosys/Requests/'.$lang;
+        $basedir = $this->getBaseDir();
 
         $Requests = array();
         if ($dh = @opendir($basedir)) {
@@ -199,4 +199,11 @@ QPJOBLOG   1        *READY     24        150911 093940 EJOBOTOSY1 QEZJOBLOG
         exit();
     }
 
+    /* Donne le répertoire de travail en fonction de la langue et de l'utilisiation */
+    private function getBaseDir() {
+        $lang = $this->getRequest()->getLocale();
+        $session = $this->container->get('arii_core.session');
+        return $session->get('workspace').'/Autosys/Requests/'.$lang;        
+    }
+    
 }

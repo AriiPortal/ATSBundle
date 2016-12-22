@@ -86,6 +86,7 @@ class RequestsController extends Controller
 
     public function resultAction($output='html',$dbname='',$req='')
     {
+        
         $lang = $this->getRequest()->getLocale();
         $request = Request::createFromGlobals();
         if ($request->query->get( 'request' )!='')
@@ -140,9 +141,9 @@ class RequestsController extends Controller
         // bibliothèques
         $ats  = $this->container->get('arii_ats.autosys'); 
         $date = $this->container->get('arii_core.date');   
-        $r = array();
         while ($line = $data->sql->get_next($res))
         {
+            $r = array();
             $status = 'unknown';
             foreach ($value['columns'] as $h) {
                 if (isset($line[$h])) {
@@ -186,9 +187,25 @@ class RequestsController extends Controller
             $value['lines'][$nb]['status'] = $status;
          }
         $value['count'] = $nb;
-        
-        if ($output=='html')
+        if ($output=='html') {
+            print_r($value);
+            exit();
             return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
+        }
+        elseif ($output=='csv') {
+            $sep = ";";
+            $response = new Response();
+            $response->headers->set('Content-type', 'text/plain');
+            $response->headers->set("Content-disposition", "attachment; filename=$req.csv"); 
+            $csv = implode($sep,$value['columns'])."\n";
+            if (isset($value['lines'])) {
+                foreach ($value['lines'] as $k=>$l) {
+                    $csv .= implode($sep,$l['cells'])."\n";
+                }
+            }
+            $response->setContent( utf8_decode( $csv ) );
+            return $response;                      
+        }
         elseif ($output=='check') {
             $response = new Response(); 
             if ($nb==0) {

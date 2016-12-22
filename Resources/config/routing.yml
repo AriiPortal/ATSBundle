@@ -2,456 +2,456 @@
 # PAGES PRINCIPALES
 # --------------------------------------------------------------------------
 arii_ATS_index:
-    pattern:  /
+    path:  /
     defaults: { _controller: AriiATSBundle:Default:index }
 
 arii_ATS_readme:
-    pattern:  /readme
+    path:  /readme
     defaults: { _controller: AriiATSBundle:Default:readme }
 
 xml_ATS_toolbar:
-    pattern:  /toolbar.xml
+    path:  /toolbar.xml
     defaults: { _controller: AriiATSBundle:Default:toolbar }
 
 json_ATS_ribbon:
-    pattern:  /ribbon.json
+    path:  /ribbon.json
     defaults: { _controller: AriiATSBundle:Default:ribbon }
 
 xml_ATS_menu:
-    pattern:  /menu.xml
+    path:  /menu.xml
     defaults: { _controller: AriiATSBundle:Default:menu }
 
 arii_ATS_doc:
-    pattern:  /doc
+    path:  /doc
     defaults: { _controller: AriiATSBundle:Default:doc }
 
 arii_ATS_sendevent:
-    pattern:  /sendevent
+    path:  /sendevent
     defaults: { _controller: AriiATSBundle:Default:sendevent }
 
 arii_ATS_autorep:
-    pattern:  /autorep
+    path:  /autorep
     defaults: { _controller: AriiATSBundle:Default:autorep }
 
 arii_ATS_autosyslog:
-    pattern:  /autosyslog
+    path:  /autosyslog
     defaults: { _controller: AriiATSBundle:Default:autosyslog }
 
 xml_ATS_autosyslog:
-    pattern:  /autosyslog.xml
+    path:  /autosyslog.xml
     defaults: { _controller: AriiATSBundle:Default:autosyslog_grid }
 
 html_ATS_chk_auto_up:
-    pattern:  /chk_auto_up.html
+    path:  /chk_auto_up.html
     defaults: { _controller: AriiATSBundle:Default:chk_auto_up }
 
 # SENDEVENT
 json_ATS_sendevent_form:
-    pattern:  /sendevent/form.json
+    path:  /sendevent/form.json
     defaults: { _controller: AriiATSBundle:Sendevent:form }
 
 xml_ATS_sendevent_form_toolbar:
-    pattern:  /sendevent/form_toolbar.xml
+    path:  /sendevent/form_toolbar.xml
     defaults: { _controller: AriiATSBundle:Sendevent:form_toolbar }
 
 xml_ATS_sendevent_toolbar:
-    pattern:  /sendevent/toolbar.xml
+    path:  /sendevent/toolbar.xml
     defaults: { _controller: AriiATSBundle:Sendevent:toolbar }
 
 html_ATS_sendevent_exec:
-    pattern:  /sendevent/exec.html
+    path:  /sendevent/exec.html
     defaults: { _controller: AriiATSBundle:Sendevent:sendevent }
 
 # --------------------------------------------------------------------------
 # Config
 # --------------------------------------------------------------------------
 arii_ATS_config:
-    pattern:  /config
+    path:  /config
     defaults: { _controller: AriiATSBundle:Config:index }
 
 html_ATS_config:
-    pattern:  /config.html
+    path:  /config.html
     defaults: { _controller: AriiATSBundle:Config:config }
 
 # --------------------------------------------------------------------------
 # JOBS
 # --------------------------------------------------------------------------
 arii_ATS_jobs:
-    pattern:  /jobs
+    path:  /jobs
     defaults: { _controller: AriiATSBundle:Jobs:index }
 
 xml_ATS_jobs_pie:
-    pattern:  /jobs/pie.xml
+    path:  /jobs/pie.xml
     defaults: { _controller: AriiATSBundle:Jobs:pie }
 
 xml_ATS_jobs_tree:
-    pattern:  /jobs/tree.xml
+    path:  /jobs/tree.xml
     defaults: { _controller: AriiATSBundle:Jobs:tree }
 
 xml_ATS_jobs_grid:
-    pattern:  /jobs/grid.xml
+    path:  /jobs/grid.xml
     defaults: { _controller: AriiATSBundle:Jobs:status }
 
 xml_ATS_jobs_grid_toolbar:
-    pattern:  /jobs/toolbar.xml
+    path:  /jobs/toolbar.xml
     defaults: { _controller: AriiATSBundle:Jobs:grid_toolbar }
 
 xml_ATS_jobs_grid_menu:
-    pattern:  /jobs/menu.xml
+    path:  /jobs/menu.xml
     defaults: { _controller: AriiATSBundle:Jobs:grid_menu }
 
 xml_ATS_jobs_barchart:
-    pattern:  /jobs/barchart.xml
+    path:  /jobs/barchart.xml
     defaults: { _controller: AriiATSBundle:Jobs:barchart }
 
 # --------------------------------------------------------------------------
 # BOXES
 # --------------------------------------------------------------------------
 arii_ATS_boxes:
-    pattern:  /boxes
+    path:  /boxes
     defaults: { _controller: AriiATSBundle:Boxes:index }
 
 xml_ATS_boxes_pie:
-    pattern:  /boxes/pie.xml
+    path:  /boxes/pie.xml
     defaults: { _controller: AriiATSBundle:Boxes:pie }
 
 xml_ATS_boxes_tree:
-    pattern:  /boxes/tree.xml
+    path:  /boxes/tree.xml
     defaults: { _controller: AriiATSBundle:Boxes:tree }
 
 xml_ATS_boxes_grid:
-    pattern:  /boxes/grid.xml
+    path:  /boxes/grid.xml
     defaults: { _controller: AriiATSBundle:Boxes:status }
 
 xml_ATS_boxes_grid_toolbar:
-    pattern:  /boxes/toolbar.xml
+    path:  /boxes/toolbar.xml
     defaults: { _controller: AriiATSBundle:Boxes:grid_toolbar }
 
 xml_ATS_boxes_grid_menu:
-    pattern:  /boxes/menu.xml
+    path:  /boxes/menu.xml
     defaults: { _controller: AriiATSBundle:Boxes:grid_menu }
 
 xml_ATS_boxes_barchart:
-    pattern:  /boxes/barchart.xml
+    path:  /boxes/barchart.xml
     defaults: { _controller: AriiATSBundle:Boxes:barchart }
 
 # --------------------------------------------------------------------------
 # BOX
 # --------------------------------------------------------------------------
 html_ATS_box_doc:
-    pattern:  /box/doc.html
+    path:  /box/doc.html
     defaults: { _controller: AriiATSBundle:Box:doc }
 
 # --------------------------------------------------------------------------
 # RUNTIMES
 # --------------------------------------------------------------------------
 arii_ATS_runtimes:
-    pattern:  /runtimes
+    path:  /runtimes
     defaults: { _controller: AriiATSBundle:Runtimes:index }
 
 xml_ATS_runtimes_grid:
-    pattern:  /runtimes/grid.xml
+    path:  /runtimes/grid.xml
     defaults: { _controller: AriiATSBundle:Runtimes:grid }
 
 xml_ATS_runtimes_grid_toolbar:
-    pattern:  /runtimes/toolbar.xml
+    path:  /runtimes/toolbar.xml
     defaults: { _controller: AriiATSBundle:Runtimes:grid_toolbar }
 
 xml_ATS_runtimes_grid_menu:
-    pattern:  /runtimes/menu.xml
+    path:  /runtimes/menu.xml
     defaults: { _controller: AriiATSBundle:Runtimes:grid_menu }
 
 # --------------------------------------------------------------------------
 # JOB
 # --------------------------------------------------------------------------
 json_ATS_job_form:
-    pattern:  /job/form.json
+    path:  /job/form.json
     defaults: { _controller: AriiATSBundle:Job:form }
 
 xml_ATS_job_form:
-    pattern:  /job/form.xml
+    path:  /job/form.xml
     defaults: { _controller: AriiATSBundle:Job:xml }
 
 arii_ATS_job_history:
-    pattern:  /job/history
+    path:  /job/history
     defaults: { _controller: AriiATSBundle:Job:history }
 
 xml_ATS_job_history:
-    pattern:  /job/history.xml
+    path:  /job/history.xml
     defaults: { _controller: AriiATSBundle:Job:history_grid }
 
 xml_ATS_job_history_chart:
-    pattern:  /job/history_chart.xml
+    path:  /job/history_chart.xml
     defaults: { _controller: AriiATSBundle:Job:history_chart  }
 
 txt_ATS_job_jil:
-    pattern:  /job/jil.txt
+    path:  /job/jil.txt
     defaults: { _controller: AriiATSBundle:Job:jil }
 
 # --------------------------------------------------------------------------
 # EVENTS
 # --------------------------------------------------------------------------
 arii_ATS_events:
-    pattern:  /events
+    path:  /events
     defaults: { _controller: AriiATSBundle:Events:index }
 
 xml_ATS_events_pie:
-    pattern:  /events/pie.xml
+    path:  /events/pie.xml
     defaults: { _controller: AriiATSBundle:Events:pie }
 
 xml_ATS_events_grid:
-    pattern:  /events/grid.xml
+    path:  /events/grid.xml
     defaults: { _controller: AriiATSBundle:Events:grid }
 
 xml_ATS_events_grid_toolbar:
-    pattern:  /events/toolbar.xml
+    path:  /events/toolbar.xml
     defaults: { _controller: AriiATSBundle:Events:toolbar }
 
 # --------------------------------------------------------------------------
 # SERVERS
 # --------------------------------------------------------------------------
 arii_ATS_servers:
-    pattern:  /servers
+    path:  /servers
     defaults: { _controller: AriiATSBundle:Servers:index }
 
 xml_ATS_servers_pie:
-    pattern:  /servers/pie.xml
+    path:  /servers/pie.xml
     defaults: { _controller: AriiATSBundle:Servers:pie }
 
 xml_ATS_servers_grid:
-    pattern:  /servers/grid.xml
+    path:  /servers/grid.xml
     defaults: { _controller: AriiATSBundle:Servers:grid }
 
 xml_ATS_servers2_grid:
-    pattern:  /servers/grid2.xml
+    path:  /servers/grid2.xml
     defaults: { _controller: AriiATSBundle:Servers:grid2 }
 
 xml_ATS_servers_grid_toolbar:
-    pattern:  /servers/toolbar.xml
+    path:  /servers/toolbar.xml
     defaults: { _controller: AriiATSBundle:Servers:toolbar }
 
 xml_ATS_processes_pie:
-    pattern:  /servers/pie.xml
+    path:  /servers/pie.xml
     defaults: { _controller: AriiATSBundle:Servers:pie }    
 
 # AGENTS
 
 arii_ATS_agents:
-    pattern:  /agents
+    path:  /agents
     defaults: { _controller: AriiATSBundle:Agents:index }
 
 xml_ATS_agents_grid:
-    pattern:  /agents/grid.xml
+    path:  /agents/grid.xml
     defaults: { _controller: AriiATSBundle:Agents:agents }
 
 xml_ATS_agents_pie:
-    pattern:  /agents/pie.xml
+    path:  /agents/pie.xml
     defaults: { _controller: AriiATSBundle:Agents:pie }
 
 xml_ATS_agents_pie:
-    pattern:  /agents/pie.xml
+    path:  /agents/pie.xml
     defaults: { _controller: AriiATSBundle:Agents:pie }
 
 # --------------------------------------------------------------------------
 # PROCESSED
 # --------------------------------------------------------------------------
 arii_ATS_processed:
-    pattern:  /processed
+    path:  /processed
     defaults: { _controller: AriiATSBundle:Processed:index }
 
 xml_ATS_processed_pie:
-    pattern:  /processed/pie.xml
+    path:  /processed/pie.xml
     defaults: { _controller: AriiATSBundle:Processed:pie }
 
 xml_ATS_processed_grid:
-    pattern:  /processed/grid.xml
+    path:  /processed/grid.xml
     defaults: { _controller: AriiATSBundle:Processed:grid }
 
 xml_ATS_processed_grid_toolbar:
-    pattern:  /processed/toolbar.xml
+    path:  /processed/toolbar.xml
     defaults: { _controller: AriiATSBundle:Processed:toolbar }
 
 # --------------------------------------------------------------------------
 # AUDIT
 # --------------------------------------------------------------------------
 arii_ATS_audit:
-    pattern:  /audit
+    path:  /audit
     defaults: { _controller: AriiATSBundle:Audit:index }
 
 xml_ATS_audit_grid:
-    pattern:  /audit/grid.xml
+    path:  /audit/grid.xml
     defaults: { _controller: AriiATSBundle:Audit:grid }
 
 xml_ATS_audit_pie:
-    pattern:  /audit/pie.xml
+    path:  /audit/pie.xml
     defaults: { _controller: AriiATSBundle:Audit:pie }
 
 xml_ATS_audit_detail:
-    pattern:  /audit/detail.xml
+    path:  /audit/detail.xml
     defaults: { _controller: AriiATSBundle:Audit:detail }
 
 xml_ATS_audit_grid_toolbar:
-    pattern:  /audit/toolbar.xml
+    path:  /audit/toolbar.xml
     defaults: { _controller: AriiATSBundle:Audit:toolbar }
 
 # --------------------------------------------------------------------------
 # ALARMS
 # --------------------------------------------------------------------------
 arii_ATS_alarms:
-    pattern:  /alarms
+    path:  /alarms
     defaults: { _controller: AriiATSBundle:Alarms:index }
 
 xml_ATS_alarms_grid:
-    pattern:  /alarms/grid.xml
+    path:  /alarms/grid.xml
     defaults: { _controller: AriiATSBundle:Alarms:grid }
 
 xml_ATS_alarms_pie:
-    pattern:  /alarms/pie.xml
+    path:  /alarms/pie.xml
     defaults: { _controller: AriiATSBundle:Alarms:pie }
 
 xml_ATS_alarms_detail:
-    pattern:  /alarms/detail.xml
+    path:  /alarms/detail.xml
     defaults: { _controller: AriiATSBundle:Alarms:detail }
 
 xml_ATS_alarms_grid_toolbar:
-    pattern:  /alarms/toolbar.xml
+    path:  /alarms/toolbar.xml
     defaults: { _controller: AriiATSBundle:Alarms:toolbar }
 
 xml_ATS_alarms_grid_menu:
-    pattern:  /alarms/grid_menu.xml
+    path:  /alarms/grid_menu.xml
     defaults: { _controller: AriiATSBundle:Alarms:grid_menu }
 
 # --------------------------------------------------------------------------
 # ERRORS
 # --------------------------------------------------------------------------
 arii_ATS_errors:
-    pattern:  /errors
+    path:  /errors
     defaults: { _controller: AriiATSBundle:Errors:index }
 
 xml_ATS_errors_runtimes:
-    pattern:  /errors/runtimes.xml
+    path:  /errors/runtimes.xml
     defaults: { _controller: AriiATSBundle:Errors:runtimes }
 
 xml_ATS_errors_tree:
-    pattern:  /errors/tree.xml
+    path:  /errors/tree.xml
     defaults: { _controller: AriiATSBundle:Errors:tree }
 
 xml_ATS_errors_detail:
-    pattern:  /errors/detail.xml
+    path:  /errors/detail.xml
     defaults: { _controller: AriiATSBundle:Errors:detail }
 
 xml_ATS_errors_grid_toolbar:
-    pattern:  /errors/toolbar.xml
+    path:  /errors/toolbar.xml
     defaults: { _controller: AriiATSBundle:Errors:toolbar }
 
 # --------------------------------------------------------------------------
 # CALENDARS
 # --------------------------------------------------------------------------
 arii_ATS_calendars:
-    pattern:  /calendars
+    path:  /calendars
     defaults: { _controller: AriiATSBundle:Calendars:timeline }
 
 xml_ATS_calendars_runtimes:
-    pattern:  /calendars/runtimes.xml
+    path:  /calendars/runtimes.xml
     defaults: { _controller: AriiATSBundle:Calendars:runtimes }
 
 xml_ATS_calendars_tree:
-    pattern:  /calendars/tree.xml
+    path:  /calendars/tree.xml
     defaults: { _controller: AriiATSBundle:Calendars:tree }
 
 xml_ATS_calendars_detail:
-    pattern:  /calendars/detail.xml
+    path:  /calendars/detail.xml
     defaults: { _controller: AriiATSBundle:Calendars:detail }
 
 xml_ATS_calendars_list:
-    pattern:  /calendars/list.xml
+    path:  /calendars/list.xml
     defaults: { _controller: AriiATSBundle:Calendars:list }
 
 xml_ATS_calendars_grid_toolbar:
-    pattern:  /calendars/toolbar.xml
+    path:  /calendars/toolbar.xml
     defaults: { _controller: AriiATSBundle:Calendars:toolbar }
 
 xml_ATS_calendar:
-    pattern:  /calendars/calendar.xml
+    path:  /calendars/calendar.xml
     defaults: { _controller: AriiATSBundle:Calendars:calendar }
 
 xml_ATS_calendar_jobs:
-    pattern:  /calendars/jobs.xml
+    path:  /calendars/jobs.xml
     defaults: { _controller: AriiATSBundle:Calendars:jobs }
 
 xml_ATS_calendar_exclude:
-    pattern:  /calendars/exclude.xml
+    path:  /calendars/exclude.xml
     defaults: { _controller: AriiATSBundle:Calendars:excludejobs }
 
 # --------------------------------------------------------------------------
 # INSTRUCTIONS
 # --------------------------------------------------------------------------
 arii_ATS_instructions:
-    pattern:  /instructions
+    path:  /instructions
     defaults: { _controller: AriiATSBundle:Instructions:index }
 
 xml_ATS_instructions_grid:
-    pattern:  /instructions/grid.xml
+    path:  /instructions/grid.xml
     defaults: { _controller: AriiATSBundle:Instructions:grid }
 
 xml_ATS_instructions_pie:
-    pattern:  /instructions/pie.xml
+    path:  /instructions/pie.xml
     defaults: { _controller: AriiATSBundle:Instructions:pie }
 
 xml_ATS_instructions_detail:
-    pattern:  /instructions/detail.xml
+    path:  /instructions/detail.xml
     defaults: { _controller: AriiATSBundle:Instructions:detail }
 
 xml_ATS_instructions_grid_toolbar:
-    pattern:  /instructions/toolbar.xml
+    path:  /instructions/toolbar.xml
     defaults: { _controller: AriiATSBundle:Instructions:toolbar }
     
 # --------------------------------------------------------------------------
 # JOBS
 # --------------------------------------------------------------------------
 arii_ATS_generate:
-    pattern:  /generate
+    path:  /generate
     defaults: { _controller: AriiATSBundle:Graphviz:generate }
 
 # --------------------------------------------------------------------------
 # Logs
 # --------------------------------------------------------------------------
 arii_ATS_logs:
-    pattern:  /logs
+    path:  /logs
     defaults: { _controller: AriiATSBundle:Logs:index }
 
 xml_ATS_logs_toolbar:
-    pattern:  /logs/toolbar.xml
+    path:  /logs/toolbar.xml
     defaults: { _controller: AriiATSBundle:Logs:toolbar }
 
 xml_ATS_event_demon:
-    pattern:  /logs/event_demon.xml
+    path:  /logs/event_demon.xml
     defaults: { _controller: AriiATSBundle:Logs:EventDemon }
 
 # --------------------------------------------------------------------------
 # REQUESTS
 # --------------------------------------------------------------------------
 arii_ATS_requests:
-    pattern:  /requests
+    path:  /requests
     defaults: { _controller: AriiATSBundle:Requests:index }
 
 xml_ATS_requests_list:
-    pattern:  /requests/list.xml
+    path:  /requests/list.xml
     defaults: { _controller: AriiATSBundle:Requests:list }
 
 arii_ATS_requests_result:
-    pattern:  /requests/result.html
+    path:  /requests/result.html
     defaults: { _controller: AriiATSBundle:Requests:result }
 
 arii_ATS_requests_summary:
-    pattern:  /requests/summary.html
+    path:  /requests/summary.html
     defaults: { _controller: AriiATSBundle:Requests:summary }
 
 # --------------------------------------------------------------------------
 # Monitoring
 # --------------------------------------------------------------------------
 check_ATS_requests_result:
-    pattern:  /{output}/{dbname}/{req}
+    path:  /{output}/{dbname}/{req}
     defaults: { _controller: AriiATSBundle:Requests:result }
     requirements:
         output: check
@@ -460,138 +460,138 @@ check_ATS_requests_result:
 # Templates
 #--------------------------------------------------------------------
 arii_ATS_templates:
-    pattern:  /templates
+    path:  /templates
     defaults: { _controller: AriiATSBundle:Templates:index }
 
 xml_ATS_templates_tree:
-    pattern:  /templates/tree.xml
+    path:  /templates/tree.xml
     defaults: { _controller: AriiATSBundle:Templates:tree }
 
 xml_ATS_templates_files:
-    pattern:  /templates/files.xml
+    path:  /templates/files.xml
     defaults: { _controller: AriiATSBundle:Templates:files }
 
 html_ATS_template_recalc:
-    pattern:  /template/recalc.xml
+    path:  /template/recalc.xml
     defaults: { _controller: AriiATSBundle:Templates:recalc }
 
 arii_ATS_template:
-    pattern:  /template
+    path:  /template
     defaults: { _controller: AriiATSBundle:Templates:template }
 
 arii_ATS_template_read:
-    pattern:  /template/read
+    path:  /template/read
     defaults: { _controller: AriiATSBundle:Templates:read }
 
 arii_ATS_template_diff:
-    pattern:  /template/diff
+    path:  /template/diff
     defaults: { _controller: AriiATSBundle:Templates:diff }
 
 arii_ATS_template_mep:
-    pattern:  /template/mep
+    path:  /template/mep
     defaults: { _controller: AriiATSBundle:Templates:mep }
 
 xml_ATS_templates_mep_toolbar:
-    pattern:  template/mep/toolbar.xml
+    path:  template/mep/toolbar.xml
     defaults: { _controller: AriiATSBundle:Templates:toolbar }
 
 # --------------------------------------------------------------------------
 # Dashboard
 # --------------------------------------------------------------------------
 arii_ATS_dashboard:
-    pattern:  /public/dashboard
+    path:  /public/dashboard
     defaults: { _controller: AriiATSBundle:Dashboard:index }
 
 html_ATS_dashboard:
-    pattern:  /public/page
+    path:  /public/page
     defaults: { _controller: AriiATSBundle:Dashboard:page }
     
 # --------------------------------------------------------------------------
 # Formulaire utilisateur
 # --------------------------------------------------------------------------
 arii_ATS_form:
-    pattern:  /public/form
+    path:  /public/form
     defaults: { _controller: AriiATSBundle:Form:index }
 
 xml_ATS_form_toolbar:
-    pattern:  /public/form/toolbar.xml
+    path:  /public/form/toolbar.xml
     defaults: { _controller: AriiATSBundle:Form:toolbar }
 
 xml_ATS_forms_list:
-    pattern:  /public/form/list.xml
+    path:  /public/form/list.xml
     defaults: { _controller: AriiATSBundle:Form:list }
 
 xml_ATS_form_grid:
-    pattern:  /public/form/grid.xml
+    path:  /public/form/grid.xml
     defaults: { _controller: AriiATSBundle:Form:grid }
 
 json_ATS_form_default:
-    pattern:  /public/form/default.json
+    path:  /public/form/default.json
     defaults: { _controller: AriiATSBundle:Form:default }
     
 json_ATS_form_get:
-    pattern:  /public/form/get.json
+    path:  /public/form/get.json
     defaults: { _controller: AriiATSBundle:Form:get }
 
 xml_ATS_form_data:
-    pattern:  /public/form/form.xml
+    path:  /public/form/form.xml
     defaults: { _controller: AriiATSBundle:Form:form }
 
 arii_ATS_form_save:
-    pattern:  /public/form/save.html
+    path:  /public/form/save.html
     defaults: { _controller: AriiATSBundle:Form:save }
 
 # --------------------------------------------------------------------------
 # Note
 # --------------------------------------------------------------------------
 arii_ATS_note:
-    pattern:  /note/show.html
+    path:  /note/show.html
     defaults: { _controller: AriiATSBundle:Note:show }
 
 xml_ATS_note_toolbar:
-    pattern:  /note/toolbar.xml
+    path:  /note/toolbar.xml
     defaults: { _controller: AriiATSBundle:Note:toolbar }
 
 xml_ATS_note_save:
-    pattern:  /note/save.xml
+    path:  /note/save.xml
     defaults: { _controller: AriiATSBundle:Note:save }
 
 xml_ATS_note_form:
-    pattern:  /note/form.xml
+    path:  /note/form.xml
     defaults: { _controller: AriiATSBundle:Note:form }
 
 xml_ATS_note_load:
-    pattern:  /note/load.xml
+    path:  /note/load.xml
     defaults: { _controller: AriiATSBundle:Note:load }
 
 xml_ATS_note_delete:
-    pattern:  /note/delete.xml
+    path:  /note/delete.xml
     defaults: { _controller: AriiATSBundle:Note:delete }
     
 xml_ATS_note_templates:
-    pattern:  /note/templates.xml
+    path:  /note/templates.xml
     defaults: { _controller: AriiATSBundle:Note:templates }
 
 # --------------------------------------------------------------------------
 # Instructions
 # --------------------------------------------------------------------------
 arii_ATS_docs:
-    pattern:  /docs
+    path:  /docs
     defaults: { _controller: AriiATSBundle:Docs:index }
 
 xml_ATS_docs_all:
-    pattern:  /docs/all.xml
+    path:  /docs/all.xml
     defaults: { _controller: AriiATSBundle:Docs:all }
 
 xml_ATS_docs_grid:
-    pattern:  /docs/grid.xml
+    path:  /docs/grid.xml
     defaults: { _controller: AriiATSBundle:Docs:grid }
 
 xml_ATS_docs_alarms:
-    pattern:  /docs/alarms.xml
+    path:  /docs/alarms.xml
     defaults: { _controller: AriiATSBundle:Docs:alarms }
     
 xml_ATS_docs_alarms_all:
-    pattern:  /docs/alarms_all.xml
+    path:  /docs/alarms_all.xml
     defaults: { _controller: AriiATSBundle:Docs:allalarms }
     
