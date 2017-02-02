@@ -11,9 +11,46 @@ class DefaultController extends Controller
 {
     public function indexAction()
     {
+        $portal = $this->container->get('arii_core.portal');
+        $request = Request::createFromGlobals();
+        if ($request->query->get( 'scheduler' )!='') {
+            $JobScheduler = $portal->setJobScheduler($request->query->get( 'scheduler' ));
+            // On en profite pour mettre là jour la base de données
+            $Database = array();
+            foreach ($JobScheduler['Connections'] as $name=>$Connection) {
+                if ($Connection['domain']=='database') {
+                    $Database = $portal->setDatabase($Connection);
+                    break;
+                }
+            }
+        }
+        else {
+            $Scheduler = $portal->getJobScheduler();
+        }        
         return $this->render('AriiATSBundle:Default:index.html.twig');
     }
 
+    public function summaryAction()
+    {
+        $portal = $this->container->get('arii_core.portal');
+        $Spoolers=$portal->getNodesBy('vendor', 'ats'); 
+        
+        return $this->render('AriiATSBundle:Default:summary.html.twig',
+            array(  'module' => $portal->getModule('ATS'), 
+                    'Spoolers' => $Spoolers ));                
+    }
+
+    public function mainAction()
+    {
+        $portal = $this->container->get('arii_core.portal');
+        $Spoolers=$portal->getNodesBy('vendor', 'ats'); 
+        
+        return $this->render('AriiATSBundle:Default:main.html.twig',
+            array(  'module'   => $portal->getModule('ATS'), 
+                    'Spooler'  => $portal->getJobScheduler(),
+                    'Database' => $portal->getDatabase() ));                
+    }
+    
     public function readmeAction()
     {
         return $this->render('AriiATSBundle:Default:readme.html.twig');
@@ -51,25 +88,13 @@ class DefaultController extends Controller
         
         // On recupere la liste des base de données
         // si il y en a plus d'une, pour ats, on cree une liste de choix
-        $session = $this->container->get('arii_core.session');
-        $Databases = array();
-        $n=0;
-        foreach ($session->getDatabases() as $d) {
-            $n++;
-            if ($d['type']!='waae') continue;
-            $d['id'] = "DB$n";
-            array_push($Databases,$d);
-        }
-        // Si la base par defaut n'est pas de type waae, on prend la première
-        $current = $session->getDatabase();
-        if ($current['type'] != 'waae') {
-            $session->setDatabase($Databases[0]);
-        }
+        $portal = $this->container->get('arii_core.portal');
+        $Nodes=$portal->getNodesBy('vendor', 'ats');  
         
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         
-        return $this->render('AriiATSBundle:Default:ribbon.json.twig',array('Databases' => $Databases, 'Requests' => $Requests ), $response );
+        return $this->render('AriiATSBundle:Default:ribbon.json.twig',array('Nodes' => $Nodes, 'Requests' => $Requests ), $response );
     }
 
     public function docAction() {

@@ -1,0 +1,11 @@
+{% extends "AriiJIDBundle::bootstrap.html.twig" %}
+{% block body %}
+<div class="container-fluid">
+<h2>{{ "Instances" | trans }}</h2>
+<ul class="list-group">
+  {% for name,spooler in Spoolers %} 
+      <li class="list-group-item"><a href="{{ url('arii_ATS_index') }}?scheduler={{ spooler.name }}" target="_top"> {{ spooler.title }}</a></li>
+  {% endfor %}
+</ul>
+</div>
+{% endblock %}

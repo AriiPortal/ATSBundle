@@ -1,0 +1,13 @@
+{% extends "AriiJIDBundle::bootstrap.html.twig" %}
+{% block body %}
+<div class="container-fluid">
+<h2>{{ Spooler.title }}</h2>
+{% if (Database|length)>0 %}
+{{ Database.title }}
+{% else %}
+<div class="alert alert-danger">
+  <strong>Stop!</strong> {{ "You have to define a database." | trans }}
+</div>    
+{% endif %}
+</div>
+{% endblock %}

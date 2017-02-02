@@ -17,10 +17,24 @@ dhtmlxEvent(window,"load",function(){
     myRibbon.attachEvent("onStateChange", StateRibbon );
     myRibbon.attachEvent("onClick", ClickRibbon );
 
+    mySidebar = globalLayout.cells("a").attachSidebar({
+        icons_path: "{{ asset('/bundles/ariicore/images/sidebar/') }}",
+        width: 410,
+        items: [
+            {id: 'jobs', text: "{{ "Jobs" | trans }}", icon: "jobs.png"},
+            {id: 0, text: "{{ "Servers" | trans }}", icon: "server.png"},
+            {id: 1, text: "{{ "Alarms" | trans }}", icon: "alarms.png"}
+        ]
+    });
+    mySidebar.attachEvent("onBubbleClick", function(id, value){
+        // bubble clicked, your code here
+        // 'return true' means item allowed to be selected
+        // false - otherwise
+        return true;
+    });
     globalLayout.cells("a").hideHeader(); 
-    myGlobalTab = globalLayout.cells("a").attachURL("{{ url('html_ATS_summary') }}");    
-    globalLayout.cells("b").attachURL("{{ url('html_ATS_main') }}");
-    
+
+    myGlobalTab = globalLayout.cells("b").attachURL("{{ url('html_ATS_summary') }}");
 });
 </script>
 {% endblock %}

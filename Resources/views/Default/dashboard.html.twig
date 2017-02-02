@@ -1,0 +1,159 @@
+{# src/Arii/JIDBundle/Resources/views/Default/history.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<script type="text/javascript">
+var max_history = 0; // pas d'historique
+var chained = 0; // que des standalone
+var only_warning = 0; // que les problemes
+var update=30;
+var autorefresh;
+var jobtype = "CMD"; // Type de job en cours
+var myGridToolbar;
+var status;
+var id=0;
+
+dhtmlxEvent(window,"load",function(){     
+    globalLayout = new dhtmlXLayoutObject(document.body,"2U");  
+    globalLayout.cells("a").setWidth(410); 
+    globalLayout.cells("b").hideHeader(); 
+
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('/bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+
+    mySidebar = globalLayout.cells("a").attachSidebar({
+        icons_path: "{{ asset('/bundles/ariicore/images/sidebar/') }}",
+/*        template: "tiles",
+        skin: "dhx_skyblue",
+*/        width: 410,
+        items: [
+//            {id: 'jobs', text: "{{ "Jobs" | trans }}", icon: "jobs.png"},
+            {id: 0, text: "{{ "Servers" | trans }}", icon: "server.png"},
+            {id: 1, text: "{{ "Alarms" | trans }}", icon: "alarms.png"}
+        ]
+    });
+    mySidebar.attachEvent("onBubbleClick", function(id, value){
+        // bubble clicked, your code here
+        // 'return true' means item allowed to be selected
+        // false - otherwise
+        return true;
+    });
+    globalLayout.cells("a").hideHeader(); 
+
+    myGlobalTab = globalLayout.cells("b").attachTabbar();
+    myCarousel  = globalLayout.cells("b").attachCarousel({
+         effect: "cards"
+    });
+
+    Carousel=[];                        
+    Carousel[0] = myCarousel.addCell();
+    myServers =  myCarousel.cells(Carousel[0]).attachChart({
+            view:"donut",
+            container:"pie_chart_container",
+            value:"#PROCESSES#",
+            label:"",
+            tooltip: "#STATUS#",
+            color: "#COLOR#",
+            border:false,
+            pieInnerText: "#PROCESSES#",
+            shadow: 0,
+            legend:{
+                width: 0,
+                template: "#STATUS#",
+                valign:"top",
+                align:"left"
+            } 
+    });    
+    ServersTitle = myCarousel.cells(Carousel[0]).attachStatusBar({
+        // status bar config here, optional
+        text:   "{{ "Servers" | trans }}",   // status bar text
+        height: 50                 // custom height
+    });
+    
+
+    Carousel[1] = myCarousel.addCell();
+    myAlarms =  myCarousel.cells(Carousel[1]).attachChart({
+            view:"donut",
+            container:"pie_chart_container",
+            value:"#JOBS#",
+            label:"",
+            tooltip: "#STATUS#",
+            color: "#COLOR#",
+            border:false,
+            pieInnerText: "#JOBS#",
+            shadow: 0,
+            legend:{
+                width: 0,
+                template: "#STATUS#",
+                valign:"top",
+                align:"left"
+            } 
+    });
+    AlarmsTitle = myCarousel.cells(Carousel[1]).attachStatusBar({
+        // status bar config here, optional
+        text:   "{{ "Alarms" | trans }}",   // status bar text
+        height: 50                 // custom height
+    });
+
+    // Premier chargement avant le smart rendering
+    GlobalRefresh();
+    autorefresh = setInterval( "GridRefresh()",update*1000);
+});
+
+function GlobalRefresh() {
+    clearInterval( autorefresh );
+    GridRefresh();
+    autorefresh = setInterval( "GridRefresh()", update*1000 );
+}
+
+function GridRefresh() {
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
+    var seconds = currentTime.getSeconds();
+    if (minutes < 10){
+    minutes = "0" + minutes;
+    }
+    if (seconds < 10){
+    seconds = "0" + seconds;
+    }
+    myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
+    if (id==1) {
+        myCarousel.goFirst();
+        id = 0;
+    }
+    else {
+        myCarousel.goNext();
+        id++;
+    }
+    mySidebar.cells(id).setActive();
+    
+    // On remet les bulles à jour en fonction des graphiques
+    
+    myServers.load( "{{ url('xml_ATS_processes_pie') }}", function() {
+        val = myServers.get("STOPPED");
+        if (val["PROCESSES"]>0)
+            mySidebar.cells(0).setBubble(val["PROCESSES"]);
+        else
+            mySidebar.cells(0).clearBubble();
+    });
+
+    myAlarms.load( "{{ url('xml_ATS_alarms_pie') }}?only_warning="+1, function() {
+        val = myAlarms.get("OPEN");
+        if (val["JOBS"]>0)
+            mySidebar.cells(1).setBubble(val["JOBS"]);
+        else
+            mySidebar.cells(1).clearBubble();
+    });
+    globalLayout.progressOff();
+    globalLayout.cells("a").progressOff();
+    globalLayout.cells("b").progressOff();
+}
+</script>
+{% endblock %}

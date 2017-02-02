@@ -59,7 +59,7 @@ dhtmlxEvent(window,"load",function(){
     myGridMenu = new dhtmlXMenuObject(null);
     myGridMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/wa/') }}" );
     myGridMenu.renderAsContextMenu();
-    myGridMenu.loadStruct("{{ url('xml_ATS_jobs_grid_menu') }}");
+    myGridMenu.loadStruct("{{ url('xml_ATS_boxes_menu') }}");
           
     myGrid = globalLayout.cells("b").attachGrid();
     myGrid.selMultiRows = true;
@@ -88,7 +88,7 @@ dhtmlxEvent(window,"load",function(){
 
     myGridToolbar = globalLayout.cells("b").attachToolbar();
     myGridToolbar.setIconsPath("{{ asset('bundles/ariicore/images/toolbar/') }}");
-    myGridToolbar.loadStruct( "{{ url('xml_ATS_jobs_grid_toolbar') }}");
+    myGridToolbar.loadStruct( "{{ url('xml_ATS_boxes_toolbar') }}");
     myGridToolbar.attachEvent("onClick",function(itemid){
          switch (itemid) {
             case 'refresh':

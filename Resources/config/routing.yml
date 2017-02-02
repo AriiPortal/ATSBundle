@@ -9,6 +9,14 @@ arii_ATS_readme:
     path:  /readme
     defaults: { _controller: AriiATSBundle:Default:readme }
 
+html_ATS_summary:
+    path:  /summary
+    defaults: { _controller: AriiATSBundle:Default:summary }
+
+html_ATS_main:
+    path:  /main
+    defaults: { _controller: AriiATSBundle:Default:main }
+
 xml_ATS_toolbar:
     path:  /toolbar.xml
     defaults: { _controller: AriiATSBundle:Default:toolbar }
@@ -123,13 +131,13 @@ xml_ATS_boxes_grid:
     path:  /boxes/grid.xml
     defaults: { _controller: AriiATSBundle:Boxes:status }
 
-xml_ATS_boxes_grid_toolbar:
+xml_ATS_boxes_toolbar:
     path:  /boxes/toolbar.xml
-    defaults: { _controller: AriiATSBundle:Boxes:grid_toolbar }
+    defaults: { _controller: AriiATSBundle:Boxes:toolbar }
 
-xml_ATS_boxes_grid_menu:
+xml_ATS_boxes_menu:
     path:  /boxes/menu.xml
-    defaults: { _controller: AriiATSBundle:Boxes:grid_menu }
+    defaults: { _controller: AriiATSBundle:Boxes:menu }
 
 xml_ATS_boxes_barchart:
     path:  /boxes/barchart.xml
@@ -187,6 +195,17 @@ xml_ATS_job_history_chart:
 txt_ATS_job_jil:
     path:  /job/jil.txt
     defaults: { _controller: AriiATSBundle:Job:jil }
+
+# --------------------------------------------------------------------------
+# SEARCH
+# --------------------------------------------------------------------------
+arii_ATS_search:
+    path:  /search
+    defaults: { _controller: AriiATSBundle:Search:index }
+
+xml_ATS_search_grid:
+    path:  /search/grid.xml
+    defaults: { _controller: AriiATSBundle:Search:grid }
 
 # --------------------------------------------------------------------------
 # EVENTS

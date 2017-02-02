@@ -129,19 +129,18 @@
                         {id:"box","type":"buttonTwoState",text:"","img":"box.png", state: false }
                   ]
               },
-{% set current_db = app.session.get('database') %} 
-              {   id: "database", 
+/*              {   id: "spooler", 
                   "type":"buttonSelect", 
                   text:"", 
-                  "img": "database.png",
+                  "img": "spooler.png",
                   "items": 
                   [ 
-{% for database in Databases %}
-{id:"{{ database.id }}", text:"{{ database.name }}"{% if database.name == current_db.name %}, img: "accept.png"{% endif %} },
+{% for node in Nodes %}
+{id:"scheduler.{{ node.name }}", text:"{{ node.title }}" },
 {% endfor %}
                   ]
                },
-            {   "type": "buttonSelect", 
+*/            {   "type": "buttonSelect", 
                  text:"",
                  "id": "Filters",
                  "img": "zoom.png", 

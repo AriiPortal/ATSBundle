@@ -130,8 +130,8 @@ function ClickRibbon (itemid,state) {
         else if (itemid.substr(0,7)=='request') {
             window.location = "{{ url('arii_ATS_requests') }}?request="+itemid.substr(8);
         }
-        else if (itemid.substr(0,2)=='DB') {
-            dhx4.ajax.get( "{{ url('arii_session_update') }}?database="+itemid.substr(2), function(loader,response) {
+        else if (itemid.substr(0,10)=='scheduler.') {
+            dhx4.ajax.get( "{{ url('arii_session_update') }}?scheduler="+itemid.substr(10), function(loader,response) {
                 dhtmlx.message({
                     type: "Notice",
                     text: loader.xmlDoc.responseText,

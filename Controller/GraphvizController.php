@@ -8,8 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GraphvizController extends Controller
 {
-    private $images_path;
-    private $images = '/bundles/ariicore/images/wa';
+    private $image_path;
     private $Color = array(
         's' => 'green',
         'f' => 'red',
@@ -48,8 +47,10 @@ class GraphvizController extends Controller
         $request = Request::createFromGlobals();
         $joid = $request->query->get( 'id' );
 
+        $Options = array();
         if ($request->query->get( 'output' ) !='') 
-            $output = $request->query->get( 'output' );
+            $Options['output'] = $request->query->get( 'output' );
+        
         if ($request->query->get( 'level' ) !='') 
             $level = $request->query->get( 'level' );
         if ($request->query->get( 'fields' ) !='') 
@@ -59,13 +60,18 @@ class GraphvizController extends Controller
         $date = $this->container->get('arii_core.date');        
         
         // Images
-        $this->images_path = str_replace('\\','/',$this->container->get('kernel')->getRootDir()).'/../web'.$this->images;
+        // Localisation des images 
+        $root = $this->container->get('kernel')->getRootDir();
+        $images = '/bundles/ariiats/images';
+        $this->images_path = str_replace('\\','/',$root).'/../web'.$images;
+        $images_url = $this->container->get('templating.helper.assets')->getUrl($images);        
 
         // Jobs concernés
         $sql = $this->container->get('arii_core.sql');                  
         $dhtmlx = $this->container->get('arii_core.dhtmlx');
+        
         $data = $dhtmlx->Connector('data');
-
+        
         $digraph = '';
         $Ids = array($joid);
         $Infos = $Boxes = $Jobs = array();
@@ -84,7 +90,6 @@ class GraphvizController extends Controller
                 $Jobs[$joid] = 1;
                 $Ver[$joid] = $line['JOB_VER'];
                 $box  = $line['BOX_JOID'];
-                // print "(($box -> $joid))";
 
                 if ($box!=0) {
                     if (!isset($Boxes[$box][$joid]))
@@ -185,28 +190,15 @@ class GraphvizController extends Controller
         }
                 
         $graphviz = $this->container->get('arii_core.graphviz');
-        $out = $graphviz->dot($digraph,$output,$this->images);
-                
-        // reponse du controleur
-        $response = new Response();
-        switch ($output) {
-            case 'svg':
-                $response->headers->set('Content-Type', 'image/svg+xml');
-                break;
-            case 'pdf':
-                $response->headers->set('Content-Type', 'application/pdf');
-                break;
-            case 'dot':
-                $response->headers->set('Content-Type', 'text/plain');
-                break;
-            default:
-                $response->headers->set('Content-Type', 'image/'.$output);
-        }
-        $response->setContent($out);
-        return $response;        
+        $Options = array(
+            'output' => $output,
+            'images' => $images
+        );
+        return $graphviz->dot($digraph,$Options);
     }
 
     private function Boxes($box,&$Boxes,$Infos) {
+
         // deja fait ?
         $cluster = '';
         // boite mais sans information dedans
@@ -301,14 +293,6 @@ class GraphvizController extends Controller
     
     function CleanPath($path) {
         
-        // bidouille en attendant la fin de l'étude
-/*        if (substr($path,0,4)=='live') 
-            $path = substr($path,4);
-        elseif (substr($path,0,6)=='remote') 
-            $path = substr($path,6);
-        elseif (substr($path,0,5)=='cache') 
-            $path = substr($path,5);
-*/      
         $path = str_replace('/','.',$path);
         $path = str_replace('\\','.',$path);
         $path = str_replace('#','.',$path);

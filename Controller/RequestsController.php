@@ -62,7 +62,7 @@ class RequestsController extends Controller
         $basedir = $this->getBaseDir();
 
         $yaml = new Parser();
-        $value['title'] = $this->get('translator')->trans('Summary');
+        $value['title'] = $this->get('translator')->trans('Summary','internal');
         $value['description'] = $this->get('translator')->trans('List of requests');
         $value['columns'] = array(
             $this->get('translator')->trans('Title'),

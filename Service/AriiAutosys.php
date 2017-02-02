@@ -9,8 +9,8 @@ class AriiAutosys
 {
     protected $ColorStatus;
     
-    public function __construct (\Arii\CoreBundle\Service\AriiSession $session) {
-        $this->ColorStatus = $session->getColors();
+    public function __construct (\Arii\CoreBundle\Service\AriiPortal $portal) {
+        $this->ColorStatus = $portal->getColors();
     }
     
     public function Alarm($alarm) {   
@@ -144,16 +144,8 @@ class AriiAutosys
     public function ColorStatus($status) {
         if (!isset($this->ColorStatus[$status]))
             return array('black','#FF0000');
-        $Colors = explode('/',$this->ColorStatus[$status]);
-        $bgcolor=$Colors[0];
-        if (isset($Colors[1]))
-            $color = $Colors[1];
-        else {
-            if ($bgcolor!='black')
-                $color = 'black';
-            else 
-                $color = 'white';
-        }
+        $color = $this->ColorStatus[$status]['color'];
+        $bgcolor= $this->ColorStatus[$status]['bgcolor'];
         return array($bgcolor,$color);
    }
 

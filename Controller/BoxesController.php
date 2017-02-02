@@ -22,18 +22,18 @@ class BoxesController extends Controller
         return $this->render('AriiATSBundle:Boxes:index.html.twig');
     }
 
-    public function grid_toolbarAction()
+    public function toolbarAction()
     {
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
-        return $this->render('AriiATSBundle:Boxes:grid_toolbar.xml.twig',array(), $response );
+        return $this->render('AriiATSBundle:Boxes:toolbar.xml.twig',array(), $response );
     }
 
-    public function grid_menuAction()
+    public function menuAction()
     {
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
-        return $this->render('AriiATSBundle:Boxes:grid_menu.xml.twig',array(), $response );
+        return $this->render('AriiATSBundle:Boxes:menu.xml.twig',array(), $response );
     }
 
     public function statusAction($box='',$only_warning=0,$job=0)
@@ -119,9 +119,8 @@ class BoxesController extends Controller
         $pie = '<data>';
         foreach (array('SUCCESS','FAILURE','TERMINATED','RUNNING','INACTIVE','ACTIVATED','WAIT_REPLY','ON_ICE','ON_HOLD','ON_NOEXEC') as $s) {
             list($bgcolor,$color) = $autosys->ColorStatus($s);
-            if (!isset($Status[$s])) 
-                $Status[$s]=0;
-            $pie .= '<item id="'.$s.'"><STATUS>'.$s.'</STATUS><JOBS>'.$Status[$s].'</JOBS><COLOR>'.$bgcolor.'</COLOR></item>';
+            if (isset($Status[$s])) 
+                $pie .= '<item id="'.$s.'"><STATUS>'.$s.'</STATUS><JOBS>'.$Status[$s].'</JOBS><COLOR>'.$bgcolor.'</COLOR></item>';
         }
         $pie .= '</data>';
         $response = new Response();
