@@ -7,10 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Cron
  *
- * @ORM\Table(name="ATS_ALARMS")
- * @ORM\Entity(repositoryClass="Arii\ATSBundle\Entity\AlarmsRepository")
+ * @ORM\Table(name="ATS_ALERTS")
+ * @ORM\Entity()
  */
-class Alarms
+class Alerts
 {
     /**
      * @var integer

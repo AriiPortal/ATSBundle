@@ -1,0 +1,178 @@
+{# src/Arii/CoreBundle/Resources/views/index.html.twig #}
+{% extends "AriiATSBundle::layout.html.twig" %}
+{% block body %}
+<script>
+dhtmlxEvent(window,"load",function(){ 
+var size=430;   
+
+    globalLayout = new dhtmlXLayoutObject(document.body,"3L");
+    globalLayout.cells("a").hideHeader();
+    globalLayout.cells("a").setWidth(400);
+    globalLayout.cells("b").hideHeader();
+    globalLayout.cells("c").hideHeader();
+    globalLayout.cells("c").setHeight(320); 
+    
+    globalMenu = globalLayout.cells("a").attachMenu();
+    globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
+    globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
+
+    myRibbon = globalLayout.cells("a").attachRibbon(); 
+    myRibbon.setIconPath( "{{ asset('bundles/ariicore/images/ribbon/') }}" );
+    myRibbon.loadStruct("{{ url('json_ATS_ribbon') }}");
+    myRibbon.attachEvent("onStateChange", StateRibbon );
+    myRibbon.attachEvent("onClick", ClickRibbon );
+            
+    formData = [
+       { type: "settings", position: "label-left", labelWidth: 100, inputWidth: 240, labelAlign: "right", readonly: 1, position: "label-left" },
+        {type: "hidden", name: 'ID' },       
+        {type: "input", name: 'NAME', label:'{{ 'Name' | trans }}', required: true },
+        {type: "input", name: 'TITLE', label:'{{ 'Title' | trans }}' },
+        {type: "input", name: 'DESCRIPTION', label:'{{ 'Description' | trans }}', rows: 4 },
+        { type: "newcolumn" },
+        {type: "input", name: 'SOURCE', label:'{{ 'Source' | trans }}' },
+        {type: "input", name: 'PATTERN', label:'{{ 'Pattern' | trans }}' },
+        {type: "input", name: 'ALERT', label:'{{ 'Alert' | trans }}' },
+        {type: "input", name: 'CODES', label:'{{ 'Codes' | trans }}' },
+        {type: "input", name: 'MESSAGE', label:'{{ 'Message' | trans }}' },
+        { type: "newcolumn" },
+        {   type: 'editor', 
+            toolbar: true,
+            iconsPath: "{{ asset('dhtmlx/skins/terrace/imgs/') }}",
+            name: 'HELP',
+            label: "{{ "Help"| trans }}", 
+            inputWidth: 500,
+            inputHeight: 200
+        }
+    ];
+    
+    myForm = globalLayout.cells("c").attachForm(formData);
+    myForm.enableLiveValidation(true);
+    
+    myFormToolbar = globalLayout.cells("c").attachToolbar();
+    myFormToolbar.setIconsPath("{{ asset('/bundles/ariicore/images/toolbar/') }}");
+    myFormToolbar.loadStruct("{{ url('xml_ATS_alert_toolbar') }}");
+    
+    myGrid = globalLayout.cells("b").attachGrid();
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid.setHeader("{{ "Name" | trans }},{{ "Title" | trans }},{{ "Description" | trans }},{{ "Source" | trans }},{{ "Pattern" | trans }},{{ "Alert" | trans }},{{ "Codes" | trans }}");
+    myGrid.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+    myGrid.setInitWidths("100,200,*,250,250,200,200");
+    myGrid.setColAlign("left,left,left,left,left,left,left");
+    myGrid.setColTypes("ro,ro,ro,ro,ro,ro,ro");
+    myGrid.setColSorting("str,str,str,str,str,str,str");
+    myGrid.enableAlterCss("even_row","odd_row");    
+    myGrid.init();
+    myGrid.load( "{{ url('xml_ATS_alerts_grid') }}" );
+    myGrid.attachEvent("onRowDblClicked", function (rid) {
+        EditAlert(rid);
+    });
+    
+    myFormToolbar.attachEvent("onClick", function(id){
+        switch (id) {
+            case 'new_alert':
+            case 'add_alert':
+                myForm.clear();
+                break;
+            case 'save_alert':
+                globalLayout.progressOn();
+                if(!myForm.validate())
+                {
+                    dhtmlx.message({
+                        title:"Error",
+                        type: "error",
+                        lifetime: "60000",
+                        text: "{{ "Please type in all the required fields!" | trans }}"
+                     });
+                    return;
+                }
+                myForm.send("{{ url('xml_ATS_alert_save') }}","POST",function(loader,response){
+                   if(response === "success")
+                   {
+                     dhtmlx.message({
+                        title:"{{ "Save" | trans }}",
+                        type: "Notice",
+                        lifetime: "60000",
+                        text: "{{ "Alert saved" | trans }}"
+                     });
+                   }
+                   else 
+                   {
+                     dhtmlx.message({
+                        title:"{{ "Save" | trans }}",
+                        type: "error",
+                        lifetime: "60000",
+                        text: response
+                     });
+                     // globalLayout.cells("b").attachHTMLString(response);
+                   }
+                   myGrid.clearAll();
+                   myGrid.load("{{ url('xml_ATS_alerts_grid') }}", function() {
+                        globalLayout.progressOff();
+                   });
+                });
+                break;
+            default:
+                alert(id);
+            }
+    });
+
+    globalLayout.cells("a").hideHeader();
+
+});
+
+function EditAlert(id) {
+    globalLayout.cells("b").progressOn();
+    myForm.setItemLabel("fieldset","{{ "Edit alert" | trans }}");
+    myForm.clear();
+    myForm.load("{{ url('xml_ATS_alert_form') }}?id="+id, function () {
+        globalLayout.cells("b").progressOff();
+    });
+}
+
+function DeleteAlert(id) {
+    // On edite pour sauvegarder
+    globalLayout.cells("b").progressOn();
+    EditAlert(id);
+    dhtmlx.confirm({
+     title: "{{ "Delete alert" | trans }}",
+     type: "confirm-error",
+     text: '{{ "Do you confirm the suppression ?" | trans }}',
+     callback: function(answer) { if (answer) {
+               myForm.send("{{ url('xml_ATS_alert_delete') }}","POST",function(loader,response){
+               if(response === "success")
+               {
+                 dhtmlx.message({
+                    title:"{{ "Save" | trans }}",
+                    type: "Notice",
+                    lifetime: "60000",
+                    text: "{{ "Alert deleted" | trans }}"
+                 });
+               }
+               else 
+               {
+                 dhtmlx.message({
+                    title:"{{ "Delete" | trans }}",
+                    type: "error",
+                    lifetime: "60000",
+                    text: response
+                 });
+               }
+                    myGrid.deleteRow(id);
+                    globalLayout.cells("b").progressOff();
+                })
+        }
+    },
+     cancel: "{{ "No" | trans }}",
+     ok: "{{ "Yes" | trans }}" });
+ }
+ 
+function GridRefresh()
+{
+    myGrid.clearAll();
+    myGrid.load("{{ url('xml_ATS_alerts_grid') }}");
+}
+
+function GlobalRefresh() {
+}
+</script>
+{% endblock %}

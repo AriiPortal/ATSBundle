@@ -613,4 +613,45 @@ xml_ATS_docs_alarms:
 xml_ATS_docs_alarms_all:
     path:  /docs/alarms_all.xml
     defaults: { _controller: AriiATSBundle:Docs:allalarms }
+
+#============================================================
+# Alerts
+#------------------------------------------------------------
+arii_ATS_alerts:
+    path:  /alerts
+    defaults: { _controller: AriiATSBundle:Alerts:index }
     
+xml_ATS_alerts_grid:
+    path:  /alerts/grid.xml
+    defaults: { _controller: AriiATSBundle:Alerts:grid }
+    
+xml_ATS_alerts_tree:
+    path:  /alerts/tree.xml
+    defaults: { _controller: AriiATSBundle:Alerts:tree }
+
+xml_ATS_alerts_select:
+    path:  /alerts/select.xml
+    defaults: { _controller: AriiATSBundle:Alerts:select }
+
+html_ATS_alerts_import:
+    path:  /alerts/import.html
+    defaults: { _controller: AriiATSBundle:Alerts:import }
+    
+#============================================================
+# Alert
+#------------------------------------------------------------
+xml_ATS_alert_form:
+    path:  /alert/form.xml
+    defaults: { _controller: AriiATSBundle:Alerts:form}
+
+xml_ATS_alert_save:
+    path:  /alert/save.xml
+    defaults: { _controller: AriiATSBundle:Alerts:save}
+
+xml_ATS_alert_delete:
+    path:  /alert/delete.xml
+    defaults: { _controller: AriiATSBundle:Alerts:delete}
+
+xml_ATS_alert_toolbar:
+    path:  /alert/toolbar.xml
+    defaults: { _controller: AriiATSBundle:Alerts:toolbar}
