@@ -8,12 +8,13 @@ use Symfony\Component\HttpFoundation\Request;
 class BoxController extends Controller
 {
     
-    public function docAction()
+    public function docAction($id=0)
     {
         $request = Request::createFromGlobals();
-        $id = $request->get('id');
+        if ($request->get('id')>0) 
+            $id = $request->get('id');
         $job_name = $request->get('job');
-        
+
         $db = $this->container->get('arii_core.dhtmlx');
         $sql = $this->container->get('arii_core.sql');
         $data = $db->Connector('data');

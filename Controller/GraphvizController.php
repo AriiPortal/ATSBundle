@@ -194,6 +194,7 @@ class GraphvizController extends Controller
             'output' => $output,
             'images' => $images
         );
+
         return $graphviz->dot($digraph,$Options);
     }
 
@@ -259,7 +260,7 @@ class GraphvizController extends Controller
         }
         else {
             if ($Infos['JOB_TYPE']==98)
-                $label  = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="grey" BGCOLOR="#AAAAAA">';
+                $label  = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="grey" BGCOLOR="#CCCCCC">';
             else
                 $label  = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="grey" BGCOLOR="#DDDDDD">';
         }
@@ -270,10 +271,10 @@ class GraphvizController extends Controller
             $image = 'cmd';
         }
         if ($realtime) {
-            $label .= '<TR><TD ROWSPAN="3"><IMG SRC="'.$this->images_path.'/big/'.$image.'.png"/></TD><TD ALIGN="RIGHT">'.$Infos['STATUS_TEXT'].'</TD></TR>';
+            $label .= '<TR><TD ROWSPAN="3"><IMG SRC="'.str_replace('/',DIRECTORY_SEPARATOR,$this->images_path).'/big/'.$image.'.png"/></TD><TD ALIGN="RIGHT">'.$Infos['STATUS_TEXT'].'</TD></TR>';
         }
         else {
-            $label .= '<TR><TD ROWSPAN="3"><IMG SRC="'.$this->images_path.'/big/'.$image.'.png"/></TD><TD ALIGN="RIGHT"></TD></TR>';
+            $label .= '<TR><TD ROWSPAN="3"><IMG SRC="'.str_replace('/',DIRECTORY_SEPARATOR,$this->images_path).'/big/'.$image.'.png"/></TD><TD ALIGN="RIGHT"></TD></TR>';
         }
         $label .= '<TR><TD><b>'.$Infos['JOB_NAME'].'</b></TD></TR>';
         $label .= '<TR><TD ALIGN="LEFT">'.$Infos['DESCRIPTION'].'</TD></TR>';
@@ -282,7 +283,7 @@ class GraphvizController extends Controller
             if (isset($Infos[$k]) and (trim($Infos[$k])!='')) {
                 $label .= '<TR><TD>';
                 if (isset($Icons[$k])) {
-                    $label .= '<IMG SRC="'.$this->images_path.'/'.$Icons[$k].'.png"/>';            
+                    $label .= '<IMG SRC="'.str_replace('/',DIRECTORY_SEPARATOR,$this->images_path).'/'.$Icons[$k].'.png"/>';            
                 }
                 $label .= '</TD><TD ALIGN="LEFT">'. htmlentities($Infos[$k]).'</TD></TR>';            }
         }

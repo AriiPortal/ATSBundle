@@ -71,7 +71,6 @@ class JobController extends Controller
         $response->headers->set('Content-Type', 'text/plain');
         $response->setContent($jil);
         return $response;
-        
     }
     
     public function formAction()
