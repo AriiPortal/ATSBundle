@@ -188,8 +188,6 @@ class RequestsController extends Controller
          }
         $value['count'] = $nb;
         if ($output=='html') {
-            print_r($value);
-            exit();
             return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
         }
         elseif ($output=='csv') {
@@ -243,10 +241,9 @@ class RequestsController extends Controller
         exit();
     }
 
-    /* Donne le répertoire de travail en fonction de la langue et de l'utilisiation */
     private function getBaseDir() {
-        $lang = $this->getRequest()->getLocale();
-        $session = $this->container->get('arii_core.session');
-        return $session->get('workspace').'/Autosys/Requests/'.$lang;        
+        $lang = $this->getRequest()->getLocale();       
+        $portal = $this->container->get('arii_core.portal');
+        return $portal->getWorkspace().'/Autosys/Requests/'.$lang;    
     }
 }

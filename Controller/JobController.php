@@ -39,8 +39,8 @@ class JobController extends Controller
             $type = $line['JOB_TYPE'];
         }
         if ($job=='') {
-            print "$id ?";
-            exit();
+            $portal->ErrorLog("Unknown ID ($id)", 1,  __FILE__, __LINE__);
+            $id = $type = $job = '?';
         }
         return $this->render('AriiATSBundle:Job:history.html.twig',array('id' => $id, 'type' => $type, 'job' => $job));
     }

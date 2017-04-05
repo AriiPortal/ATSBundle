@@ -24,7 +24,7 @@ class AriiExec {
         $engine = $this->session->getSpoolerByName($name,'waae');
         
         if (!isset($engine[0]['shell'])) {
-            print "?!";
+            $portal->ErrorLog("Unknown DB", 1,  __FILE__, __LINE__);
             exit();
         }
 
