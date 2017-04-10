@@ -11,18 +11,18 @@
 <body>
 <div class="container-fluid">
 <div class="jumbotron">
-{% set db = app.session.get('database') %}
-  <h1>{{ db.name }}</h1>
-  <p>{{ db.type }}</p>
+  <h1>{{ db.title }}</h1>
+  <p>{{ db.description }}</p>
+  <i>Code: {{ db.title }}</i>
 </div>
 
 <div class="table-responsive">
     <table class="table">
         <tr><th>{{ "driver" | trans }}</th><td>{{ db.driver }}</td></tr>
-        <tr><th>{{ "database" | trans }}</th><td>{{ db.dbname }}</td></tr>
+        <tr><th>{{ "database" | trans }}</th><td>{{ db.database }}</td></tr>
         <tr><th>{{ "host" | trans }}</th><td>{{ db.host }}</td></tr>
         <tr><th>{{ "port" | trans }}</th><td>{{ db.port }}</td></tr>
-        <tr><th>{{ "user" | trans }}</th><td>{{ db.user }}</td></tr>
+        <tr><th>{{ "user" | trans }}</th><td>{{ db.login }}</td></tr>
     </table>
 </div>    
 </div>

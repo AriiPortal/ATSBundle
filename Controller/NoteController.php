@@ -80,11 +80,12 @@ class NoteController extends Controller
         $job = $request->get('job');
         
         $note = $this->getDoctrine()->getRepository("AriiATSBundle:Notes")->findOneBy(array('job_name'=>$job)); 
-        if ($note)
-            print $note->getJobNote();
+        if (!$note)
+            throw new \Exception('ATS',1);
         
-        $portal->ErrorLog("Unknown note for $job", 1,  __FILE__, __LINE__);
-        exit();
+        $response = new Response();
+        $response->setContent( $note->getJobNote() );
+        return $response;        
     }
 
     public function templatesAction()

@@ -4,17 +4,11 @@ namespace Arii\ATSBundle\Service;
 class AriiExec {
     
     protected $session;
-    protected $audit;
-    protected $log;
     
     public function __construct(
-            \Arii\CoreBundle\Service\AriiSession $session, 
-            \Arii\CoreBundle\Service\AriiAudit $audit,  
-            \Arii\CoreBundle\Service\AriiLog $log
+            \Arii\CoreBundle\Service\AriiSession $session
     ) {
-        $this->session = $session;
-        $this->audit = $audit;
-        $this->log = $log;
+        $this->portal = $portal;
     }
     
     public function Exec($command,$stdin='') {

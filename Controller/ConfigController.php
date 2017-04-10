@@ -15,7 +15,10 @@ class ConfigController extends Controller
 
     public function configAction()
     {
-        return $this->render('AriiATSBundle:Config:config.html.twig');
+        $portal = $this->container->get('arii_core.portal');
+        $db = $portal->getDatabase();
+        
+        return $this->render('AriiATSBundle:Config:config.html.twig', array('db' => $db));
     }
 
 }

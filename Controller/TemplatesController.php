@@ -48,10 +48,8 @@ class TemplatesController extends Controller
         }
         
         # Ouverture du template
-        if (!isset($config['template'])) {
-            print "$template ?!";
-            exit();
-        }
+        if (!isset($config['template']))
+            throw new \Exception('ATS',2);
         
         $temp = $config['template'];
         $content = file_get_contents("$path/$temp");
@@ -152,11 +150,8 @@ class TemplatesController extends Controller
         }
         
         # Ouverture du template
-        if (!isset($cfg['templates'])) {
-            print "Templates ?!";
-            print_r($cfg);
-            exit();
-        }
+        if (!isset($cfg['templates']))
+            throw new \Exception('ATS',2);
 
         # Parametres globaux
         $global = $cfg['global'];

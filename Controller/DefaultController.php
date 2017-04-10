@@ -103,9 +103,11 @@ class DefaultController extends Controller
 
         $doc = $this->container->get('arii_core.doc');
         $url = $doc->Url($template);
-        
-        header("Location: $url");
-        die();
+
+        $response = new Response();
+        $response->setStatusCode(200);
+        $response->headers->set('Refresh', '0; url='.$url);
+        $response->send();
     }
 
     public function sendeventAction() {
@@ -115,15 +117,13 @@ class DefaultController extends Controller
         $comment = $request->request->get( 'COMMENT' );
         
         $exec = $this->container->get('arii_ats.exec');
-        
         $sendevent = 'sendevent -E '.$action.' -J '.$job.' -c "'.$comment.'"';
-        print "$sendevent";
-        exit();
-        print $exec->Exec($sendevent);
         
-        // On recupere l'evenement immediatement
-        print "$sendevent";
-        exit();
+        $response = new Response();
+        $response->headers->set('Content-Type: text/html; charset=utf-8');        
+        $html = '<pre>'.$exec->Exec($sendevent).'</pre>';
+        $response->setContent( $html );
+        return $response;
     }
 
     public function autorepAction() {
@@ -133,12 +133,11 @@ class DefaultController extends Controller
         
         $exec = $this->container->get('arii_ats.exec');
         
-        header('Content-Type: text/html; charset=utf-8');        
-        print "<pre>";
-        print $exec->Exec("autorep -J $job $options");
-        print "</pre>";
-        
-        exit();
+        $response = new Response();
+        $response->headers->set('Content-Type: text/html; charset=utf-8');        
+        $html = '<pre>'.$exec->Exec("autorep -J $job $options").'</pre>';
+        $response->setContent( $html );
+        return $response;
     }
 
     public function autosyslogAction() {
@@ -148,12 +147,11 @@ class DefaultController extends Controller
         
         $exec = $this->container->get('arii_ats.exec');
         
-        header('Content-Type: text/html; charset=utf-8');        
-        print "<pre>";
-        print $exec->Exec("autosyslog -J $job $options");
-        print "</pre>";
-        
-        exit();
+        $response = new Response();
+        $response->headers->set('Content-Type: text/html; charset=utf-8');        
+        $html = '<pre>'.$exec->Exec("autosyslog -J $job $options").'</pre>';
+        $response->setContent( $html );
+        return $response;        
     }
 /*
 File Name  File Num Status     Size (KB) Date   Time   User Data  Queue Name 
@@ -216,11 +214,12 @@ QPJOBLOG   1        *READY     24        150911 093940 EJOBOTOSY1 QEZJOBLOG
             array_push($Check, $line);            
         }
         header('Content-Type: text/html; charset=utf-8');        
-        print "<pre>";
-        print implode("\n",$Check);
-        print "</pre>";
-        
-        exit();
+
+        $response = new Response();
+        $response->headers->set('Content-Type: text/html; charset=utf-8');        
+        $html = '<pre>'.implode("\n",$Check).'</pre>';
+        $response->setContent( $html );
+        return $response;         
     }
 
     /* Donne le répertoire de travail en fonction de la langue et de l'utilisiation */
