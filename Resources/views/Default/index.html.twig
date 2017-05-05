@@ -5,8 +5,9 @@
 dhtmlxEvent(window,"load",function(){     
     globalLayout = new dhtmlXLayoutObject(document.body,"2U");  
     globalLayout.cells("a").setWidth(340); 
+    globalLayout.cells("a").hideHeader(); 
     globalLayout.cells("b").hideHeader(); 
-
+    
     globalMenu = globalLayout.cells("a").attachMenu();
     globalMenu.setIconsPath( "{{ asset('/bundles/ariicore/images/menu/') }}" );
     globalMenu.loadStruct("{{ url('xml_menu') }}?route={{ app.request.attributes.get('_route') }}");
@@ -17,10 +18,21 @@ dhtmlxEvent(window,"load",function(){
     myRibbon.attachEvent("onStateChange", StateRibbon );
     myRibbon.attachEvent("onClick", ClickRibbon );
 
-    globalLayout.cells("a").hideHeader(); 
-    myGlobalTab = globalLayout.cells("a").attachURL("{{ url('html_ATS_summary') }}");    
-    globalLayout.cells("b").attachURL("{{ url('html_ATS_main') }}");
-    
+    myGrid = globalLayout.cells("a").attachGrid();
+    myGrid.selMultiRows = true;
+    myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
+    myGrid.setHeader("{{ "Node" | trans }},{{ "Database" | trans }},name");
+    myGrid.attachHeader("#text_filter,#select_filter,#text_filter,");
+    myGrid.setColAlign("left,left,left");
+    myGrid.setInitWidths("*,*,0");
+    myGrid.setColTypes("ro,ro,ro");
+    myGrid.setColSorting("str,str,str");
+    myGrid.init();
+    myGrid.load( "{{ url('xml_ATS_nodes_grid') }}");
+    myGrid.attachEvent("onRowDblClicked",function(id) { 
+        globalLayout.cells("b").attachURL('{{ url('html_ATS_summary') }}?db_id='+this.cells(id,2).getValue()); 
+    });
+    globalLayout.cells("b").attachURL('{{ url('html_ATS_summary') }}'); 
 });
 </script>
 {% endblock %}

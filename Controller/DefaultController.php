@@ -11,33 +11,75 @@ class DefaultController extends Controller
 {
     public function indexAction()
     {
-        $portal = $this->container->get('arii_core.portal');
+        // La db est en parametre ?
         $request = Request::createFromGlobals();
-        if ($request->query->get( 'scheduler' )!='') {
-            $JobScheduler = $portal->setJobScheduler($request->query->get( 'scheduler' ));
-            // On en profite pour mettre là jour la base de données
-            $Database = array();
-            foreach ($JobScheduler['Connections'] as $name=>$Connection) {
-                if ($Connection['domain']=='database') {
-                    $Database = $portal->setDatabase($Connection);
-                    break;
-                }
-            }
-        }
-        else {
-            $Scheduler = $portal->getJobScheduler();
-        }        
+            $portal = $this->container->get('arii_core.portal');
+        if ($request->get('db')!='')
+            $portal->setDatabaseByName($request->get('db'));
+        if ($request->get('db_id')!='')
+            $portal->setDatabaseById($request->get('db_id'));
         return $this->render('AriiATSBundle:Default:index.html.twig');
     }
 
     public function summaryAction()
     {
         $portal = $this->container->get('arii_core.portal');
-        $Spoolers=$portal->getNodesBy('vendor', 'ats'); 
+        $Module = $portal->getModule('ATS');
+
+        // On recupère les requetes
+        $yaml = new Parser();
+        $lang = $this->getRequest()->getLocale();
+
+        $basedir = $this->getBaseDir();
+        $Requests = array();
+        if ($dh = @opendir($basedir)) {
+            while (($file = readdir($dh)) !== false) {
+                if (substr($file,-4) == '.yml') {
+                    $content = file_get_contents("$basedir/$file");
+                    $v = $yaml->parse($content);
+                    $v['id']=substr($file,0,strlen($file)-4);
+                    if (!isset($v['icon'])) $v['icon']='cross';
+                    if (!isset($v['title'])) $v['title']='?';
+                    array_push($Requests, $v);
+                }
+            }
+        }
         
-        return $this->render('AriiATSBundle:Default:summary.html.twig',
-            array(  'module' => $portal->getModule('ATS'), 
-                    'Spoolers' => $Spoolers ));                
+        // Base de donnees courante ?
+        // passée en variable        
+        $request = Request::createFromGlobals();
+            $portal = $this->container->get('arii_core.portal');
+        if ($request->get('db')!='')
+            $portal->setDatabaseByName($request->get('db'));
+        if ($request->get('db_id')!='')
+            $portal->setDatabaseById($request->get('db_id'));
+
+        // on reteste (c'est en session)
+        $Database = $portal->getDatabase();
+        if (isset($Database['name']))
+            $db = $Database['name'];
+        else
+            $db = "?";
+
+        // base de données
+        $Nodes=$portal->getNodesBy('vendor', 'ats');
+  
+        // on recrée un arbre avec référentiel 
+        $db_active = '';
+        $Repositories = array();
+        foreach ($Nodes as $Node) {
+            foreach ($Node['Connections'] as $Connection) {
+                if ($Connection['domain']!='database') continue;
+                $name = $Connection['name'];
+                if (!isset($Repositories[$name])) {
+                    $Repositories[$name] = $Connection;
+                    // si la base est dans la liste, elle est validée
+                    if ($Connection['name']==$db) $db_active=$db;                
+                }
+            }
+        }
+        // si la base n'est pas dans la liste, on reset ?
+        return $this->render('AriiATSBundle:Default:summary.html.twig',array('module' => $Module, 'Repositories' => $Repositories, 'db_active' => $db_active ));
     }
 
     public function mainAction()
@@ -45,7 +87,7 @@ class DefaultController extends Controller
         $portal = $this->container->get('arii_core.portal');
         $Spoolers=$portal->getNodesBy('vendor', 'ats'); 
         
-        return $this->render('AriiATSBundle:Default:main.html.twig',
+        return $this->render('AriiATSBundle:Default:summary.html.twig',
             array(  'module'   => $portal->getModule('ATS'), 
                     'Spooler'  => $portal->getJobScheduler(),
                     'Database' => $portal->getDatabase() ));                
@@ -227,6 +269,43 @@ QPJOBLOG   1        *READY     24        150911 093940 EJOBOTOSY1 QEZJOBLOG
         $lang = $this->getRequest()->getLocale();       
         $portal = $this->container->get('arii_core.portal');
         return $portal->getWorkspace().'/Autosys/Requests/'.$lang;    
+    }
+
+    public function nodesAction()
+    {        
+        // On recupere la liste des spoolers, donc des nodes 'OJS'
+        $portal = $this->container->get('arii_core.portal');
+        $Nodes=$portal->getNodesBy('vendor', 'ats');
+  
+        $Result = array();
+        foreach ($Nodes as $Node) {
+            foreach ($Node['Connections'] as $Connection) {
+                if ($Connection['domain']!='database') continue;
+                $name = $Node['title'];
+                $Result[$name] = array(
+                    'id'=> $Node['id'], 
+                    'db' => $Connection['title'], 
+                    'db_id' => $Connection['id'],
+                    'db_name' => $Connection['name'] );
+            }
+        }
+        asort($Result);
+        // on recrée un arbre avec référentiel 
+        $data = "<?xml version='1.0' encoding='utf-8' ?>";
+        $data .= "<rows>";
+        foreach ($Result as $name => $Info) {
+            $data .= '<row id="'.$Info['id'].'">';
+            $data .= '<cell>'.$name.'</cell>';
+            $data .= '<cell>'.$Info['db'].'</cell>';
+            $data .= '<cell>'.$Info['db_id'].'</cell>';
+            $data .= "</row>";
+        }
+        $data .= "</rows>";
+        
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/xml');
+        $response->setContent( $data );
+        return $response;
     }
     
 }

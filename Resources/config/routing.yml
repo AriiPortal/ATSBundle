@@ -70,6 +70,10 @@ html_ATS_sendevent_exec:
     path:  /sendevent/exec.html
     defaults: { _controller: AriiATSBundle:Sendevent:sendevent }
 
+xml_ATS_nodes_grid:
+    path:  /nodes.xml
+    defaults: { _controller: AriiATSBundle:Default:nodes }
+    
 # --------------------------------------------------------------------------
 # Config
 # --------------------------------------------------------------------------

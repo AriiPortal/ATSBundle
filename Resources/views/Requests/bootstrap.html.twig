@@ -17,7 +17,7 @@
 <img style="float: right;" src="{{ asset('logo.png') }}"/>
   <h1>{{ result.title | trans }}</h1>
   <p>{{ result.description | trans }}</p>
-  {% set current_db = app.session.get('database') %}[{{ current_db.name }}]
+  {% set current_db = app.session.get('database') %}[{ { current_db.name }}]
 </div>
 <div class="table-responsive">
 {% if result.count > 0 %}

@@ -89,22 +89,21 @@ class RequestsController extends Controller
         
         $lang = $this->getRequest()->getLocale();
         $request = Request::createFromGlobals();
-        if ($request->query->get( 'request' )!='')
+        if ($request->query->get( 'request' ))
             $req=$request->query->get( 'request');
-
-        if ($request->query->get( 'output' ))
-            $output=$request->query->get( 'output');
+        else {
+            throw new \Exception('ARI',6);
+        }
 
         // cas de l'appel direct
-        if ($request->query->get( 'dbname' )!='')
-            $dbname=$request->query->get( 'dbname');
+        if ($request->query->get( 'dbname' )) {
+            $instance=$request->query->get( 'dbname');
 
-        if ($dbname!='') {
-            $session = $this->container->get('arii_core.session');
-            $engine = $session->setDatabaseByName($dbname,'waae');    
+            $portal = $this->container->get('arii_core.portal');
+            $engine = $portal->setDatabaseByName($instance,'waae');            
         }
-               
-        if (isset($req)=='') return $this->summaryAction();
+        
+        if (!isset($req)) return $this->summaryAction();
         
         $page = $this->getBaseDir().'/'.$req.'.yml';
         $content = file_get_contents($page);
@@ -112,12 +111,9 @@ class RequestsController extends Controller
         $yaml = new Parser();
         try {
             $value = $yaml->parse($content);
-            
         } catch (ParseException $e) {
-            $error = array( 'text' =>  "Unable to parse the YAML string: %s<br/>".$e->getMessage() );
-            return $this->render('AriiATSBundle:Requests:ERROR.html.twig', array('error' => $error));
+            throw new \Exception($e->getMessage());
         }
-
 
         $sql = $this->container->get('arii_core.sql');
         
@@ -138,6 +134,7 @@ class RequestsController extends Controller
             }
             array_push($value['columns'],$c);
         }
+        
         // bibliothèques
         $ats  = $this->container->get('arii_ats.autosys'); 
         $date = $this->container->get('arii_core.date');   

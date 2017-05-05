@@ -1,11 +1,29 @@
-{% extends "AriiJIDBundle::bootstrap.html.twig" %}
+{% extends "AriiATSBundle::bootstrap.html.twig" %}
 {% block body %}
 <div class="container-fluid">
-<h2>{{ "Instances" | trans }}</h2>
-<ul class="list-group">
-  {% for name,spooler in Spoolers %} 
-      <li class="list-group-item"><a href="{{ url('arii_ATS_index') }}?scheduler={{ spooler.name }}" target="_top"> {{ spooler.title }}</a></li>
+<div class="jumbotron">
+    <div style='float: right'><img src="{{ asset('/bundles/ariicore/images/cover/') }}/{{ module.img }}"/></div>
+  <h1>{{ module.name }}</h1>
+  <p>{{ module.desc }}</p>
+</div>
+{% if db_active=='' %}
+<div class="alert alert-danger">
+  <strong>Stop!</strong> {{ "You have to define a database." | trans }}
+<ul class="list-group">  
+  {% for title,repository in Repositories %} 
+      <li class="list-group-item {% if repository.name == db_active %}active{% endif %}"><a href="{{ url('arii_ATS_index') }}?db={{ repository.name }}" target="_top"> {% if repository.name == db_active %}<font color='white'>{% endif %}{{ repository.title }}{% if repository.name == db_active %}</font>{% endif %}</a></li>
   {% endfor %}
 </ul>
+</div>    
+{% else %}    
+<div class="alert alert-info">
+  {% for title,repository in Repositories %} 
+    {% if repository.name == db_active %}
+        <strong>{{ repository.title }}</strong> [{{ repository.name }}]
+        
+    {% endif %}
+  {% endfor %}  
+</div>    
+{% endif %}
 </div>
 {% endblock %}
