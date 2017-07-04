@@ -470,15 +470,6 @@ arii_ATS_requests_summary:
     path:  /requests/summary.html
     defaults: { _controller: AriiATSBundle:Requests:summary }
 
-# --------------------------------------------------------------------------
-# Monitoring
-# --------------------------------------------------------------------------
-check_ATS_requests_result:
-    path:  /{output}/{dbname}/{req}
-    defaults: { _controller: AriiATSBundle:Requests:result }
-    requirements:
-        output: check
-
 #--------------------------------------------------------------------
 # Templates
 #--------------------------------------------------------------------
@@ -618,3 +609,9 @@ xml_ATS_docs_alarms_all:
     path:  /docs/alarms_all.xml
     defaults: { _controller: AriiATSBundle:Docs:allalarms }
 
+# --------------------------------------------------------------------------
+# Monitoring
+# --------------------------------------------------------------------------
+check_ATS_requests_result:
+    path:  /public/request/{dbname}/{req}.{output}
+    defaults: { _controller: AriiATSBundle:Requests:result }

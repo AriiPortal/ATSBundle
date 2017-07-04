@@ -135,18 +135,19 @@ class RequestsController extends Controller
     {
         $lang = $this->getRequest()->getLocale();
         $request = Request::createFromGlobals();
-        if ($request->query->get( 'request' ))
+        if ($request->query->get( 'request' )!='')
             $req=$request->query->get( 'request');
-        else {
+        
+        if ($req=='')
             throw new \Exception('ARI',6);
-        }
 
         // cas de l'appel direct
-        if ($request->query->get( 'dbname' )) {
-            $instance=$request->query->get( 'dbname');
+        if ($request->query->get( 'dbname' )!='')
+            $dbname=$request->query->get( 'dbname');
 
+        if ($dbname!='') {
             $portal = $this->container->get('arii_core.portal');
-            $engine = $portal->setDatabaseByName($instance,'waae');            
+            $engine = $portal->setDatabaseByName($dbname,'waae');            
         }
         
         if (!isset($req)) return $this->summaryAction();
@@ -300,22 +301,11 @@ class RequestsController extends Controller
             return $response;                      
         }
         elseif ($output=='check') {
-            $response = new Response(); 
-            if ($status==4) {
-                $response->setStatusCode( '500' );
-            }
-            else {
-                $response->setContent( implode("\n",$r) );
-            }
-            return $response;                        
-        }
-        elseif ($output=='nagios') {
             $response = new Response();
-            $response->setStatusCode( '401' );
-            $response->setContent( implode("\n",$r));
-            return $response;                        
-        }
-        
+            $response->setContent( "ok" );
+            $response->setStatusCode( '417' );
+            return $response;                      
+        }        
 /*        
         $twig = file_get_contents('../src/Arii/ATSBundle/Resources/views/Requests/html2pdf.pdf.twig');
         $content = $this->get('arii_ats.twig_string')->render( $twig, array('result' => $value ) );      
