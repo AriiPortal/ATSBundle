@@ -33,16 +33,25 @@ dhtmlxEvent(window,"load",function(){
 
     myGrid = globalLayout.cells("a").attachGrid();
     myGrid.setImagePath( "{{ asset('bundles/ariicore/images/treegrid/') }}");
-    myGrid.setHeader("#text_filter");
-    myGrid.setColSorting("str");
+    myGrid.setHeader("#text_filter,#numeric_filter");
+    myGrid.setColAlign("left,right");    
+    myGrid.setInitWidths("*,70");
+    myGrid.setColSorting("str,int");
     myGrid.init();
     myGrid.load( "{{ url('xml_ATS_requests_list') }}");
 
+    globalLayout.attachEvent("onContentLoaded", function(){
+        globalLayout.cells("b").progressOff();
+        myGrid.load( "{{ url('xml_ATS_requests_list') }}", function() {
+            globalLayout.cells("a").progressOff();        
+        });
+    });
+    
     myGrid.attachEvent("onRowDblClicked", function (id) {
         last = id;
         globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request="+id);
     });
-    
+
     autorefresh = setInterval( "GlobalRefresh()",update*1000);
 });
 
@@ -59,9 +68,6 @@ function GlobalRefresh() {
     }
     myRibbon.setItemText( "refresh", hours + ":" + minutes + ":" +  seconds );
     globalLayout.cells("b").attachURL("{{ url('arii_ATS_requests_result') }}?request="+last);
-    globalLayout.cells("a").progressOff();
-    globalLayout.cells("b").progressOff();
-    globalLayout.progressOff();
 }
 </script>
 {% endblock %}

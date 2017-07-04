@@ -29,21 +29,68 @@ class RequestsController extends Controller
 
     public function listAction()
     {
+        // On récupère les statuts en cours
+        $em = $this->getDoctrine()->getManager();        
+        $Checks = $em->getRepository("AriiATSBundle:Check")->findAll();
+        foreach ($Checks as $Check) {
+            $request = $Check->getName();
+            $State[$request] = [
+                'status'  => $Check->getStatus(),
+                'executed'  => $Check->getExecuted()->format('U'),
+                'results'  => $Check->getResults()
+            ];            
+        }
+        
         $response = new Response();
         $response->headers->set('Content-Type', 'text/xml');
         $list = '<?xml version="1.0" encoding="UTF-8"?>';
         $list .= '<rows>';
+        $list .= '<head>
+            <afterInit>
+                <call command="clearAll"/>
+            </afterInit>
+        </head>';
         
         $yaml = new Parser();
         $basedir = $this->getBaseDir();
-        
+
+        $portal = $this->container->get('arii_core.portal');
+        $ColorStatus = $portal->getColors();
+
         if ($dh = @opendir($basedir)) {
             while (($file = readdir($dh)) !== false) {
                 if (substr($file,-4) == '.yml') {
                     $content = file_get_contents("$basedir/$file");
                     $v = $yaml->parse($content);
                     $title = $v['title'];
-                    $Files[$title] = '<row id="'.substr($file,0,strlen($file)-4).'"><cell>'.$title.'</cell></row>';
+                    $name = substr($file,0,strlen($file)-4);
+                    if (isset($State[$name])) {
+                        $nb     = $State[$name]['results'];
+                        $delay = round((time() - $State[$name]['executed'])/3600);
+                        if ($delay>24) {
+                            $bg = ' style="background-color: '.$ColorStatus['WARNING']['bgcolor'].';"';
+                        }
+                        else {
+                            switch ($State[$name]['status']) {
+                                case 1:
+                                    $bg = ' style="background-color: '.$ColorStatus['INACTIVE']['bgcolor'].';"';
+                                    break;
+                                case 2:
+                                    $bg = ' style="background-color: '.$ColorStatus['SUCCESS']['bgcolor'].';"';
+                                    break;
+                                case 4:
+                                    $bg = ' style="background-color: '.$ColorStatus['FAILURE']['bgcolor'].';"';
+                                    break;
+                                default:
+                                    $bg = '';
+                            }
+                        }
+                    }
+                    else {
+                        $nb='';
+                        $bg = '';
+                    }
+                    $Files[$title] = '<row id="'.$name.'"'.$bg.'><cell>'.$title.'</cell><cell>'.$nb.'</cell></row>';
                 }
             }
             ksort($Files);
@@ -86,7 +133,6 @@ class RequestsController extends Controller
 
     public function resultAction($output='html',$dbname='',$req='')
     {
-        
         $lang = $this->getRequest()->getLocale();
         $request = Request::createFromGlobals();
         if ($request->query->get( 'request' ))
@@ -115,6 +161,7 @@ class RequestsController extends Controller
             throw new \Exception($e->getMessage());
         }
 
+        $runtime = microtime();
         $sql = $this->container->get('arii_core.sql');
         
         $dhtmlx = $this->container->get('arii_core.dhtmlx');
@@ -184,8 +231,59 @@ class RequestsController extends Controller
             $value['lines'][$nb]['status'] = $status;
          }
         $value['count'] = $nb;
+
+        // Statut 
+        $status = 0; // inconnu
+        $min=0;
+        $max=1000000;
+        if (!isset($value['expected'])) {
+            $status=1; // info
+        }
+        else {
+            $expected = $value['expected'];
+            $Limits = explode("-",$expected);
+            $min=$Limits[0];
+            if (!isset($Limits[1]))
+                $max=$min;
+            if (($nb>=$min) and ($nb<=$max))
+                $status = 2; // success
+            else 
+                $status = 4; // error
+        }
+        
+        $runtime = microtime() - $runtime;
+
+        // on peut mettre a jour la table des sondes
+        $em = $this->getDoctrine()->getManager();        
+        $Check = $em->getRepository("AriiATSBundle:Check")->findOneBy( [ 'name' => $req ] );
+
+        if (!$Check)
+            $Check = new \Arii\ATSBundle\Entity\Check();  
+
+        $Check->setName($req);
+        $Check->setTitle($value['title']);
+        $Check->setRunTime($runtime);
+        $Check->setResults($nb);
+        $Check->setMinSuccess($min);
+        $Check->setMaxSuccess($max);
+        $Check->setStatus($status);
+        $Check->setExecuted(new \Datetime());
+
+        $em->persist($Check);
+        $em->flush();
+        
         if ($output=='html') {
-            return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value ));
+            return $this->render('AriiATSBundle:Requests:bootstrap.html.twig', array('result' => $value, 
+                'infos' => [ 
+                    'results' => $nb,
+                    'min_success' => $min,
+                    'max_success' => $max,
+                    'min_warning' => $min,
+                    'max_warning' => $max,
+                    'status' => $status,
+                    'runtime' => $runtime,
+                    'request' => $req
+                ] ));
         }
         elseif ($output=='csv') {
             $sep = ";";
@@ -203,7 +301,7 @@ class RequestsController extends Controller
         }
         elseif ($output=='check') {
             $response = new Response(); 
-            if ($nb==0) {
+            if ($status==4) {
                 $response->setStatusCode( '500' );
             }
             else {
@@ -235,6 +333,7 @@ class RequestsController extends Controller
         $dompdf->load_html($content);
         $dompdf->render();
         $dompdf->stream("sample.pdf");
+                
         exit();
     }
 

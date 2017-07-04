@@ -17,7 +17,40 @@
 <img style="float: right;" src="{{ asset('logo.png') }}"/>
   <h1>{{ result.title | trans }}</h1>
   <p>{{ result.description | trans }}</p>
-  {% set current_db = app.session.get('database') %}[{ { current_db.name }}]
+{% if infos.status == 1 %}   
+    <div class="alert alert-info" role="alert">
+        <p># {{ infos.results }}</p>
+        <p>{{ infos.runtime }}s</p>
+    </div>
+{% endif %}
+{% if infos.status == 2 %}   
+    <div class="alert alert-success" role="alert">
+        <p># {{ infos.results }}</p>
+        <p>{{ infos.runtime }}s</p>
+        {% if infos.min_warning != infos.max_warning %}
+        <p>{{ infos.min_warning }} &lt;= {{ infos.results }} &lt;= {{ infos.max_warning }}]</p>
+        {% endif %}
+    </div>
+{% endif %}
+{% if infos.status == 3 %}   
+    <div class="alert alert-warning" role="alert">
+        <p># {{ infos.results }}</p>
+        {% if infos.min_warning != infos.max_warning %}
+        <p>{{ infos.min_warning }} &lt; {{ infos.results }} &lt; {{ infos.max_warning }}]</p>
+        {% endif %}
+        <p>{{ infos.runtime }}s</p>
+    </div>
+{% endif %}
+{% if infos.status == 4 %}   
+    <div class="alert alert-danger" role="alert">
+        <p># {{ infos.results }}</p>
+        <p>
+        {% if infos.results < infos.min_success %}&lt; {{ infos.min_success }}{% endif %}
+        {% if infos.results > infos.max_success %}&gt; {{ infos.max_success }}{% endif %}
+        </p>
+        <p>{{ infos.runtime }}s</p>
+    </div>
+{% endif %}
 </div>
 <div class="table-responsive">
 {% if result.count > 0 %}
@@ -54,6 +87,7 @@
     <pre>{{ result.sql.oracle }} </pre>
 {% endif %}
 </div>
+<small><i>{{ infos.request }}</i></small>
 </div>
 <script>
 $(document).ready(function(){
