@@ -67,8 +67,8 @@ class RequestsController extends Controller
                     if (isset($State[$name])) {
                         $nb     = $State[$name]['results'];
                         $delay = round((time() - $State[$name]['executed'])/3600);
-                        if ($delay>24) {
-                            $bg = ' style="background-color: '.$ColorStatus['WARNING']['bgcolor'].';"';
+                        if ($delay>4) {
+                            $bg = ' style="background-color: '.$ColorStatus['RUNNING']['bgcolor'].';"';
                         }
                         else {
                             switch ($State[$name]['status']) {
@@ -297,12 +297,14 @@ class RequestsController extends Controller
                     $csv .= implode($sep,$l['cells'])."\n";
                 }
             }
+            if ($status==4)
+                $response->setStatusCode( '417' );
+
             $response->setContent( utf8_decode( $csv ) );
             return $response;                      
         }
         elseif ($output=='check') {
             $response = new Response();
-            $response->setContent( "ok" );
             $response->setStatusCode( '417' );
             return $response;                      
         }        
