@@ -7,7 +7,7 @@ var chained = 0; // que des standalone
 var only_warning = 1; // que les problemes
 var update=30;
 var autorefresh;
-var jobtype = "CMD"; // Type de job en cours
+var jobtype = "BOX"; // Type de job en cours
 var status;
 
 dhtmlxEvent(window,"load",function(){     
@@ -229,11 +229,13 @@ function GridRefresh() {
 }
 
 function JobDetail(id) {
+alert(id);
     globalLayout.cells("c").expand();
     
     job = myGrid.cells(id, 1 ).getValue(); 
     status = myGrid.cells(id, 2 ).getValue(); 
-    type = myGrid.cells(id, 3 ).getValue(); 
+    // toujours une boite
+    // type = myGrid.cells(id, 3 ).getValue(); 
     
     myDetailToolbar.showItem("STARTJOB");    
     myDetailToolbar.hideItem("KILLJOB");

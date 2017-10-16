@@ -308,15 +308,7 @@ class RequestsController extends Controller
             $response->setStatusCode( '417' );
             return $response;                      
         }        
-/*        
-        $twig = file_get_contents('../src/Arii/ATSBundle/Resources/views/Requests/html2pdf.pdf.twig');
-        $content = $this->get('arii_ats.twig_string')->render( $twig, array('result' => $value ) );      
-        require_once('../vendor/html2pdf/html2pdf.class.php');
-        header('Content-Type: application/pdf');
-        $html2pdf = new \HTML2PDF('L','A4','fr');
-        $html2pdf->WriteHTML($content);
-        $html2pdf->Output($request.'.pdf');
-*/
+
         $twig = file_get_contents('../src/Arii/ATSBundle/Resources/views/Requests/dompdf.pdf.twig');
         $content = $this->get('arii_ats.twig_string')->render( $twig, array('result' => $value ) );      
         require_once('../vendor/dompdf/dompdf_config.inc.php');
