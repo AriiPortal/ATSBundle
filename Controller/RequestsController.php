@@ -30,7 +30,7 @@ class RequestsController extends Controller
     public function listAction()
     {
         // On récupère les statuts en cours
-        $em = $this->getDoctrine()->getManager();        
+        $em = $this->getDoctrine()->getManager('default');        
         $Checks = $em->getRepository("AriiATSBundle:Check")->findAll();
         foreach ($Checks as $Check) {
             $request = $Check->getName();
